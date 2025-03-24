@@ -1,7 +1,7 @@
 ---
 #---------------------------------------------------------
 # - Create a semantical release
-# - Merge main into next, alpha, beta, and next-major
+# - Merge main into alpha, beta
 #---------------------------------------------------------
 name: Push to main
 
@@ -21,20 +21,6 @@ jobs:
         with:
           persist-credentials: false
           token: ${{ secrets.PAT }}
-
-      - name: Merge main into next
-        uses: ./.github/actions/merge-branch
-        with:
-          github-token: ${{ secrets.PAT }}
-          source-branch: main
-          target-branch: next
-
-      - name: Merge main into next-major
-        uses: ./.github/actions/merge-branch
-        with:
-          github-token: ${{ secrets.PAT }}
-          source-branch: main
-          target-branch: next-major
 
       - name: Merge main into alpha
         uses: ./.github/actions/merge-branch
@@ -70,8 +56,6 @@ jobs:
             [
               '+([0-9])?(.{+([0-9]),x}).x',
               'main',
-              'next',
-              'next-major',
               {
                 name: 'beta',
                 prerelease: true

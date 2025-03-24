@@ -20,10 +20,6 @@ on:
       - "**.py"
       - "smarter/**"
 
-env:
-  AWS_REGION: us-east-2
-  ROOT_DOMAIN: "smarter.sh"
-
 jobs:
   check_merged:
     runs-on: ubuntu-latest
@@ -41,8 +37,8 @@ jobs:
 
       - name: Check branch name
         run: |
-          if [[ "${{ github.ref }}" != "refs/heads/alpha" && "${{ github.ref }}" != "refs/heads/beta" && "${{ github.ref }}" != "refs/heads/next" && "${{ github.ref }}" != "refs/heads/main" ]]; then
-            echo "This workflow can only run on alpha, beta, next, or main branches"
+          if [[ "${{ github.ref }}" != "refs/heads/alpha" && "${{ github.ref }}" != "refs/heads/beta" && "${{ github.ref }}" != "refs/heads/main" ]]; then
+            echo "This workflow can only run on alpha, beta, or main branches"
             exit 1
           fi
 

@@ -14,13 +14,9 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - lpm0073
       - main
       - alpha
       - beta
-      - test
-      - next
-      - next-major
 
 jobs:
   bump-version-next:
