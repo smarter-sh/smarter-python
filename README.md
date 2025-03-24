@@ -47,7 +47,7 @@ While you can provide an `api_key` keyword argument,
 we recommend using [python-dotenv](https://pypi.org/project/python-dotenv/)
 to add `SMARTER_API_KEY="My API Key"` to your `.env` file
 so that your API key is not stored in source control.
-[Get an API key here](https://platform.smarter.sh/settings/organization/api-keys).
+[Get an API key here](https://platform.smarter.sh/dashboard/account/dashboard/api-keys/).
 
 ## Using types
 
@@ -178,7 +178,7 @@ Error codes are as follows:
 
 ## Request IDs
 
-> For more information on debugging requests, see [these docs](https://platform.smarter.sh/docs/api-reference/debugging-requests)
+> For more information on debugging requests, see [these docs](https://platform.smarter.sh/docs/api/)
 
 All object responses in the SDK provide a `_request_id` property which is added from the `x-request-id` response header so that you can quickly log failing requests and report them back to Smarter.
 
@@ -299,62 +299,6 @@ if response.my_field is None:
     print('Got json like {"my_field": null}.')
 ```
 
-### Accessing raw response data (e.g. headers)
-
-The "raw" Response object can be accessed by prefixing `.with_raw_response.` to any HTTP method call, e.g.,
-
-```python
-from smarter import Smarter
-
-client = Smarter()
-response = client.chat.completions.with_raw_response.create(
-    messages=[{
-        "role": "user",
-        "content": "Say this is a test",
-    }],
-    model="gpt-4o",
-)
-print(response.headers.get('X-My-Header'))
-
-completion = response.parse()  # get the object that `chat.completions.create()` would have returned
-print(completion)
-```
-
-These methods return a [`LegacyAPIResponse`](https://github.com/openai/openai-python/tree/main/src/openai/_legacy_response.py) object. This is a legacy class as we're changing it slightly in the next major version.
-
-For the sync client this will mostly be the same with the exception
-of `content` & `text` will be methods instead of properties. In the
-async client, all methods will be async.
-
-A migration script will be provided & the migration in general should
-be smooth.
-
-#### `.with_streaming_response`
-
-The above interface eagerly reads the full response body when you make the request, which may not always be what you want.
-
-To stream the response body, use `.with_streaming_response` instead, which requires a context manager and only reads the response body once you call `.read()`, `.text()`, `.json()`, `.iter_bytes()`, `.iter_text()`, `.iter_lines()` or `.parse()`. In the async client, these are async methods.
-
-As such, `.with_streaming_response` methods return a different [`APIResponse`](https://github.com/openai/openai-python/tree/main/src/openai/_response.py) object, and the async client returns an [`AsyncAPIResponse`](https://github.com/openai/openai-python/tree/main/src/openai/_response.py) object.
-
-```python
-with client.chat.completions.with_streaming_response.create(
-    messages=[
-        {
-            "role": "user",
-            "content": "Say this is a test",
-        }
-    ],
-    model="gpt-4o",
-) as response:
-    print(response.headers.get("X-My-Header"))
-
-    for line in response.iter_lines():
-        print(line)
-```
-
-The context manager is required so that the response will reliably be closed.
-
 ### Configuring the HTTP client
 
 You can directly override the [httpx client](https://www.python-httpx.org/api/#client) to customize it for your use case, including:
@@ -401,7 +345,7 @@ This package generally follows [SemVer](https://semver.org/spec/v2.0.0.html) con
 
 We take backwards-compatibility seriously and work hard to ensure you can rely on a smooth upgrade experience.
 
-We are keen for your feedback; please open an [issue](https://www.github.com/openai/openai-python/issues) with questions, bugs, or suggestions.
+We are keen for your feedback; please open an [issue](https://github.com/smarter-sh/smarter-python/issues) with questions, bugs, or suggestions.
 
 ### Determining the installed version
 
@@ -420,4 +364,4 @@ Python 3.8 or higher.
 
 ## Contributing
 
-See [the contributing documentation](./CONTRIBUTING.md).
+See [the contributing documentation](./doc/CONTRIBUTING.md).
