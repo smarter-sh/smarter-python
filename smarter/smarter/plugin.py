@@ -1,0 +1,3 @@
+"""
+smarter-api Plugin.
+"""

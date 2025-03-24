@@ -1,9 +1,20 @@
-"""Setup for secure_logger package."""
+"""Setup for secure_logger package.
+
+__app__ = "smarter_" + __version__.split("+", maxsplit=1)[0]
+__author__ = "Lawrence McDaniel"
+__author_email__ = "lpm0073@gmail.com"
+__description__ = "smarter-api"
+__url__ = "https://github.com/smarter-sh/smarter-python/"
+__license__ = "MIT"
+__keywords__ = "smarter-api"
+
+"""
 
 from setuptools import find_packages, setup
 
 from setup_utils import get_semantic_version  # pylint: disable=import-error
 from setup_utils import load_readme
+from smarter.__about__ import __author__, __author_email__, __license__, __url__
 
 
 setup(
@@ -12,12 +23,12 @@ setup(
     description="The official Python library for the Smarter platform Api.",
     long_description=load_readme(),
     long_description_content_type="text/markdown",
-    author="Lawrence McDaniel",
-    author_email="lpm0073@gmail.com",
-    maintainer="Lawrence McDaniel",
-    maintainer_email="lpm0073@gmail.com",
-    url="https://github.com/smarter-sh/smarter-api",
-    license="AGPLv3",
+    author=__author__,
+    author_email=__author_email__,
+    maintainer=__author__,
+    maintainer_email=__author_email__,
+    url=__url__,
+    license=__license__,
     license_files=("LICENSE.txt",),
     platforms=["any"],
     packages=find_packages(),
