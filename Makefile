@@ -55,7 +55,7 @@ lint:
 	black .
 
 analyze:
-	cloc . --exclude-ext=svg,json,zip --fullpath --not-match-d=smarter/smarter/static/assets/ --vcs=git
+	cloc . --exclude-ext=svg,json,zip --fullpath --vcs=git
 
 coverage:
 	echo "Please implement the coverage procedure ..."
