@@ -51,7 +51,7 @@ make pre-commit
 
 Output should look similar to the following:
 
-![pre-commit output](./doc/img/pre-commit.png)
+![pre-commit output](./img/pre-commit.png)
 
 ### Github Secrets setup
 
@@ -59,7 +59,7 @@ Common secrets for automated CD/CD processes are managed with [GitHub Secrets](h
 
 On the other hand, if you've forked this repo and are working on your own independent project, then you'll need to initialize each of these yourself.
 
-![Github Secrets](./doc/img/github-secrets.png)
+![Github Secrets](./img/github-secrets.png)
 
 ### GitHub Actions
 
@@ -74,7 +74,7 @@ This project depends heavily on GitHub Actions to automate routine activities, s
 
 A typical pull request will look like the following:
 
-![Automated pull request](./doc/img/automated-pr.png)
+![Automated pull request](./img/automated-pr.png)
 
 ## Python Setup
 
