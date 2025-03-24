@@ -1,0 +1,23 @@
+# -----------------------------------
+# smarter-python Environment Variables
+#
+# Python:
+# We need to explicitly set the PYTHONPATH
+# for Pylint so that it can find the smarter module
+# in your local file system when running pylint, flake8, or Cornflakes
+# from inside of VS Code. This is unrelated to actually
+# running the Django app from Docker, which sets the
+# PYTHONPATH in the Dockerfile.
+# -----------------------------------
+
+################################################################
+# For local development
+################################################################
+ENVIRONMENT=local
+PYTHONPATH=./venv:./smarter
+
+
+# Api Keys
+# ----------------------------------------------------------
+SMARTER_API_BASE_URL=https://api.smarter.sh/v1/
+SMARTER_API_KEY=SET-ME-PLEASE
