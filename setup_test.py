@@ -11,7 +11,7 @@ class TestSetup(unittest.TestCase):
         """Test setup.py syntax."""
         result = subprocess.run(["python", "setup.py", "check"], capture_output=True, text=True, check=False)
         assert result.returncode == 0, f"setup.py failed with output:\n{result.stdout}\n{result.stderr}"
-        assert not result.stderr, "Expected no error output"
+        assert not result.stderr, f"Expected no error output, but got:\n{result.stderr}"
 
 
 if __name__ == "__main__":

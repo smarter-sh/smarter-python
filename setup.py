@@ -1,14 +1,4 @@
-"""Setup for secure_logger package.
-
-__app__ = "smarter_" + __version__.split("+", maxsplit=1)[0]
-__author__ = "Lawrence McDaniel"
-__author_email__ = "lpm0073@gmail.com"
-__description__ = "smarter-api"
-__url__ = "https://github.com/smarter-sh/smarter-python/"
-__license__ = "MIT"
-__keywords__ = "smarter-api"
-
-"""
+"""Setup for smarter package."""
 
 from setuptools import find_packages, setup
 
@@ -42,7 +32,6 @@ setup(
         "Development Status :: 3 - Alpha",
         "Environment :: Console",
         "Intended Audience :: Developers",
-        "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",

@@ -1,7 +1,6 @@
 [flake8]
-ignore = D205,D413,D400,D401
-max-line-length =120
+ignore = C101,D205,D413,D400,D401
+max-line-length = 120
 max-complexity = 10
 exclude = "venv"
-extend-exclude = "*__init__.py,*__version__.py,venv,lambda_dist_pkg"
-select = "C101"
+extend-exclude = "*__init__.py,*__version__.py,venv,node_modules"

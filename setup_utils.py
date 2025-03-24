@@ -6,7 +6,7 @@ import re
 from typing import Dict
 
 
-MODULE_NAME = "secure_logger"
+MODULE_NAME = "smarter"
 HERE = os.path.abspath(os.path.dirname(__file__))
 PROJECT_ROOT = os.path.abspath(os.path.join(HERE, MODULE_NAME))
 

@@ -1,0 +1,20 @@
+---
+#------------------------------------------------------------------------------
+# - Build from Dockerfile
+# - Run manage.py unit tests
+#------------------------------------------------------------------------------
+name: Test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        id: checkout
+        uses: actions/checkout@v4
+
+      - name: Test
+        uses: ./.github/actions/test
