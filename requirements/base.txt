@@ -11,7 +11,7 @@ setuptools==75.5.0
 # General back end
 # ------------
 cachetools==5.5.0                       # Python object caching library
-httpx>=0.23.0
+httpx>=0.23.0                           # HTTP client
 validators==0.34.0                      # Data validation library
 
 

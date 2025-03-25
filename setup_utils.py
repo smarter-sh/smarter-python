@@ -69,3 +69,11 @@ def load_about() -> Dict[str, str]:
     spec.loader.exec_module(about_module)
     about = {attr: getattr(about_module, attr) for attr in dir(about_module) if not attr.startswith("_")}
     return about
+
+
+def load_requirements(filename) -> list:
+    with open(filename, encoding="utf-8") as f:
+        lines = f.read().splitlines()
+    # Filter out comments and empty lines
+    requirements = [line for line in lines if line and not line.startswith("#")]
+    return requirements

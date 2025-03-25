@@ -1,6 +1,10 @@
 """Console helpers for formatting output."""
 
 import json
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 def formatted_json(json_obj: json) -> str:
@@ -31,6 +35,9 @@ def formatted_text_green(text: str) -> str:
 
 class SmarterHelperMixin:
     """Mixin for smarter classes to provide helpful methods."""
+
+    def __init__(self):
+        logger.debug("Initializing %s()", self.formatted_class_name)
 
     @property
     def formatted_class_name(self):

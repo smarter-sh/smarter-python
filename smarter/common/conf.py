@@ -21,12 +21,16 @@ configuration values. This is useful for debugging and logging.
 # INTENDED TO BE USED INDEPENDENTLY OF DJANGO.
 # ------------------------------------------------
 
+import importlib
+
 # python stuff
 import logging
 import os  # library for interacting with the operating system
 import platform  # library to view information about the server host this module runs on
 import re
+from functools import cached_property
 from typing import Any, List, Optional
+from urllib.parse import urljoin
 
 # 3rd party stuff
 import pkg_resources
@@ -36,7 +40,7 @@ from pydantic_settings import BaseSettings
 
 # our stuff
 from .const import (
-    SMARTER_API_SUBDOMAIN,
+    SMARTER_API_VERSION,
     SMARTER_PLATFORM_SUBDOMAIN,
     VERSION,
     SmarterEnvironments,
@@ -104,7 +108,7 @@ class SettingsDefaults:
     LLM_DEFAULT_MAX_TOKENS = 2048
 
     # defaults for this Python package
-    ENVIRONMENT = os.environ.get("ENVIRONMENT", SmarterEnvironments.LOCAL)
+    ENVIRONMENT = os.environ.get("ENVIRONMENT", SmarterEnvironments.PROD)
     ROOT_DOMAIN = os.environ.get("ROOT_DOMAIN", "smarter.sh")
     SHARED_RESOURCE_IDENTIFIER = os.environ.get("SHARED_RESOURCE_IDENTIFIER", "smarter")
     DEBUG_MODE: bool = os.environ.get("DEBUG_MODE", False)
@@ -116,6 +120,8 @@ class SettingsDefaults:
     LOCAL_HOSTS = ["localhost", "127.0.0.1"]
     LOCAL_HOSTS += [host + ":8000" for host in LOCAL_HOSTS]
     LOCAL_HOSTS.append("testserver")
+
+    SMARTER_API_KEY = os.environ.get("SMARTER_API_KEY", "")
 
     @classmethod
     def to_dict(cls):
@@ -213,13 +219,9 @@ class Settings(BaseSettings):
         SettingsDefaults.LLM_DEFAULT_TEMPERATURE, env="LLM_DEFAULT_TEMPERATURE"
     )
     llm_default_max_tokens: Optional[int] = Field(SettingsDefaults.LLM_DEFAULT_MAX_TOKENS, env="LLM_DEFAULT_MAX_TOKENS")
+    smarter_api_key: Optional[str] = Field(SettingsDefaults.SMARTER_API_KEY, env="SMARTER_API_KEY")
 
-    @property
-    def data_directory(self) -> str:
-        """Data directory"""
-        return "/home/smarter_user/data"
-
-    @property
+    @cached_property
     def environment_domain(self) -> str:
         """Return the complete domain name."""
         if self.environment == SmarterEnvironments.PROD:
@@ -227,62 +229,65 @@ class Settings(BaseSettings):
         if self.environment in SmarterEnvironments.aws_environments:
             return self.environment + "." + SMARTER_PLATFORM_SUBDOMAIN + "." + self.root_domain
         if self.environment == SmarterEnvironments.LOCAL:
-            return "localhost:8000"
+            raise SmarterConfigurationError("Local environment is not supported")
         # default domain format
-        return self.environment + "." + SMARTER_PLATFORM_SUBDOMAIN + "." + self.root_domain
+        return SMARTER_PLATFORM_SUBDOMAIN + "." + self.root_domain
 
-    @property
+    @cached_property
     def environment_url(self) -> str:
         return SmarterValidator.urlify(self.environment_domain, environment=self.environment)
 
-    @property
+    @cached_property
     def platform_name(self) -> str:
         """Return the platform name."""
         return self.root_domain.split(".")[0]
 
-    @property
+    @cached_property
     def environment_namespace(self) -> str:
         """Return the Kubernetes namespace for the environment."""
         return f"{self.platform_name}-{SMARTER_PLATFORM_SUBDOMAIN}-{settings.environment}"
 
-    @property
+    @cached_property
     def platform_domain(self) -> str:
         """Return the platform domain name. ie platform.smarter.sh"""
         return f"{SMARTER_PLATFORM_SUBDOMAIN}.{self.root_domain}"
 
-    @property
+    @cached_property
     def api_domain(self) -> str:
-        """Return the root API domain name. ie api.smarter.sh"""
-        return f"{SMARTER_API_SUBDOMAIN}.{self.root_domain}"
+        """
+        Return the root API domain name. ie api.smarter.sh
+        alpha = https://alpha.platform.smarter.sh/api/v1/
+        """
+        return self.root_domain
 
-    @property
+    @cached_property
     def environment_api_domain(self) -> str:
         """Return the customer API domain name. ie api.alpha.platform.smarter.sh"""
-        if self.environment == SmarterEnvironments.PROD:
-            return f"{SMARTER_API_SUBDOMAIN}.{self.root_domain}"
-        if self.environment in SmarterEnvironments.aws_environments:
-            return f"{self.environment}.{SMARTER_API_SUBDOMAIN}.{self.root_domain}"
-        if self.environment == SmarterEnvironments.LOCAL:
-            return f"{SMARTER_API_SUBDOMAIN}.localhost:8000"
-        # default domain format
-        return f"{self.environment}.{SMARTER_API_SUBDOMAIN}.{self.root_domain}"
+        return self.environment_domain
 
-    @property
+    @cached_property
+    def environment_api_url(self) -> str:
+        retval = SmarterValidator.urlify(self.environment_api_domain, environment=self.environment)
+        retval = urljoin(retval, "api/")
+        retval = urljoin(retval, SMARTER_API_VERSION)
+        return SmarterValidator.urlify(retval, environment=self.environment)
+
+    @cached_property
     def is_using_dotenv_file(self) -> bool:
         """Is the dotenv file being used?"""
         return DOT_ENV_LOADED
 
-    @property
+    @cached_property
     def environment_variables(self) -> List[str]:
         """Environment variables"""
         return list(os.environ.keys())
 
-    @property
+    @cached_property
     def version(self) -> str:
         """OpenAI API version"""
         return get_semantic_version()
 
-    @property
+    @cached_property
     def dump(self) -> dict:
         """Dump all settings."""
 
@@ -299,6 +304,29 @@ class Settings(BaseSettings):
         packages_dict = [{"name": name, "version": version} for name, version in packages]
 
         self._dump = {
+            "settings": {
+                "shared_resource_identifier": self.shared_resource_identifier,
+                "debug_mode": self.debug_mode,
+                "dump_defaults": self.dump_defaults,
+                "environment": self.environment,
+                "local_hosts": self.local_hosts,
+                "root_domain": self.root_domain,
+                "environment_domain": self.environment_domain,
+                "environment_url": self.environment_url,
+                "platform_name": self.platform_name,
+                "environment_api_domain": self.environment_api_domain,
+                "environment_api_url": self.environment_api_url,
+                "platform_domain": self.platform_domain,
+                "init_info": self.init_info,
+                "openai_endpoint_image_n": self.openai_endpoint_image_n,
+                "openai_endpoint_image_size": self.openai_endpoint_image_size,
+                "llm_default_provider": self.llm_default_provider,
+                "llm_default_model": self.llm_default_model,
+                "llm_default_system_role": self.llm_default_system_role,
+                "llm_default_temperature": self.llm_default_temperature,
+                "llm_default_max_tokens": self.llm_default_max_tokens,
+                "smarter_api_key": self.smarter_api_key,
+            },
             "environment": {
                 "is_using_dotenv_file": self.is_using_dotenv_file,
                 "os": os.name,
@@ -453,3 +481,5 @@ class SingletonSettings:
 
 
 settings = SingletonSettings().settings
+settings_module = "smarter.settings." + settings.environment
+importlib.import_module(settings_module)

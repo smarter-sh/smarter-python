@@ -3,7 +3,7 @@
 from setuptools import find_packages, setup
 
 from setup_utils import get_semantic_version  # pylint: disable=import-error
-from setup_utils import load_readme
+from setup_utils import load_readme, load_requirements
 from smarter.__about__ import __author__, __author_email__, __license__, __url__
 
 
@@ -21,12 +21,12 @@ setup(
     license=__license__,
     license_files=("LICENSE.txt",),
     platforms=["any"],
-    packages=find_packages(),
+    packages=find_packages(exclude=["tests", "tests.*"]),
     package_data={
         "smarter": ["*.md"],
     },
-    python_requires=">=3.8",
-    install_requires=["pydantic>=2.0.0"],
+    python_requires=">=3.10",
+    install_requires=load_requirements("requirements/base.txt"),
     extras_require={},
     classifiers=[  # https://pypi.org/classifiers/
         "Development Status :: 3 - Alpha",

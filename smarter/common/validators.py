@@ -12,6 +12,8 @@ import re
 import warnings
 from urllib.parse import urlparse, urlunparse
 
+import validators
+
 from smarter.common.const import SmarterEnvironments
 from smarter.common.exceptions import SmarterValueError
 
@@ -61,6 +63,14 @@ class SmarterValidator:
         """Validate port format"""
         if not re.match(SmarterValidator.VALID_PORT_PATTERN, port):
             raise SmarterValueError(f"Invalid port {port}")
+
+    @staticmethod
+    def validate_url(url: str) -> None:
+        """Validate URL format"""
+        if not url:
+            raise SmarterValueError(f"Invalid url {url}")
+        if not validators.url(url):
+            raise SmarterValueError(f"Invalid url {url}")
 
     @staticmethod
     def validate_hostname(hostname: str) -> None:
