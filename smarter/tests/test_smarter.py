@@ -26,6 +26,11 @@ class TestSample(unittest.TestCase):
     def test_client(self):
         client = Client()
         self.assertTrue(client)
+        self.assertEqual(client.base_url, "https://platform.smarter.sh/api/v1/")
+        self.assertEqual(client.api_key, smarter_settings.smarter_api_key)
+        self.assertEqual(client.response_environment, SmarterEnvironments.PROD)
+        self.assertEqual(client.response_user["username"], "admin")
+        self.assertEqual(client.response_account["account_number"], "3141-5926-5359")
 
     def test_chatbot(self):
         chatbot = Chatbot(name="netec-demo")

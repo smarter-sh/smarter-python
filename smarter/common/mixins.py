@@ -3,40 +3,18 @@
 import json
 import logging
 
+from cachetools import LRUCache
 from httpx import Client as httpx_Client
 from httpx import Response as httpx_Response
 
 from smarter.common.conf import settings as smarter_settings
-from smarter.common.const import SmarterEnvironments
+
+from .utils import formatted_text
 
 
 logger = logging.getLogger(__name__)
 
-
-def formatted_json(json_obj: json) -> str:
-    pretty_json = json.dumps(json_obj, indent=4)
-    return f"\033[32m{pretty_json}\033[0m"
-
-
-def formatted_text(text: str) -> str:
-
-    # bright green
-    # return f"\033[92m{text}\033[0m"
-
-    # regular green
-    # return f"\033[32m{text}\033[0m"
-
-    # dark red
-    # return f"\033[31m{text}\033[0m"
-
-    # bold and dark red
-    return f"\033[1;31m{text}\033[0m"
-
-
-def formatted_text_green(text: str) -> str:
-
-    # bright green
-    return f"\033[92m{text}\033[0m"
+SMARTER_HELPER_MIXIN_CACHE = LRUCache(maxsize=smarter_settings.smarter_max_cache_size)
 
 
 class SmarterHelperMixin:
@@ -55,19 +33,35 @@ class SmarterRequestHelper(SmarterHelperMixin):
 
     _client: httpx_Client
     _api_key: str
-    _environment: str = SmarterEnvironments.PROD
-    _whoami: dict
+    _response: dict
+    _response_data: dict
 
-    def __init__(self, api_key: str = None, environment: str = None):
+    def __new__(cls, api_key: str = None):
+        cache_key = api_key or smarter_settings.smarter_api_key
+        if cache_key and cache_key in SMARTER_HELPER_MIXIN_CACHE:
+            logger.debug("Returning cached instance for api_key: %s", cache_key)
+            return SMARTER_HELPER_MIXIN_CACHE[cache_key]
+
+        instance = super().__new__(cls)
+        SMARTER_HELPER_MIXIN_CACHE[cache_key] = instance
+        return instance
+
+    def __init__(self, api_key: str = None):
         super().__init__()
+
+        if not api_key:
+            api_key = smarter_settings.smarter_api_key
+        if not api_key:
+            raise ValueError("api_key is required")
+
         self._client = httpx_Client()
         self._api_key = api_key or smarter_settings.smarter_api_key
-        self._environment = environment or self._environment
-        self._whoami = None
+        self._response_data = None
+        url = f"{self.base_url}cli/whoami/"
+        self._response = self.post(url=url)
         self.validate()
-        logger.debug(
-            "%s.__init__() base_url=%s environment=%s", self.formatted_class_name, self.base_url, self.environment
-        )
+
+        logger.debug("%s.__init__() base_url=%s", self.formatted_class_name, self.base_url)
 
     def get(self, url: str) -> httpx_Response:
         """
@@ -75,7 +69,7 @@ class SmarterRequestHelper(SmarterHelperMixin):
         """
         return self.client.get(url)
 
-    def post(self, url: str, data: dict, headers=None) -> dict:
+    def post(self, url: str, data: dict = None, headers=None) -> dict:
         """
         Makes a post request to the smarter api
         """
@@ -94,10 +88,20 @@ class SmarterRequestHelper(SmarterHelperMixin):
         """
         if not self.api_key:
             raise ValueError("api_key is required")
-        if not self.environment:
-            raise ValueError("environment is required")
-        if not self.whoami:
-            raise ValueError("Invalid api_key or environment")
+        if not self.response_data:
+            raise ValueError("Invalid api_key")
+
+        # validate the response_data response
+        if not self.response_data:
+            raise ValueError("no data was returned from http response")
+        if not self.response_data:
+            raise ValueError("'data' key is missing from http response")
+        if not self.response_account:
+            raise ValueError("'account' key is missing from http response")
+        if not self.response_user:
+            raise ValueError("'user' key is missing from http response")
+        if not self.response_environment:
+            raise ValueError("'environment' key is missing from http response")
 
     @property
     def request_helper(self):
@@ -112,20 +116,33 @@ class SmarterRequestHelper(SmarterHelperMixin):
         return self._api_key
 
     @property
-    def environment(self) -> str:
-        return self._environment
-
-    @property
     def base_url(self) -> str:
         return smarter_settings.environment_api_url
 
     @property
-    def whoami(self) -> dict:
-        if self._whoami:
-            return self._whoami
-        url = f"{self.base_url}cli/whoami/"
-        self._whoami = self.post(url=url, data=None)
-        return self._whoami
+    def response_user(self) -> dict:
+        retval = self.response_data.get("user")
+        return retval
+
+    @property
+    def response_account(self) -> dict:
+        retval = self.response_data.get("account")
+        return retval
+
+    @property
+    def response_environment(self) -> str:
+        retval = self.response_data.get("environment")
+        return retval
+
+    @property
+    def response(self) -> dict:
+        return self._response
+
+    @property
+    def response_data(self) -> dict:
+        if not self._response_data:
+            self._response_data = self.response.get("data")
+        return self._response_data
 
     def __del__(self):
         self.client.close()
