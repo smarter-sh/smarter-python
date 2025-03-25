@@ -41,6 +41,8 @@ from pydantic_settings import BaseSettings
 # our stuff
 from .const import (
     SMARTER_API_VERSION,
+    SMARTER_DEFAULT_CACHE_TIMEOUT,
+    SMARTER_MAX_CACHE_SIZE,
     SMARTER_PLATFORM_SUBDOMAIN,
     VERSION,
     SmarterEnvironments,
@@ -122,6 +124,8 @@ class SettingsDefaults:
     LOCAL_HOSTS.append("testserver")
 
     SMARTER_API_KEY = os.environ.get("SMARTER_API_KEY", "")
+    SMARTER_DEFAULT_CACHE_TIMEOUT = SMARTER_DEFAULT_CACHE_TIMEOUT
+    SMARTER_MAX_CACHE_SIZE = SMARTER_MAX_CACHE_SIZE
 
     @classmethod
     def to_dict(cls):
@@ -220,6 +224,10 @@ class Settings(BaseSettings):
     )
     llm_default_max_tokens: Optional[int] = Field(SettingsDefaults.LLM_DEFAULT_MAX_TOKENS, env="LLM_DEFAULT_MAX_TOKENS")
     smarter_api_key: Optional[str] = Field(SettingsDefaults.SMARTER_API_KEY, env="SMARTER_API_KEY")
+    smarter_default_cache_timeout: Optional[int] = Field(
+        SettingsDefaults.SMARTER_DEFAULT_CACHE_TIMEOUT, env="SMARTER_DEFAULT_CACHE_TIMEOUT"
+    )
+    smarter_max_cache_size: Optional[int] = Field(SettingsDefaults.SMARTER_MAX_CACHE_SIZE, env="SMARTER_MAX_CACHE_SIZE")
 
     @cached_property
     def environment_domain(self) -> str:
@@ -446,6 +454,30 @@ class Settings(BaseSettings):
         if v in [None, ""]:
             return SettingsDefaults.LLM_DEFAULT_MAX_TOKENS
         return int(v)
+
+    @field_validator("smarter_default_cache_timeout")
+    def check_smarter_default_cache_timeout(cls, v) -> int:
+        """Check smarter_default_cache_timeout"""
+        if isinstance(v, int):
+            return v
+        if v in [None, ""]:
+            return SettingsDefaults.SMARTER_DEFAULT_CACHE_TIMEOUT
+        retval = int(v)
+        if retval < 0:
+            raise ValueError("Cache timeout must be greater than or equal to 0")
+        return retval
+
+    @field_validator("smarter_max_cache_size")
+    def check_smarter_max_cache_size(cls, v) -> int:
+        """Check smarter_max_cache_size"""
+        if isinstance(v, int):
+            return v
+        if v in [None, ""]:
+            return SettingsDefaults.SMARTER_MAX_CACHE_SIZE
+        retval = int(v)
+        if retval < 0:
+            raise ValueError("Cache size must be greater than or equal to 0")
+        return retval
 
 
 class SingletonSettings:

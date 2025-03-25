@@ -28,7 +28,7 @@ class TestSample(unittest.TestCase):
         self.assertTrue(client)
 
     def test_chatbot(self):
-        chatbot = Chatbot()
+        chatbot = Chatbot(name="netec-demo")
         self.assertTrue(chatbot)
 
     def test_plugin(self):

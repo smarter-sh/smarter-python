@@ -23,6 +23,7 @@ SMARTER_CUSTOMER_SUPPORT = "support@smarter.sh"
 # for these values as well which should be kept in sync.
 SMARTER_CHAT_SESSION_KEY_NAME = "session_key"
 SMARTER_DEFAULT_CACHE_TIMEOUT = 60 * 10  # 10 minutes
+SMARTER_MAX_CACHE_SIZE = 128
 
 HERE = os.path.abspath(os.path.dirname(__file__))  # smarter/smarter/common
 PROJECT_ROOT = str(Path(HERE).parent)  # smarter/smarter
