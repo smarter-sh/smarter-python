@@ -8,6 +8,7 @@ from functools import cached_property
 from urllib.parse import ParseResult, urlparse
 
 from smarter.common.mixins import ApiBase
+from smarter.resources.models.prompt import PromptResponseModel
 
 
 logger = logging.getLogger(__name__)
@@ -141,26 +142,15 @@ class Chatbot(ApiBase):
             "prompt": json.loads(escaped_message),
         }
         response = self.post(url=url, data=data)
+        response_json: dict = response.json()
+        chat = PromptResponseModel(**response_json)
+
         if verbose:
             logger.debug("%s.chat() response=%s", self.formatted_class_name, response.json())
             return response.json()
-
-        response_json: dict = response.json()
-        # response_json['data']['response']['data']['body']['smarter']['messages']
-        data = response_json.get("data")
-        assert isinstance(data, dict)
-        response = data.get("response")
-        assert isinstance(response, dict)
-        data = response.get("data")
-        assert isinstance(data, dict)
-        body = data.get("body")
-        assert isinstance(body, dict)
-        smarter = body.get("smarter")
-        assert isinstance(smarter, dict)
-        messages: list[dict[str, any]] = smarter.get("messages")
-        assert isinstance(messages, list)
-
-        for message in messages:
-            if message.get("role") == "assistant":
-                return message.get("content")
-        raise ValueError("No assistant message found in the chat response.")
+        else:
+            messages = chat.data.response.data.body.smarter.messages
+            for message in messages:
+                if message.role == "assistant":  # Access the `role` attribute directly
+                    return message.content  # Access the `content` attribute directly
+            raise ValueError("No assistant message found in the chat response.")
