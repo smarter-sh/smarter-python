@@ -2,12 +2,15 @@
 
 import json
 import logging
+from functools import cached_property
+from urllib.parse import urljoin
 
 from cachetools import LRUCache
 from httpx import Client as httpx_Client
 from httpx import Response as httpx_Response
 
 from smarter.common.conf import settings as smarter_settings
+from smarter.common.const import SmarterJournalApiResponseKeys
 
 from .utils import formatted_text
 
@@ -15,6 +18,7 @@ from .utils import formatted_text
 logger = logging.getLogger(__name__)
 
 SMARTER_HELPER_MIXIN_CACHE = LRUCache(maxsize=smarter_settings.smarter_max_cache_size)
+DEFAULT_API_ENDPOINT = "cli/whoami/"
 
 
 class SmarterHelperMixin:
@@ -28,40 +32,34 @@ class SmarterHelperMixin:
         return formatted_text(self.__class__.__name__)
 
 
-class SmarterRequestHelper(SmarterHelperMixin):
+class ApiBase(SmarterHelperMixin):
     """A class for working with the Smarter Api."""
 
-    _client: httpx_Client
     _api_key: str
-    _response: dict
-    _response_data: dict
+    _client: httpx_Client
+    _url_endpoint: str
+    _httpx_response: httpx_Response
 
-    def __new__(cls, api_key: str = None):
-        cache_key = api_key or smarter_settings.smarter_api_key
-        if cache_key and cache_key in SMARTER_HELPER_MIXIN_CACHE:
-            logger.debug("Returning cached instance for api_key: %s", cache_key)
-            return SMARTER_HELPER_MIXIN_CACHE[cache_key]
-
-        instance = super().__new__(cls)
-        SMARTER_HELPER_MIXIN_CACHE[cache_key] = instance
-        return instance
-
-    def __init__(self, api_key: str = None):
+    def __init__(self, api_key: str = None, url_endpoint: str = DEFAULT_API_ENDPOINT):
         super().__init__()
-
-        if not api_key:
-            api_key = smarter_settings.smarter_api_key
-        if not api_key:
-            raise ValueError("api_key is required")
 
         self._client = httpx_Client()
         self._api_key = api_key or smarter_settings.smarter_api_key
-        self._response_data = None
-        url = f"{self.base_url}cli/whoami/"
-        self._response = self.post(url=url)
-        self.validate()
+        if not self.api_key:
+            raise ValueError("api_key is required")
+        self._url_endpoint = url_endpoint
+        self._httpx_response = self.post(url=self.url)
+        self.validate_httpx_response()
 
         logger.debug("%s.__init__() base_url=%s", self.formatted_class_name, self.base_url)
+
+    @cached_property
+    def url(self) -> str:
+        return urljoin(self.base_url, self.url_endpoint)
+
+    @cached_property
+    def url_endpoint(self) -> str:
+        return self._url_endpoint
 
     def get(self, url: str) -> httpx_Response:
         """
@@ -69,7 +67,7 @@ class SmarterRequestHelper(SmarterHelperMixin):
         """
         return self.client.get(url)
 
-    def post(self, url: str, data: dict = None, headers=None) -> dict:
+    def post(self, url: str, data: dict = None, headers=None) -> httpx_Response:
         """
         Makes a post request to the smarter api
         """
@@ -80,69 +78,70 @@ class SmarterRequestHelper(SmarterHelperMixin):
         )
         response = self.client.post(url, json=data, headers=headers)
         response.raise_for_status()
-        return response.json()
+        return response
 
-    def validate(self):
+    @cached_property
+    def httpx_response(self) -> httpx_Response:
+        return self._httpx_response
+
+    def to_json(self) -> dict:
+        return self.httpx_response.json()
+
+    @cached_property
+    def data(self) -> dict:
+        response_json = self.to_json()
+        return response_json.get(SmarterJournalApiResponseKeys.DATA)
+
+    @cached_property
+    def api(self) -> str:
+        response_json = self.to_json()
+        return response_json.get(SmarterJournalApiResponseKeys.API)
+
+    @cached_property
+    def thing(self) -> str:
+        response_json = self.to_json()
+        return response_json.get(SmarterJournalApiResponseKeys.THING)
+
+    @cached_property
+    def metadata(self) -> str:
+        response_json = self.to_json()
+        return response_json.get(SmarterJournalApiResponseKeys.METADATA)
+
+    @cached_property
+    def message(self) -> str:
+        response_json = self.to_json()
+        return response_json.get(SmarterJournalApiResponseKeys.MESSAGE)
+
+    @cached_property
+    def status(self) -> any:
+        response_json = self.to_json()
+        return response_json.get(SmarterJournalApiResponseKeys.ERROR)
+
+    def validate_httpx_response(self):
         """
         Validates the current client
         """
-        if not self.api_key:
-            raise ValueError("api_key is required")
-        if not self.response_data:
-            raise ValueError("Invalid api_key")
+        if not self.httpx_response:
+            raise ValueError("http response did not return any data")
+        json_data = self.to_json()
+        if not json_data:
+            raise ValueError("http response did not return any json data")
 
-        # validate the response_data response
-        if not self.response_data:
-            raise ValueError("no data was returned from http response")
-        if not self.response_data:
-            raise ValueError("'data' key is missing from http response")
-        if not self.response_account:
-            raise ValueError("'account' key is missing from http response")
-        if not self.response_user:
-            raise ValueError("'user' key is missing from http response")
-        if not self.response_environment:
-            raise ValueError("'environment' key is missing from http response")
+        for key in SmarterJournalApiResponseKeys.required:
+            if key not in json_data.keys():
+                raise ValueError(f"json http response data is missing key: {key}")
 
-    @property
-    def request_helper(self):
-        return self
-
-    @property
+    @cached_property
     def client(self) -> httpx_Client:
         return self._client
 
-    @property
+    @cached_property
     def api_key(self) -> str:
         return self._api_key
 
-    @property
+    @cached_property
     def base_url(self) -> str:
         return smarter_settings.environment_api_url
-
-    @property
-    def response_user(self) -> dict:
-        retval = self.response_data.get("user")
-        return retval
-
-    @property
-    def response_account(self) -> dict:
-        retval = self.response_data.get("account")
-        return retval
-
-    @property
-    def response_environment(self) -> str:
-        retval = self.response_data.get("environment")
-        return retval
-
-    @property
-    def response(self) -> dict:
-        return self._response
-
-    @property
-    def response_data(self) -> dict:
-        if not self._response_data:
-            self._response_data = self.response.get("data")
-        return self._response_data
 
     def __del__(self):
         self.client.close()

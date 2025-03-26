@@ -3,44 +3,43 @@ smarter-api Chatbot.
 """
 
 import logging
+from urllib.parse import ParseResult, urlparse
 
-from cachetools import TTLCache
-
-from smarter.common.conf import settings as smarter_settings
-from smarter.common.mixins import SmarterRequestHelper
+from smarter.common.mixins import ApiBase
 
 
 logger = logging.getLogger(__name__)
 
 
-class Chatbot(SmarterRequestHelper):
+class Chatbot(ApiBase):
     """A class for working with Smarter Chatbots."""
 
     _name: str = None
     _chatbot_id: int = None
-    _data: dict = None
-
-    _cache = TTLCache(
-        maxsize=smarter_settings.smarter_max_cache_size, ttl=smarter_settings.smarter_default_cache_timeout
-    )
-
-    def __new__(cls, chatbot_id: int = None, name: str = None):
-        cache_key = chatbot_id or name
-        if cache_key in cls._cache:
-            logger.debug("Returning cached instance for key: %s", cache_key)
-            return cls._cache[cache_key]
-
-        instance = super().__new__(cls)
-        cls._cache[cache_key] = instance
-        return instance
+    _description: str = None
+    _version: str = None
 
     def __init__(self, chatbot_id: int = None, name: str = None):
-        super().__init__()
         self._chatbot_id = chatbot_id
         self._name = name
-        self.init()
+        url_endpoint = f"cli/describe/chatbot/?name={self.name}"
+        super().__init__(url_endpoint=url_endpoint)
         logger.debug("%s.__init__() chatbot_id=%s name=%s", self.formatted_class_name, self.chatbot_id, self.name)
-        logger.debug("%s.__init__() data=%s", self.formatted_class_name, self.data)
+
+    def validate_httpx_response(self):
+        super().validate_httpx_response()
+
+        api_version = self.data["apiVersion"]
+        if api_version != "smarter.sh/v1":
+            raise ValueError(f"Unsupported api version: {api_version}")
+        kind = self.data["kind"]
+        if kind != "Chatbot":
+            raise ValueError(f"Received unexpected object kind: {kind}")
+        assert isinstance(self.chatbot_metadata, dict)
+        metadata = self.data["metadata"]
+        if self.name:
+            if self.chatbot_metadata["name"] != self.name:
+                raise ValueError(f"Received unexpected chatbot name: {metadata['name']}")
 
     @property
     def name(self) -> str:
@@ -48,21 +47,43 @@ class Chatbot(SmarterRequestHelper):
 
     @property
     def chatbot_id(self) -> int:
+        if not self._chatbot_id:
+            sandbox_url_path = self.sandbox_url.path
+            path = list(filter(None, sandbox_url_path.split("/")))
+            self._chatbot_id = int(path[-1])
         return self._chatbot_id
 
     @property
-    def data(self) -> dict:
-        return self._data
+    def chatbot_metadata(self) -> dict:
+        return self.data["metadata"]
 
-    def init(self):
+    @property
+    def description(self) -> str:
+        if not self._description:
+            self._description = self.chatbot_metadata.get("description")
+        return self._description
+
+    @property
+    def version(self) -> str:
+        if not self._version:
+            self._version = self.chatbot_metadata.get("version")
+        return self._version
+
+    @property
+    def status(self) -> dict:
         """
-        Initializes the chatbot.
-        https://platform.smarter.sh/api/v1/cli/describe/chatbot/?name=netec-demo'
+        Get the status of the chatbot.
         """
-        if not self.name:
-            raise ValueError("Chatbot name is required")
-        url = f"{self.base_url}cli/describe/chatbot/?name=" + self.name
-        self._data = self.post(url=url, data={})
+        return self.data.get("status")
+
+    @property
+    def sandbox_url(self) -> ParseResult:
+        """
+        Get the sandbox URL of the chatbot.
+        """
+        url_string = self.status.get("sandboxUrl")
+        url_parsed = urlparse(url_string)
+        return url_parsed
 
     def chat(self, message: str) -> dict:
         """

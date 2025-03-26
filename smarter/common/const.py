@@ -54,3 +54,17 @@ class SmarterEnvironments:
     PROD = "prod"
     all = [LOCAL, ALPHA, BETA, NEXT, PROD]
     aws_environments = [ALPHA, BETA, NEXT, PROD]
+
+
+class SmarterJournalApiResponseKeys:
+    """Smarter API cli response keys."""
+
+    API = "api"
+    THING = "thing"
+    METADATA = "metadata"
+    DATA = "data"
+    ERROR = "error"
+    MESSAGE = "message"
+
+    required = [API, THING, METADATA, DATA]
+    all = [API, THING, METADATA, DATA, ERROR, MESSAGE]
