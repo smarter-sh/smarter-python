@@ -18,34 +18,34 @@ class MessageModel(BaseModel):
     annotations: Optional[List[Annotation]] = []
 
 
-class Choice(BaseModel):
+class ChoiceModel(BaseModel):
     finish_reason: str
     index: int
     logprobs: Optional[Any] = None
     message: MessageModel
 
 
-class CompletionTokensDetails(BaseModel):
+class CompletionTokensDetailsModel(BaseModel):
     accepted_prediction_tokens: int
     audio_tokens: int
     reasoning_tokens: int
     rejected_prediction_tokens: int
 
 
-class PromptTokensDetails(BaseModel):
+class PromptTokensDetailsModel(BaseModel):
     audio_tokens: int
     cached_tokens: int
 
 
-class Usage(BaseModel):
+class UsageModel(BaseModel):
     completion_tokens: int
     prompt_tokens: int
     total_tokens: int
-    completion_tokens_details: CompletionTokensDetails
-    prompt_tokens_details: PromptTokensDetails
+    completion_tokens_details: CompletionTokensDetailsModel
+    prompt_tokens_details: PromptTokensDetailsModel
 
 
-class Metadata(BaseModel):
+class MetadataModel(BaseModel):
     tool_calls: Optional[Any] = None
     model: str
     temperature: float
@@ -53,7 +53,7 @@ class Metadata(BaseModel):
     input_text: str
 
 
-class SmarterIterationRequest(BaseModel):
+class SmarterIterationRequestModel(BaseModel):
     model: str
     messages: List[MessageModel]
     tools: List[Dict[str, Any]]
@@ -62,66 +62,66 @@ class SmarterIterationRequest(BaseModel):
     tool_choice: str
 
 
-class SmarterIterationResponse(BaseModel):
+class SmarterIterationResponseModel(BaseModel):
     id: str
-    choices: List[Choice]
+    choices: List[ChoiceModel]
     created: int
     model: str
     object: str
     service_tier: str
     system_fingerprint: str
-    usage: Usage
-    metadata: Metadata
+    usage: UsageModel
+    metadata: MetadataModel
 
 
-class SmarterFirstIteration(BaseModel):
-    request: SmarterIterationRequest
-    response: SmarterIterationResponse
+class SmarterFirstIterationModel(BaseModel):
+    request: SmarterIterationRequestModel
+    response: SmarterIterationResponseModel
 
 
-class Smarter(BaseModel):
-    first_iteration: SmarterFirstIteration
+class SmarterModel(BaseModel):
+    first_iteration: SmarterFirstIterationModel
     second_iteration: Optional[Dict[str, Any]] = {}
     tools: List[str]
     plugins: List[Any]
     messages: List[MessageModel]
 
 
-class Body(BaseModel):
+class BodyModel(BaseModel):
     id: str
-    choices: List[Choice]
+    choices: List[ChoiceModel]
     created: int
     model: str
     object: str
     service_tier: str
     system_fingerprint: str
-    usage: Usage
-    metadata: Metadata
-    smarter: Smarter
+    usage: UsageModel
+    metadata: MetadataModel
+    smarter: SmarterModel
 
 
-class ResponseData(BaseModel):
+class ResponseDataModel(BaseModel):
     isBase64Encoded: bool = Field(default=False)
     statusCode: int
     headers: Dict[str, str]
-    body: Body
+    body: BodyModel
 
 
-class Response(BaseModel):
-    data: ResponseData
+class ResponseModel(BaseModel):
+    data: ResponseDataModel
 
 
-class Request(BaseModel):
+class RequestModel(BaseModel):
     session_key: str
     messages: List[MessageModel]
 
 
-class Data(BaseModel):
-    request: Request
-    response: Response
+class DataModel(BaseModel):
+    request: RequestModel
+    response: ResponseModel
 
 
 class PromptResponseModel(BaseModel):
-    data: Data
+    data: DataModel
     api: str
     thing: str
