@@ -39,9 +39,20 @@ class MetadataModel(BaseModel):
 
 class WhoAmIModel(BaseModel):
     data: dict
-    user: UserModel
-    account: AccountModel
-    environment: str
     api: str
     thing: Optional[str]
     metadata: MetadataModel
+    message: Optional[str] = None
+    error: Optional[str] = None  # FIX ME: This should be a dict
+
+    @property
+    def user(self) -> UserModel:
+        return UserModel(**self.data["user"])
+
+    @property
+    def account(self) -> AccountModel:
+        return AccountModel(**self.data["account"])
+
+    @property
+    def environment(self) -> str:
+        return self.data["environment"]

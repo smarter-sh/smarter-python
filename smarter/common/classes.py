@@ -11,7 +11,6 @@ from httpx import Response as httpx_Response
 from pydantic import BaseModel
 
 from smarter.common.conf import settings as smarter_settings
-from smarter.common.const import SmarterJournalApiResponseKeys
 from smarter.common.mixins import SmarterHelperMixin
 from smarter.common.models.whoami import WhoAmIModel
 
@@ -30,7 +29,7 @@ class ApiBase(SmarterHelperMixin):
     _url_endpoint: str
     _httpx_response: httpx_Response
     _model_class: BaseModel = WhoAmIModel
-    _model_class_instance: BaseModel = None
+    _model: BaseModel = None
 
     def __init__(self, api_key: str = None, url_endpoint: str = DEFAULT_API_ENDPOINT, model_class: BaseModel = None):
         super().__init__()
@@ -47,10 +46,14 @@ class ApiBase(SmarterHelperMixin):
         logger.debug("%s.__init__() base_url=%s", self.formatted_class_name, self.base_url)
 
     @property
+    def model_class(self) -> BaseModel:
+        return self._model_class
+
+    @property
     def model(self) -> BaseModel:
-        if not self._model_class_instance:
-            self._model_class_instance = self._model_class(**self.to_json())
-        return self._model_class_instance
+        if not self._model:
+            self._model = self.model_class(**self.httpx_response.json())
+        return self._model
 
     @cached_property
     def url(self) -> str:
@@ -81,7 +84,7 @@ class ApiBase(SmarterHelperMixin):
 
     def validate(self):
         """
-        Validates the current client
+        Validates the current client. We probably no longer need this since we are using pydantic models.
         """
         if not self.httpx_response:
             raise ValueError("http response did not return any data")
@@ -89,46 +92,49 @@ class ApiBase(SmarterHelperMixin):
         if not json_data:
             raise ValueError("http response did not return any json data")
 
-        for key in SmarterJournalApiResponseKeys.required:
-            if key not in json_data.keys():
-                raise ValueError(f"json http response data is missing key: {key}")
-
     @cached_property
     def httpx_response(self) -> httpx_Response:
         return self._httpx_response
 
     def to_json(self) -> dict:
-        return self.httpx_response.json()
+        # return self.httpx_response.json()
+        return self.model.model_dump()
 
     @cached_property
     def data(self) -> dict:
-        response_json = self.to_json()
-        return response_json.get(SmarterJournalApiResponseKeys.DATA)
+        # response_json = self.to_json()
+        # return response_json.get(SmarterJournalApiResponseKeys.DATA)
+        return self.model.data.model_dump()
 
     @cached_property
     def api(self) -> str:
-        response_json = self.to_json()
-        return response_json.get(SmarterJournalApiResponseKeys.API)
+        # response_json = self.to_json()
+        # return response_json.get(SmarterJournalApiResponseKeys.API)
+        return self.model.api
 
     @cached_property
     def thing(self) -> str:
-        response_json = self.to_json()
-        return response_json.get(SmarterJournalApiResponseKeys.THING)
+        # response_json = self.to_json()
+        # return response_json.get(SmarterJournalApiResponseKeys.THING)
+        return self.model.thing
 
     @cached_property
     def metadata(self) -> str:
-        response_json = self.to_json()
-        return response_json.get(SmarterJournalApiResponseKeys.METADATA)
+        # response_json = self.to_json()
+        # return response_json.get(SmarterJournalApiResponseKeys.METADATA)
+        return self.model.metadata.model_dump()
 
     @cached_property
     def message(self) -> str:
-        response_json = self.to_json()
-        return response_json.get(SmarterJournalApiResponseKeys.MESSAGE)
+        # response_json = self.to_json()
+        # return response_json.get(SmarterJournalApiResponseKeys.MESSAGE)
+        return self.model.message
 
     @cached_property
     def status(self) -> any:
-        response_json = self.to_json()
-        return response_json.get(SmarterJournalApiResponseKeys.ERROR)
+        # response_json = self.to_json()
+        # return response_json.get(SmarterJournalApiResponseKeys.ERROR)
+        return self.model.error
 
     @cached_property
     def client(self) -> httpx_Client:
