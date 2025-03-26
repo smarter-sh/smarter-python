@@ -5,6 +5,7 @@
 #------------------------------------------------------------------------------
 
 
+setuptools==78.1.0                      # used in common/conf.py
 cachetools==5.5.0                       # Python object caching library
 httpx>=0.23.0                           # HTTP client
 validators==0.34.0                      # Data validation library
