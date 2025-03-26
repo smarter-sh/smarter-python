@@ -55,7 +55,7 @@ class Chatbot(ApiBase):
 
     @property
     def chatbot_metadata(self) -> dict:
-        return self.data["metadata"]
+        return self.data.get("metadata")
 
     @property
     def description(self) -> str:
@@ -70,6 +70,20 @@ class Chatbot(ApiBase):
         return self._version
 
     @property
+    def spec(self) -> dict:
+        """
+        Get the spec of the chatbot.
+        """
+        return self.data.get("spec")
+
+    @property
+    def config(self) -> dict:
+        """
+        Get the config of the chatbot.
+        """
+        return self.spec.get("config")
+
+    @property
     def status(self) -> dict:
         """
         Get the status of the chatbot.
@@ -82,6 +96,24 @@ class Chatbot(ApiBase):
         Get the sandbox URL of the chatbot.
         """
         url_string = self.status.get("sandboxUrl")
+        url_parsed = urlparse(url_string)
+        return url_parsed
+
+    @property
+    def url_chatapp(self) -> ParseResult:
+        """
+        Get the chatapp URL of the chatbot.
+        """
+        url_string = self.status.get("urlChatapp")
+        url_parsed = urlparse(url_string)
+        return url_parsed
+
+    @property
+    def url_chatbot(self) -> ParseResult:
+        """
+        Get the chatbot URL of the chatbot.
+        """
+        url_string = self.status.get("urlChatbot")
         url_parsed = urlparse(url_string)
         return url_parsed
 
