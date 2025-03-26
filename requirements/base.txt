@@ -17,6 +17,7 @@ validators==0.34.0                      # Data validation library
 
 # for working with data
 # ------------
+email-validator==2.2.0                  # for validating email addresses
 python-dotenv==1.0.1                    # for reading environment variables from .env files
 pydantic>=2.0.0                         # best data validation library ever!
 pydantic-settings>=2.0.0                # settings management

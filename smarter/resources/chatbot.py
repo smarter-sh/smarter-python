@@ -8,6 +8,7 @@ from functools import cached_property
 from urllib.parse import ParseResult, urlparse
 
 from smarter.common.mixins import ApiBase
+from smarter.resources.models.chatbot import ChatbotModel
 from smarter.resources.models.prompt import MessageModel, PromptResponseModel
 
 
@@ -20,17 +21,17 @@ class Chatbot(ApiBase):
     _name: str = None
     _chatbot_id: int = None
 
-    def __init__(self, chatbot_id: int = None, name: str = None):
+    def __init__(self, api_key: str = None, url_endpoint: str = None, chatbot_id: int = None, name: str = None):
         self._chatbot_id = chatbot_id
         self._name = name
-        url_endpoint = f"cli/describe/chatbot/?name={self.name}"
-        super().__init__(url_endpoint=url_endpoint)
+        url_endpoint = url_endpoint or f"cli/describe/chatbot/?name={self.name}"
+        super().__init__(api_key=api_key, url_endpoint=url_endpoint, model_class=ChatbotModel)
         logger.debug("%s.__init__() chatbot_id=%s name=%s", self.formatted_class_name, self.chatbot_id, self.name)
 
-    def validate_httpx_response(self):
+    def validate(self):
 
         # validate the structure and integrity of the Smarter Api response body
-        super().validate_httpx_response()
+        super().validate()
 
         # validate the structure of the chatbot data
         chatbot_keys = ["apiVersion", "kind", "metadata", "spec", "status"]

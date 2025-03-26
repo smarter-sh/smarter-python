@@ -69,9 +69,9 @@ runs:
     - name: Initialize environment variables
       shell: bash
       run: |-
-        echo "NAMESPACE=${{ env.NAMESPACE_BASE }}-${{ env.ENVIRONMENT }}" >> $GITHUB_ENV
+        echo "NAMESPACE=${{ env.NAMESPACE_BASE }}-${{ env.SMARTER_ENVIRONMENT }}" >> $GITHUB_ENV
       env:
-        ENVIRONMENT: ${{ inputs.environment }}
+        SMARTER_ENVIRONMENT: ${{ inputs.environment }}
         NAMESPACE_BASE: smarter-platform
 
     # authenticate AWS CLI
@@ -192,7 +192,7 @@ runs:
     - name: Build local and run Python unit tests
       shell: bash
       env:
-        ENVIRONMENT: local
+        SMARTER_ENVIRONMENT: local
         GITHUB_ACTIONS: "true"
         DEBUG_MODE: "true"
       run: |

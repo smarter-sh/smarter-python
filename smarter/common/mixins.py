@@ -8,9 +8,11 @@ from urllib.parse import urljoin
 from cachetools import LRUCache
 from httpx import Client as httpx_Client
 from httpx import Response as httpx_Response
+from pydantic import BaseModel
 
 from smarter.common.conf import settings as smarter_settings
 from smarter.common.const import SmarterJournalApiResponseKeys
+from smarter.common.models.whoami import WhoAmIModel
 
 from .utils import formatted_text
 
@@ -39,19 +41,28 @@ class ApiBase(SmarterHelperMixin):
     _client: httpx_Client
     _url_endpoint: str
     _httpx_response: httpx_Response
+    _model_class: BaseModel = WhoAmIModel
+    _model_class_instance: BaseModel = None
 
-    def __init__(self, api_key: str = None, url_endpoint: str = DEFAULT_API_ENDPOINT):
+    def __init__(self, api_key: str = None, url_endpoint: str = DEFAULT_API_ENDPOINT, model_class: BaseModel = None):
         super().__init__()
 
+        self._model_class: BaseModel = model_class or WhoAmIModel
         self._client = httpx_Client()
         self._api_key = api_key or smarter_settings.smarter_api_key
         if not self.api_key:
             raise ValueError("api_key is required")
         self._url_endpoint = url_endpoint
         self._httpx_response = self.post(url=self.url)
-        self.validate_httpx_response()
+        self.validate()
 
         logger.debug("%s.__init__() base_url=%s", self.formatted_class_name, self.base_url)
+
+    @property
+    def model(self) -> BaseModel:
+        if not self._model_class_instance:
+            self._model_class_instance = self._model_class(**self.to_json())
+        return self._model_class_instance
 
     @cached_property
     def url(self) -> str:
@@ -79,6 +90,20 @@ class ApiBase(SmarterHelperMixin):
         response = self.client.post(url, json=data, headers=headers)
         response.raise_for_status()
         return response
+
+    def validate(self):
+        """
+        Validates the current client
+        """
+        if not self.httpx_response:
+            raise ValueError("http response did not return any data")
+        json_data = self.to_json()
+        if not json_data:
+            raise ValueError("http response did not return any json data")
+
+        for key in SmarterJournalApiResponseKeys.required:
+            if key not in json_data.keys():
+                raise ValueError(f"json http response data is missing key: {key}")
 
     @cached_property
     def httpx_response(self) -> httpx_Response:
@@ -116,20 +141,6 @@ class ApiBase(SmarterHelperMixin):
     def status(self) -> any:
         response_json = self.to_json()
         return response_json.get(SmarterJournalApiResponseKeys.ERROR)
-
-    def validate_httpx_response(self):
-        """
-        Validates the current client
-        """
-        if not self.httpx_response:
-            raise ValueError("http response did not return any data")
-        json_data = self.to_json()
-        if not json_data:
-            raise ValueError("http response did not return any json data")
-
-        for key in SmarterJournalApiResponseKeys.required:
-            if key not in json_data.keys():
-                raise ValueError(f"json http response data is missing key: {key}")
 
     @cached_property
     def client(self) -> httpx_Client:

@@ -13,11 +13,10 @@
 ################################################################
 # For local development
 ################################################################
-ENVIRONMENT=local
+SMARTER_ENVIRONMENT=local
 PYTHONPATH=./venv:./smarter
 
 
 # Api Keys
 # ----------------------------------------------------------
-SMARTER_API_BASE_URL=https://api.smarter.sh/v1/
 SMARTER_API_KEY=SET-ME-PLEASE

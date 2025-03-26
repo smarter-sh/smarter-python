@@ -110,7 +110,7 @@ class SettingsDefaults:
     LLM_DEFAULT_MAX_TOKENS = 2048
 
     # defaults for this Python package
-    ENVIRONMENT = os.environ.get("ENVIRONMENT", SmarterEnvironments.PROD)
+    SMARTER_ENVIRONMENT = os.environ.get("SMARTER_ENVIRONMENT", SmarterEnvironments.PROD)
     ROOT_DOMAIN = os.environ.get("ROOT_DOMAIN", "smarter.sh")
     SHARED_RESOURCE_IDENTIFIER = os.environ.get("SHARED_RESOURCE_IDENTIFIER", "smarter")
     DEBUG_MODE: bool = os.environ.get("DEBUG_MODE", False)
@@ -193,8 +193,8 @@ class Settings(BaseSettings):
         getter=lambda v: empty_str_to_bool_default(v, SettingsDefaults.DUMP_DEFAULTS),
     )
     environment: Optional[str] = Field(
-        SettingsDefaults.ENVIRONMENT,
-        env="ENVIRONMENT",
+        SettingsDefaults.SMARTER_ENVIRONMENT,
+        env="SMARTER_ENVIRONMENT",
     )
     local_hosts: Optional[List[str]] = Field(
         SettingsDefaults.LOCAL_HOSTS,
@@ -372,7 +372,7 @@ class Settings(BaseSettings):
     def validate_environment(cls, v) -> str:
         """Validate environment"""
         if v in [None, ""]:
-            return SettingsDefaults.ENVIRONMENT
+            return SettingsDefaults.SMARTER_ENVIRONMENT
         return v
 
     @field_validator("local_hosts")
