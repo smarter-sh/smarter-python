@@ -4,11 +4,10 @@ top-level test file for the smarter package.
 
 import unittest
 
-from smarter.api import Client
+from smarter import Account, Chatbot, Plugin, Smarter
 from smarter.common.classes import DEFAULT_API_ENDPOINT
 from smarter.common.conf import settings as smarter_settings
 from smarter.common.const import SmarterEnvironments
-from smarter.resources import Account, Chatbot, Plugin
 
 
 class TestApi(unittest.TestCase):
@@ -22,7 +21,7 @@ class TestApi(unittest.TestCase):
         self.assertEqual(smarter_settings.environment, SmarterEnvironments.PROD)
 
     def test_client(self):
-        client = Client()
+        client = Smarter()
         self.assertTrue(client)
         self.assertEqual(client.base_url, "https://platform.smarter.sh/api/v1/")
         self.assertEqual(client.url_endpoint, DEFAULT_API_ENDPOINT)
@@ -72,7 +71,7 @@ class TestApi(unittest.TestCase):
     def test_chatbot_prompt(self):
         chatbot = Chatbot(name="netec-demo")
         chat = chatbot.prompt("Hello, World!")
-        print("prompt response: ", chat)
+        print("test_chatbot_prompt() prompt response: ", chat)
         self.assertIsInstance(chat, str)
 
     def test_plugin(self):
@@ -82,6 +81,16 @@ class TestApi(unittest.TestCase):
     def test_account(self):
         account = Account()
         self.assertTrue(account)
+
+    def test_client_resource(self):
+        client = Smarter(api_key=smarter_settings.smarter_api_key.get_secret_value())
+        self.assertTrue(client)
+        chatbot = client.resources.chatbots.get(name="netec-demo")
+        self.assertTrue(chatbot)
+        self.assertEqual(chatbot.name, "netec-demo")
+        chat = chatbot.prompt("Hello, World from client.resources.chatbots.get(name='netec-demo')")
+        print("test_client_resource() prompt response: ", chat)
+        self.assertIsInstance(chat, str)
 
 
 if __name__ == "__main__":

@@ -164,7 +164,7 @@ class Chatbot(ApiBase):
         Chat with the chatbot.
         # http://platform.smarter.sh/api/v1/cli/chat/netec-demo/?new_session=true&uid=admin
         """
-        # to do: Client() should pass in the 'whoami' data (username, etc) to the Chatbot class.
+        # to do: Smarter() should pass in the 'whoami' data (username, etc) to the Chatbot class.
         username = "admin"
         url = self.base_url + f"cli/chat/{self.name}/?new_session=true&uid={username}"
         escaped_message = json.dumps(message)

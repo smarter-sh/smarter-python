@@ -1,4 +1,4 @@
-from .client import Client
+from .client import Smarter
 
 
-__all__ = ["Client"]
+__all__ = ["Smarter"]

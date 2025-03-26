@@ -39,9 +39,9 @@ class ApiBase(SmarterHelperMixin):
     ):
         """
         Initializes the class with the api key, url endpoint, and Pydantic model.
-        We default to the WhoAmIModel if no model is provided so that Client() can be initialized without any arguments.
-        The validate() method is probably no longer needed since we are using Pydantic models,
-        but it doesn't hurt to keep it.
+        We default to the WhoAmIModel if no model is provided so that Smarter()
+        can be initialized without any arguments. The validate() method is probably
+        no longer needed since we are using Pydantic models, but it doesn't hurt to keep it.
         """
         super().__init__()
 

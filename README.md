@@ -34,13 +34,10 @@ client = Smarter(
     api_key=os.environ.get("SMARTER_API_KEY"),
 )
 
-response = client.responses.create(
-    model="gpt-4o",
-    instructions="You are a coding assistant that talks like a pirate.",
-    input="How do I check if a Python object is an instance of a class?",
-)
+chatbot = client.resources.chatbots.get(name="my-chatbot")
+chat = chatbot.prompt("Hello, World!")
 
-print(response.output_text)
+print(chat)
 ```
 
 While you can provide an `api_key` keyword argument,
