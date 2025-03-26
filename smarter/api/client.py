@@ -4,7 +4,7 @@ smarter-api Client.
 
 import logging
 
-from smarter.common.mixins import ApiBase
+from smarter.common.classes import ApiBase
 from smarter.resources import Chatbot
 
 

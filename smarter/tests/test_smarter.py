@@ -5,9 +5,9 @@ top-level test file for the smarter package.
 import unittest
 
 from smarter.api import Client
+from smarter.common.classes import DEFAULT_API_ENDPOINT
 from smarter.common.conf import settings as smarter_settings
 from smarter.common.const import SmarterEnvironments
-from smarter.common.mixins import DEFAULT_API_ENDPOINT
 from smarter.resources import Account, Chatbot, Plugin
 
 

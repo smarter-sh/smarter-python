@@ -7,7 +7,7 @@ import logging
 from functools import cached_property
 from urllib.parse import ParseResult, urlparse
 
-from smarter.common.mixins import ApiBase
+from smarter.common.classes import ApiBase
 from smarter.resources.models.chatbot import ChatbotModel
 from smarter.resources.models.prompt import MessageModel, PromptResponseModel
 
