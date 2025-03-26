@@ -29,7 +29,7 @@ from urllib.parse import urljoin
 # 3rd party stuff
 import pkg_resources
 from dotenv import load_dotenv
-from pydantic import Field, ValidationError, field_validator
+from pydantic import Field, SecretStr, ValidationError, field_validator
 from pydantic_settings import BaseSettings
 
 # our stuff
@@ -104,7 +104,6 @@ class SettingsDefaults:
     LLM_DEFAULT_MAX_TOKENS = 2048
 
     # defaults for this Python package
-    SMARTER_ENVIRONMENT = os.environ.get("SMARTER_ENVIRONMENT", SmarterEnvironments.PROD)
     ROOT_DOMAIN = os.environ.get("SMARTER_ROOT_DOMAIN", "smarter.sh")
     SHARED_RESOURCE_IDENTIFIER = os.environ.get("SMARTER_SHARED_RESOURCE_IDENTIFIER", "smarter")
     DEBUG_MODE: bool = os.environ.get("SMARTER_DEBUG_MODE", False)
@@ -117,6 +116,7 @@ class SettingsDefaults:
     LOCAL_HOSTS += [host + ":8000" for host in LOCAL_HOSTS]
     LOCAL_HOSTS.append("testserver")
 
+    SMARTER_ENVIRONMENT = os.environ.get("SMARTER_ENVIRONMENT", SmarterEnvironments.PROD)
     SMARTER_API_KEY = os.environ.get("SMARTER_API_KEY", "")
     SMARTER_DEFAULT_CACHE_TIMEOUT = SMARTER_DEFAULT_CACHE_TIMEOUT
     SMARTER_MAX_CACHE_SIZE = SMARTER_MAX_CACHE_SIZE
@@ -217,7 +217,7 @@ class Settings(BaseSettings):
         SettingsDefaults.LLM_DEFAULT_TEMPERATURE, env="LLM_DEFAULT_TEMPERATURE"
     )
     llm_default_max_tokens: Optional[int] = Field(SettingsDefaults.LLM_DEFAULT_MAX_TOKENS, env="LLM_DEFAULT_MAX_TOKENS")
-    smarter_api_key: Optional[str] = Field(SettingsDefaults.SMARTER_API_KEY, env="SMARTER_API_KEY")
+    smarter_api_key: Optional[SecretStr] = Field(SettingsDefaults.SMARTER_API_KEY, env="SMARTER_API_KEY")
     smarter_default_cache_timeout: Optional[int] = Field(
         SettingsDefaults.SMARTER_DEFAULT_CACHE_TIMEOUT, env="SMARTER_DEFAULT_CACHE_TIMEOUT"
     )

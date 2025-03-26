@@ -47,7 +47,7 @@ class ApiBase(SmarterHelperMixin):
 
         self._model_class: SmarterApiBaseModel = model_class or WhoAmIModel
         self._client = httpx_Client()
-        self._api_key = api_key or smarter_settings.smarter_api_key
+        self._api_key = api_key or smarter_settings.smarter_api_key.get_secret_value()
         if not self.api_key:
             raise ValueError("api_key is required")
         self._url_endpoint = url_endpoint

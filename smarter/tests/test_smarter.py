@@ -27,7 +27,7 @@ class TestApi(unittest.TestCase):
         self.assertEqual(client.base_url, "https://platform.smarter.sh/api/v1/")
         self.assertEqual(client.url_endpoint, DEFAULT_API_ENDPOINT)
         self.assertEqual(client.url, "https://platform.smarter.sh/api/v1/cli/whoami/")
-        self.assertEqual(client.api_key, smarter_settings.smarter_api_key)
+        self.assertEqual(client.api_key, smarter_settings.smarter_api_key.get_secret_value())
         self.assertEqual(client.api, "smarter.sh/v1")
         self.assertEqual(client.thing, "None")
         self.assertIn("key", client.metadata)
