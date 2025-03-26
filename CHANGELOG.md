@@ -1,3 +1,10 @@
+## [0.1.1](https://github.com/smarter-sh/smarter-python/compare/v0.1.0...v0.1.1) (2025-03-26)
+
+
+### Bug Fixes
+
+* file and package ommisions ([3291d56](https://github.com/smarter-sh/smarter-python/commit/3291d56897a27c39a8d860bfbf3363f7aa6fe1e0))
+
 # [0.1.0](https://github.com/smarter-sh/smarter-python/compare/v0.0.1...v0.1.0) (2025-03-26)
 
 
