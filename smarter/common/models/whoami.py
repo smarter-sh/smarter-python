@@ -3,6 +3,8 @@ from typing import Optional
 
 from pydantic import BaseModel, EmailStr
 
+from smarter.common.models.base import MetadataModel, SmarterApiBaseModel
+
 
 class UserModel(BaseModel):
     id: int
@@ -33,11 +35,7 @@ class AccountModel(BaseModel):
     currency: str
 
 
-class MetadataModel(BaseModel):
-    key: str
-
-
-class WhoAmIModel(BaseModel):
+class WhoAmIModel(SmarterApiBaseModel):
     data: dict
     api: str
     thing: Optional[str]

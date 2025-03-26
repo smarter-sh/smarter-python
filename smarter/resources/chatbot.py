@@ -32,31 +32,25 @@ class Chatbot(ApiBase):
 
         # validate the structure and integrity of the Smarter Api response body
         super().validate()
-
-        # validate the structure of the chatbot data
-        chatbot_keys = ["apiVersion", "kind", "metadata", "spec", "status"]
-        for key in self.data.keys():
-            if key not in chatbot_keys:
-                raise ValueError(f"Received an unexpected key: {key}")
-
-        for key in chatbot_keys:
-            if key not in self.data.keys():
-                raise ValueError(f"Missing expected key: {key}")
-
-        assert isinstance(self.chatbot_metadata, dict)
-        assert isinstance(self.spec, dict)
-        assert isinstance(self.status, dict)
-
-        api_version = self.data.get("apiVersion")
-        if api_version != "smarter.sh/v1":
-            raise ValueError(f"Unsupported api version: {api_version}")
-        kind = self.data.get("kind")
-        if kind != "Chatbot":
-            raise ValueError(f"Received unexpected object kind: {kind}")
+        if self.model.api != "smarter.sh/v1":
+            raise ValueError(f"Unsupported api version: {self.model.api}")
+        if self.model.data.kind != "Chatbot":
+            raise ValueError(f"Received unexpected object kind: {self.model.data.kind}")
         if self.name:
-            metadata_name = self.chatbot_metadata.get("name")
+            metadata_name = self.model.data.metadata.name
             if metadata_name != self.name:
-                raise ValueError(f"Received unexpected chatbot name: {metadata_name}")
+                raise ValueError(f"Received unexpected chatbot name: {self.model.data.metadata.name}")
+
+    @property
+    def model(self) -> ChatbotModel:
+        """
+        Returns the Pydantic model instance.
+        """
+        if not self._model:
+            if not self.httpx_response:
+                raise ValueError("http response did not return any data.")
+            self._model = self.model_class(**self.httpx_response.json())
+        return self._model
 
     @cached_property
     def name(self) -> str:
@@ -72,43 +66,47 @@ class Chatbot(ApiBase):
 
     @cached_property
     def chatbot_metadata(self) -> dict:
-        return self.data.get("metadata")
+        return self.model.data.metadata.model_dump()
 
     @cached_property
     def description(self) -> str:
-        return self.chatbot_metadata.get("description")
+        # return self.chatbot_metadata.get("description")
+        return self.model.data.metadata.description
 
     @cached_property
     def version(self) -> str:
-        return self.chatbot_metadata.get("version")
+        # return self.chatbot_metadata.get("version")
+        return self.model.data.metadata.version
 
     @cached_property
     def spec(self) -> dict:
         """
         Get the spec of the chatbot.
         """
-        return self.data.get("spec")
+        # return self.data.get("spec")
+        return self.model.data.spec.model_dump()
 
     @cached_property
     def config(self) -> dict:
         """
         Get the config of the chatbot.
         """
-        return self.spec.get("config")
+        return self.model.data.spec.config.model_dump()
 
     @cached_property
     def status(self) -> dict:
         """
         Get the status of the chatbot.
         """
-        return self.data.get("status")
+        # return self.data.get("status")
+        return self.model.data.status.model_dump()
 
     @cached_property
     def sandbox_url(self) -> ParseResult:
         """
         Get the sandbox URL of the chatbot.
         """
-        url_string = self.status.get("sandboxUrl")
+        url_string = self.model.data.status.sandboxUrl
         url_parsed = urlparse(url_string)
         return url_parsed
 
@@ -117,7 +115,7 @@ class Chatbot(ApiBase):
         """
         Get the chatapp URL of the chatbot.
         """
-        url_string = self.status.get("urlChatapp")
+        url_string = self.model.data.status.urlChatapp
         url_parsed = urlparse(url_string)
         return url_parsed
 
@@ -126,7 +124,7 @@ class Chatbot(ApiBase):
         """
         Get the chatbot URL of the chatbot.
         """
-        url_string = self.status.get("urlChatbot")
+        url_string = self.model.data.status.urlChatbot
         url_parsed = urlparse(url_string)
         return url_parsed
 

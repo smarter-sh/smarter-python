@@ -1,10 +1,12 @@
 # pylint: disable=C0115
-from typing import Any, Dict, List, Optional
+from typing import Any, List, Optional
 
 from pydantic import BaseModel
 
+from smarter.common.models.base import SmarterApiBaseModel
 
-class Config(BaseModel):
+
+class ConfigModel(BaseModel):
     subdomain: Optional[str] = None
     customDomain: Optional[str] = None
     deployed: bool
@@ -26,14 +28,14 @@ class Config(BaseModel):
     tlsCertificateIssuanceStatus: str
 
 
-class Spec(BaseModel):
-    config: Config
+class SpecModel(BaseModel):
+    config: ConfigModel
     plugins: List[Any] = []
     functions: List[Any] = []
     apiKey: Optional[str] = None
 
 
-class Status(BaseModel):
+class StatusModel(BaseModel):
     created: str
     modified: str
     deployed: bool
@@ -50,23 +52,19 @@ class Status(BaseModel):
     dnsVerificationStatus: str
 
 
-class Metadata(BaseModel):
+class MetadataModel(BaseModel):
     name: str
     description: str
     version: str
 
 
-class Data(BaseModel):
+class DataModel(BaseModel):
     apiVersion: str
     kind: str
-    metadata: Metadata
-    spec: Spec
-    status: Status
+    metadata: MetadataModel
+    spec: SpecModel
+    status: StatusModel
 
 
-class ChatbotModel(BaseModel):
-    data: Data
-    message: str
-    api: str
-    thing: str
-    metadata: Dict[str, str]
+class ChatbotModel(SmarterApiBaseModel):
+    data: DataModel
