@@ -3,6 +3,7 @@ smarter-api Chatbot.
 """
 
 import logging
+from functools import cached_property
 from urllib.parse import ParseResult, urlparse
 
 from smarter.common.mixins import ApiBase
@@ -27,25 +28,40 @@ class Chatbot(ApiBase):
         logger.debug("%s.__init__() chatbot_id=%s name=%s", self.formatted_class_name, self.chatbot_id, self.name)
 
     def validate_httpx_response(self):
+
+        # validate the structure and integrity of the Smarter Api response body
         super().validate_httpx_response()
 
-        api_version = self.data["apiVersion"]
+        # validate the structure of the chatbot data
+        chatbot_keys = ["apiVersion", "kind", "metadata", "spec", "status"]
+        for key in self.data.keys():
+            if key not in chatbot_keys:
+                raise ValueError(f"Received an unexpected key: {key}")
+
+        for key in chatbot_keys:
+            if key not in self.data.keys():
+                raise ValueError(f"Missing expected key: {key}")
+
+        assert isinstance(self.chatbot_metadata, dict)
+        assert isinstance(self.spec, dict)
+        assert isinstance(self.status, dict)
+
+        api_version = self.data.get("apiVersion")
         if api_version != "smarter.sh/v1":
             raise ValueError(f"Unsupported api version: {api_version}")
-        kind = self.data["kind"]
+        kind = self.data.get("kind")
         if kind != "Chatbot":
             raise ValueError(f"Received unexpected object kind: {kind}")
-        assert isinstance(self.chatbot_metadata, dict)
-        metadata = self.data["metadata"]
         if self.name:
-            if self.chatbot_metadata["name"] != self.name:
-                raise ValueError(f"Received unexpected chatbot name: {metadata['name']}")
+            metadata_name = self.chatbot_metadata.get("name")
+            if metadata_name != self.name:
+                raise ValueError(f"Received unexpected chatbot name: {metadata_name}")
 
-    @property
+    @cached_property
     def name(self) -> str:
         return self._name
 
-    @property
+    @cached_property
     def chatbot_id(self) -> int:
         if not self._chatbot_id:
             sandbox_url_path = self.sandbox_url.path
@@ -53,44 +69,44 @@ class Chatbot(ApiBase):
             self._chatbot_id = int(path[-1])
         return self._chatbot_id
 
-    @property
+    @cached_property
     def chatbot_metadata(self) -> dict:
         return self.data.get("metadata")
 
-    @property
+    @cached_property
     def description(self) -> str:
         if not self._description:
             self._description = self.chatbot_metadata.get("description")
         return self._description
 
-    @property
+    @cached_property
     def version(self) -> str:
         if not self._version:
             self._version = self.chatbot_metadata.get("version")
         return self._version
 
-    @property
+    @cached_property
     def spec(self) -> dict:
         """
         Get the spec of the chatbot.
         """
         return self.data.get("spec")
 
-    @property
+    @cached_property
     def config(self) -> dict:
         """
         Get the config of the chatbot.
         """
         return self.spec.get("config")
 
-    @property
+    @cached_property
     def status(self) -> dict:
         """
         Get the status of the chatbot.
         """
         return self.data.get("status")
 
-    @property
+    @cached_property
     def sandbox_url(self) -> ParseResult:
         """
         Get the sandbox URL of the chatbot.
@@ -99,7 +115,7 @@ class Chatbot(ApiBase):
         url_parsed = urlparse(url_string)
         return url_parsed
 
-    @property
+    @cached_property
     def url_chatapp(self) -> ParseResult:
         """
         Get the chatapp URL of the chatbot.
@@ -108,7 +124,7 @@ class Chatbot(ApiBase):
         url_parsed = urlparse(url_string)
         return url_parsed
 
-    @property
+    @cached_property
     def url_chatbot(self) -> ParseResult:
         """
         Get the chatbot URL of the chatbot.
