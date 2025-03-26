@@ -69,6 +69,12 @@ class TestApi(unittest.TestCase):
         self.assertRegex(chatbot.url_chatbot.path, r"/api/v1/chatbots/\d+/chat/")
         self.assertEqual(chatbot.url_chatbot.path, f"/api/v1/chatbots/{chatbot.chatbot_id}/chat/")
 
+    def test_chatbot_prompt(self):
+        chatbot = Chatbot(name="netec-demo")
+        chat = chatbot.prompt("Hello, World!")
+        print("prompt response: ", chat)
+        self.assertIsInstance(chat, str)
+
     def test_plugin(self):
         plugin = Plugin()
         self.assertTrue(plugin)

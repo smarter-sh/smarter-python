@@ -2,6 +2,7 @@
 smarter-api Chatbot.
 """
 
+import json
 import logging
 from functools import cached_property
 from urllib.parse import ParseResult, urlparse
@@ -17,8 +18,6 @@ class Chatbot(ApiBase):
 
     _name: str = None
     _chatbot_id: int = None
-    _description: str = None
-    _version: str = None
 
     def __init__(self, chatbot_id: int = None, name: str = None):
         self._chatbot_id = chatbot_id
@@ -75,15 +74,11 @@ class Chatbot(ApiBase):
 
     @cached_property
     def description(self) -> str:
-        if not self._description:
-            self._description = self.chatbot_metadata.get("description")
-        return self._description
+        return self.chatbot_metadata.get("description")
 
     @cached_property
     def version(self) -> str:
-        if not self._version:
-            self._version = self.chatbot_metadata.get("version")
-        return self._version
+        return self.chatbot_metadata.get("version")
 
     @cached_property
     def spec(self) -> dict:
@@ -133,11 +128,39 @@ class Chatbot(ApiBase):
         url_parsed = urlparse(url_string)
         return url_parsed
 
-    def chat(self, message: str) -> dict:
+    def prompt(self, message: str, verbose: bool = False) -> dict:
         """
         Chat with the chatbot.
+        # http://platform.smarter.sh/api/v1/cli/chat/netec-demo/?new_session=true&uid=admin
         """
-        return self.post(
-            f"/chatbots/{self.chatbot_id}/chat/",
-            data={"message": message},
-        )
+        username = "admin"
+        url = self.base_url + f"cli/chat/{self.name}/?new_session=true&uid={username}"
+        escaped_message = json.dumps(message)
+        data = {
+            "messages": [],
+            "prompt": json.loads(escaped_message),
+        }
+        response = self.post(url=url, data=data)
+        if verbose:
+            logger.debug("%s.chat() response=%s", self.formatted_class_name, response.json())
+            return response.json()
+
+        response_json: dict = response.json()
+        # response_json['data']['response']['data']['body']['smarter']['messages']
+        data = response_json.get("data")
+        assert isinstance(data, dict)
+        response = data.get("response")
+        assert isinstance(response, dict)
+        data = response.get("data")
+        assert isinstance(data, dict)
+        body = data.get("body")
+        assert isinstance(body, dict)
+        smarter = body.get("smarter")
+        assert isinstance(smarter, dict)
+        messages: list[dict[str, any]] = smarter.get("messages")
+        assert isinstance(messages, list)
+
+        for message in messages:
+            if message.get("role") == "assistant":
+                return message.get("content")
+        raise ValueError("No assistant message found in the chat response.")
