@@ -9,19 +9,8 @@ from typing import Dict
 
 logger = logging.getLogger(__name__)
 
-SMARTER_ACCOUNT_NUMBER = "3141-5926-5359"
-SMARTER_API_SUBDOMAIN = "api"
 SMARTER_API_VERSION = "v1"
 SMARTER_PLATFORM_SUBDOMAIN = "platform"
-SMARTER_COMPANY_NAME = "Smarter"
-SMARTER_EXAMPLE_CHATBOT_NAME = "example"
-SMARTER_CUSTOMER_SUPPORT = "support@smarter.sh"
-
-# The following are used in the React app
-# to store the chatbot chat session key and debug mode settings
-# as browser cookies. The React app has constants
-# for these values as well which should be kept in sync.
-SMARTER_CHAT_SESSION_KEY_NAME = "session_key"
 SMARTER_DEFAULT_CACHE_TIMEOUT = 60 * 10  # 10 minutes
 SMARTER_MAX_CACHE_SIZE = 128
 

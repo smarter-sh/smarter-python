@@ -11,12 +11,17 @@
 # -----------------------------------
 
 ################################################################
-# For local development
+# Senstitve Information
 ################################################################
-SMARTER_ENVIRONMENT=local
-PYTHONPATH=./venv:./smarter
-
-
-# Api Keys
-# ----------------------------------------------------------
 SMARTER_API_KEY=SET-ME-PLEASE
+GH_TOKEN=SET-ME-PLEASE
+
+################################################################
+# Non-Sensitive Information
+################################################################
+SMARTER_ENVIRONMENT=prod
+SMARTER_ROOT_DOMAIN=smarter.sh
+SMARTER_SHARED_RESOURCE_IDENTIFIER=smarter
+SMARTER_DEBUG_MODE=True
+SMARTER_DUMP_DEFAULTS=True
+PYTHONPATH=./venv:./smarter

@@ -1,25 +1,19 @@
 # pylint: disable=no-member,no-self-argument,unused-argument,R0801,too-many-lines
 """
-Configuration for Lambda functions.
+Smarter Python Library Configuration.
 
-This module is used to configure the Lambda functions. It uses the pydantic_settings
+This module overrides Python environment-based settings modules and provides
+strongly typed and validated alternative settings values. It uses the pydantic_settings
 library to validate the configuration values. The configuration values are initialized
 according to the following prioritization sequence:
-    1. constructor
-    2. environment variables
-    3. `.env` file
-    4. tfvars file
-    5. defaults
+    1. Python __init__.py module
+    2. environment variables (os.environ)
+    3. Python settings module
+    4. SettingsDefaults
 
 The Settings class also provides a dump property that returns a dictionary of all
 configuration values. This is useful for debugging and logging.
 """
-
-# -------------------- WARNING --------------------
-# DO NOT IMPORT DJANGO OR ANY DJANGO MODULES. THIS
-# ENTIRE MODULE SITS UPSTREAM OF DJANGO AND IS
-# INTENDED TO BE USED INDEPENDENTLY OF DJANGO.
-# ------------------------------------------------
 
 import importlib
 
@@ -111,10 +105,10 @@ class SettingsDefaults:
 
     # defaults for this Python package
     SMARTER_ENVIRONMENT = os.environ.get("SMARTER_ENVIRONMENT", SmarterEnvironments.PROD)
-    ROOT_DOMAIN = os.environ.get("ROOT_DOMAIN", "smarter.sh")
-    SHARED_RESOURCE_IDENTIFIER = os.environ.get("SHARED_RESOURCE_IDENTIFIER", "smarter")
-    DEBUG_MODE: bool = os.environ.get("DEBUG_MODE", False)
-    DUMP_DEFAULTS: bool = os.environ.get("DUMP_DEFAULTS", False)
+    ROOT_DOMAIN = os.environ.get("SMARTER_ROOT_DOMAIN", "smarter.sh")
+    SHARED_RESOURCE_IDENTIFIER = os.environ.get("SMARTER_SHARED_RESOURCE_IDENTIFIER", "smarter")
+    DEBUG_MODE: bool = os.environ.get("SMARTER_DEBUG_MODE", False)
+    DUMP_DEFAULTS: bool = os.environ.get("SMARTER_DUMP_DEFAULTS", False)
 
     OPENAI_ENDPOINT_IMAGE_N = 4
     OPENAI_ENDPOINT_IMAGE_SIZE = "1024x768"
