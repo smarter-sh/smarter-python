@@ -83,7 +83,7 @@ def load_requirements(filename) -> list:
     with open(filename, encoding="utf-8") as f:
         lines = f.read().splitlines()
     # Filter out comments and empty lines
-    requirements = [line for line in lines if line and not line.startswith("#")]
+    requirements = [line.split("#", 1)[0].strip() for line in lines if line and not line.startswith("#")]
     return requirements
 
 
@@ -92,6 +92,7 @@ ABOUT = load_about()
 
 print("Current working directory:", os.getcwd())
 print("Detected packages:", find_packages(exclude=["smarter.tests"]))
+print("Detected requirements:", load_requirements("requirements/base.txt"))
 setup(
     name="smarter-api",
     version=get_semantic_version(),
