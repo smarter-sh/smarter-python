@@ -8,7 +8,7 @@ from functools import cached_property
 from urllib.parse import ParseResult, urlparse
 
 from smarter.common.mixins import ApiBase
-from smarter.resources.models.prompt import PromptResponseModel
+from smarter.resources.models.prompt import MessageModel, PromptResponseModel
 
 
 logger = logging.getLogger(__name__)
@@ -143,14 +143,14 @@ class Chatbot(ApiBase):
         }
         response = self.post(url=url, data=data)
         response_json: dict = response.json()
-        chat = PromptResponseModel(**response_json)
+        prompt_response = PromptResponseModel(**response_json)
 
         if verbose:
-            logger.debug("%s.chat() response=%s", self.formatted_class_name, response.json())
-            return response.json()
+            return prompt_response.model_dump()
         else:
-            messages = chat.data.response.data.body.smarter.messages
+            messages = prompt_response.data.response.data.body.smarter.messages
             for message in messages:
-                if message.role == "assistant":  # Access the `role` attribute directly
-                    return message.content  # Access the `content` attribute directly
-            raise ValueError("No assistant message found in the chat response.")
+                message: MessageModel
+                if message.role == "assistant":
+                    return message.content
+            raise ValueError("No assistant message found in the prompt_response response.")

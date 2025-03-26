@@ -8,7 +8,7 @@ class Annotation(BaseModel):
     pass  # Placeholder for annotations if they have a specific structure
 
 
-class Message(BaseModel):
+class MessageModel(BaseModel):
     role: str
     content: str
     refusal: Optional[Any] = None
@@ -22,7 +22,7 @@ class Choice(BaseModel):
     finish_reason: str
     index: int
     logprobs: Optional[Any] = None
-    message: Message
+    message: MessageModel
 
 
 class CompletionTokensDetails(BaseModel):
@@ -55,7 +55,7 @@ class Metadata(BaseModel):
 
 class SmarterIterationRequest(BaseModel):
     model: str
-    messages: List[Message]
+    messages: List[MessageModel]
     tools: List[Dict[str, Any]]
     temperature: float
     max_tokens: int
@@ -84,7 +84,7 @@ class Smarter(BaseModel):
     second_iteration: Optional[Dict[str, Any]] = {}
     tools: List[str]
     plugins: List[Any]
-    messages: List[Message]
+    messages: List[MessageModel]
 
 
 class Body(BaseModel):
@@ -113,7 +113,7 @@ class Response(BaseModel):
 
 class Request(BaseModel):
     session_key: str
-    messages: List[Message]
+    messages: List[MessageModel]
 
 
 class Data(BaseModel):
