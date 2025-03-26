@@ -7,7 +7,8 @@
 #             modules will look for and include these requirements in the zip
 #             packages for each Python-based Lambda function.
 #
-# python -m piptools.scripts.compile prod.in
+# python -m piptools.scripts.compile requirements/local.in
 # -----------------------------------------------------------------------------
 
--r base.txt
+
+-r local.txt

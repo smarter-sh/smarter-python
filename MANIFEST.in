@@ -1,0 +1,4 @@
+include smarter/*
+recursive-include smarter *.py
+include README.md
+include LICENSE.txt

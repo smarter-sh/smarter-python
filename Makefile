@@ -6,9 +6,11 @@ export
 ifeq ($(OS),Windows_NT)
     PYTHON := python.exe
     ACTIVATE_VENV := venv\Scripts\activate
+	PYTHONPATH := $(shell pwd)\venv:$(shell pwd)\smarter
 else
     PYTHON := python3.12
     ACTIVATE_VENV := source venv/bin/activate
+	PYTHONPATH := $(shell pwd)/venv:$(shell pwd)/smarter
 endif
 PIP := $(PYTHON) -m pip
 
@@ -115,9 +117,9 @@ build:
 	@echo "-------------------------------------------------------------------------"
 	@echo "                   IV. Building the project"
 	@echo "-------------------------------------------------------------------------"
-
-	$(PYTHON) -m build --sdist ./
-	$(PYTHON) -m build --wheel ./
+	rm -rf build dist .pytest_cache smarter_api.egg-info
+	PYTHONPATH=$(PYTHONPATH) $(PYTHON) -m build --sdist ./ --no-isolation
+	PYTHONPATH=$(PYTHONPATH) $(PYTHON) -m build --wheel ./
 
 	@echo "-------------------------------------------------------------------------"
 	@echo "                   V. Verifying the build"
