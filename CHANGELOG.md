@@ -1,3 +1,10 @@
+## [0.1.2](https://github.com/smarter-sh/smarter-python/compare/v0.1.1...v0.1.2) (2025-03-28)
+
+
+### Bug Fixes
+
+* add a package-wide timeout for httpx requests ([979fa77](https://github.com/smarter-sh/smarter-python/commit/979fa77b38fa718f926014e9679666a068eb386c))
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
