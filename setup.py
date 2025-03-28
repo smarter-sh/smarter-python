@@ -133,11 +133,11 @@ setup(
     ],
     keywords="api, smarter, ai",
     project_urls={
-        "Source": "https://github.com/smarter-sh/smarter-api",
+        "Source": "https://github.com/smarter-sh/smarter-python",
         "Documentation": "https://pypi.org/project/smarter-api/",
-        "Changelog": "https://github.com/smarter-sh/smarter-api/blob/main/CHANGELOG.md",
-        "Security": "https://github.com/smarter-sh/smarter-api/blob/main/SECURITY.md",
-        "Code of Conduct": "https://github.com/smarter-sh/smarter-api/blob/main/CODE_OF_CONDUCT.md",
-        "Tracker": "https://github.com/smarter-sh/smarter-api/issues",
+        "Changelog": "https://github.com/smarter-sh/smarter-python/blob/main/CHANGELOG.md",
+        "Security": "https://github.com/smarter-sh/smarter-python/blob/main/SECURITY.md",
+        "Code of Conduct": "https://github.com/smarter-sh/smarter-python/blob/main/CODE_OF_CONDUCT.md",
+        "Tracker": "https://github.com/smarter-sh/smarter-python/issues",
     },
 )
