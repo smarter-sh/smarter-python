@@ -30,10 +30,12 @@ class TestApi(unittest.TestCase):
         self.assertEqual(client.api, "smarter.sh/v1")
         self.assertEqual(client.thing, "None")
         self.assertIn("key", client.metadata)
+        self.assertEqual(client.timeout, smarter_settings.smarter_default_http_timeout)
 
     def test_chatbot(self):
         chatbot = Chatbot(name="netec-demo")
         self.assertTrue(chatbot)
+        self.assertEqual(chatbot.timeout, smarter_settings.smarter_default_http_timeout)
         self.assertEqual(chatbot.name, "netec-demo")
         self.assertIsInstance(chatbot.chatbot_description, str)
         self.assertIsInstance(chatbot.chatbot_version, str)
@@ -69,10 +71,17 @@ class TestApi(unittest.TestCase):
         self.assertEqual(chatbot.url_chatbot.path, f"/api/v1/chatbots/{chatbot.chatbot_id}/chat/")
 
     def test_chatbot_prompt(self):
-        chatbot = Chatbot(name="netec-demo")
+        chatbot = Chatbot(name="netec-demo", timeout=61)
         chat = chatbot.prompt("Hello, World!")
         print("test_chatbot_prompt() prompt response: ", chat)
         self.assertIsInstance(chat, str)
+        self.assertEqual(chatbot.timeout, 61)
+
+    def test_chatbot_default_addressing(self):
+        client = Smarter(timeout=61)
+        chatbot = client.resources.chatbots.get(name="netec-demo")
+        self.assertEqual(chatbot.timeout, 61)
+        self.assertEqual(chatbot.name, "netec-demo")
 
     def test_plugin(self):
         plugin = Plugin()

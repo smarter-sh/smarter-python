@@ -1,4 +1,10 @@
 # pylint: disable=C0115
+"""
+smarter.resources.models.prompt
+This module contains the models for the Smarter API prompt endpoint.
+The models are used to represent the request and response data for the
+prompt API endpoint.
+"""
 from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field

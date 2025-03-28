@@ -1,4 +1,4 @@
-# pylint: disable=W0401,F405
+# pylint: disable=W0401,W0614
 """
 smarter-api prod settings.
 """
