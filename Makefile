@@ -52,7 +52,7 @@ clean:
 # -------------------------------------------------------------------------
 lint:
 	make check-python
-	make pre-commit-run --all-files
+	make pre-commit-run
 	pylint smarter
 	black .
 

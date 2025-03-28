@@ -1,4 +1,10 @@
 # pylint: disable=C0115
+"""
+smarter.common.models.whoami
+This module contains the WhoAmIModel class, which is used to represent the
+response from the WhoAmI API endpoint. The WhoAmI API endpoint is used to
+retrieve information about the current user and their account.
+"""
 from typing import Optional
 
 from pydantic import BaseModel, EmailStr

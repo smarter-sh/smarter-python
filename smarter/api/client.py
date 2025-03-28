@@ -22,14 +22,20 @@ class ResourceBaseClass(SmarterHelperMixin):
     """A class for working with the Smarter Api resources."""
 
     _api_key: str = None
+    _timeout: int = None
 
-    def __init__(self, api_key: str = None):
+    def __init__(self, api_key: str = None, timeout: int = None):
         super().__init__()
         self._api_key = api_key
+        self._timeout = timeout
 
     @cached_property
     def api_key(self) -> str:
         return self._api_key
+
+    @cached_property
+    def timeout(self) -> int:
+        return self._timeout
 
     def get_from_cache(self, cache_key: str) -> any:
         """
@@ -60,7 +66,7 @@ class Chatbots(ResourceBaseClass):
         chatbot = self.get_from_cache(cache_key)
         if chatbot:
             return chatbot
-        chatbot = Chatbot(api_key=self.api_key, chatbot_id=chatbot_id, name=name)
+        chatbot = Chatbot(api_key=self.api_key, chatbot_id=chatbot_id, name=name, timeout=self.timeout)
         self.save_to_cache(cache_key, chatbot)
         return chatbot
 
@@ -73,14 +79,14 @@ class Resources(ResourceBaseClass):
 
     _chatbots: Chatbots = None
 
-    def __init__(self, api_key: str = None):
-        super().__init__(api_key=api_key)
+    def __init__(self, api_key: str = None, timeout: int = None):
+        super().__init__(api_key=api_key, timeout=timeout)
         self._chatbots: Chatbots = None
 
     @cached_property
     def chatbots(self) -> Chatbots:
         if not self._chatbots:
-            self._chatbots = Chatbots(api_key=self.api_key)
+            self._chatbots = Chatbots(api_key=self.api_key, timeout=self.timeout)
         return self._chatbots
 
 
@@ -89,12 +95,12 @@ class Smarter(ApiBase):
 
     _resources: Resources = None
 
-    def __init__(self, api_key: str = None):
-        super().__init__(api_key=api_key)
+    def __init__(self, api_key: str = None, timeout: int = None):
+        super().__init__(api_key=api_key, timeout=timeout)
         self._resources: Resources = None
 
     @cached_property
     def resources(self) -> Resources:
         if self._resources is None:
-            self._resources = Resources(api_key=self.api_key)
+            self._resources = Resources(api_key=self.api_key, timeout=self.timeout)
         return self._resources
