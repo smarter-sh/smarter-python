@@ -1,4 +1,4 @@
-# pylint: disable=W0401
+# pylint: disable=W0401,W0614
 """
 smarter-api local settings.
 """

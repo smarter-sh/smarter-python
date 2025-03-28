@@ -36,6 +36,7 @@ from pydantic_settings import BaseSettings
 from .const import (
     SMARTER_API_VERSION,
     SMARTER_DEFAULT_CACHE_TIMEOUT,
+    SMARTER_DEFAULT_HTTP_TIMEOUT,
     SMARTER_MAX_CACHE_SIZE,
     SMARTER_PLATFORM_SUBDOMAIN,
     VERSION,
@@ -118,6 +119,7 @@ class SettingsDefaults:
 
     SMARTER_ENVIRONMENT = os.environ.get("SMARTER_ENVIRONMENT", SmarterEnvironments.PROD)
     SMARTER_API_KEY = os.environ.get("SMARTER_API_KEY", "")
+    SMARTER_DEFAULT_HTTP_TIMEOUT = SMARTER_DEFAULT_HTTP_TIMEOUT
     SMARTER_DEFAULT_CACHE_TIMEOUT = SMARTER_DEFAULT_CACHE_TIMEOUT
     SMARTER_MAX_CACHE_SIZE = SMARTER_MAX_CACHE_SIZE
 
@@ -222,6 +224,9 @@ class Settings(BaseSettings):
         SettingsDefaults.SMARTER_DEFAULT_CACHE_TIMEOUT, env="SMARTER_DEFAULT_CACHE_TIMEOUT"
     )
     smarter_max_cache_size: Optional[int] = Field(SettingsDefaults.SMARTER_MAX_CACHE_SIZE, env="SMARTER_MAX_CACHE_SIZE")
+    smarter_default_http_timeout: Optional[int] = Field(
+        SettingsDefaults.SMARTER_DEFAULT_HTTP_TIMEOUT, env="SMARTER_DEFAULT_HTTP_TIMEOUT"
+    )
 
     @cached_property
     def environment_domain(self) -> str:
@@ -471,6 +476,18 @@ class Settings(BaseSettings):
         retval = int(v)
         if retval < 0:
             raise ValueError("Cache size must be greater than or equal to 0")
+        return retval
+
+    @field_validator("smarter_default_http_timeout")
+    def check_smarter_default_http_timeout(cls, v) -> int:
+        """Check smarter_default_http_timeout"""
+        if isinstance(v, int):
+            return v
+        if v in [None, ""]:
+            return SettingsDefaults.SMARTER_DEFAULT_HTTP_TIMEOUT
+        retval = int(v)
+        if retval < 0:
+            raise ValueError("HTTP timeout must be greater than or equal to 0")
         return retval
 
 

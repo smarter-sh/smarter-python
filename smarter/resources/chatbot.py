@@ -23,12 +23,19 @@ class Chatbot(ApiBase):
     _name: str = None
     _chatbot_id: int = None
 
-    def __init__(self, api_key: str = None, url_endpoint: str = None, chatbot_id: int = None, name: str = None):
+    def __init__(
+        self,
+        api_key: str = None,
+        url_endpoint: str = None,
+        chatbot_id: int = None,
+        name: str = None,
+        timeout: int = None,
+    ):
         self._chatbot_id = chatbot_id
         self._name = name
         # to do: need to setup a more intelligent way to build the url_endpoint from known data.
         url_endpoint = url_endpoint or f"cli/describe/chatbot/?name={self.name}"
-        super().__init__(api_key=api_key, url_endpoint=url_endpoint, model_class=ChatbotModel)
+        super().__init__(api_key=api_key, url_endpoint=url_endpoint, model_class=ChatbotModel, timeout=timeout)
         logger.debug("%s.__init__() chatbot_id=%s name=%s", self.formatted_class_name, self.chatbot_id, self.name)
 
     def validate(self):
@@ -178,10 +185,10 @@ class Chatbot(ApiBase):
 
         if verbose:
             return prompt_response.model_dump()
-        else:
-            messages = prompt_response.data.response.data.body.smarter.messages
-            for message in messages:
-                message: MessageModel
-                if message.role == "assistant":
-                    return message.content
-            raise ValueError("No assistant message found in the prompt_response response.")
+
+        messages = prompt_response.data.response.data.body.smarter.messages
+        for msg in messages:
+            msg: MessageModel
+            if msg.role == "assistant":
+                return msg.content
+        raise ValueError("No assistant message found in the prompt_response response.")

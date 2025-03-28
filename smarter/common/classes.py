@@ -28,6 +28,7 @@ class ApiBase(SmarterHelperMixin):
     """A class for working with the Smarter Api."""
 
     _api_key: str
+    _timeout: int
     _client: httpx_Client
     _url_endpoint: str
     _httpx_response: httpx_Response
@@ -35,7 +36,11 @@ class ApiBase(SmarterHelperMixin):
     _model: SmarterApiBaseModel = None
 
     def __init__(
-        self, api_key: str = None, url_endpoint: str = DEFAULT_API_ENDPOINT, model_class: SmarterApiBaseModel = None
+        self,
+        api_key: str = None,
+        url_endpoint: str = DEFAULT_API_ENDPOINT,
+        model_class: SmarterApiBaseModel = None,
+        timeout: int = None,
     ):
         """
         Initializes the class with the api key, url endpoint, and Pydantic model.
@@ -46,10 +51,11 @@ class ApiBase(SmarterHelperMixin):
         super().__init__()
 
         self._model_class: SmarterApiBaseModel = model_class or WhoAmIModel
-        self._client = httpx_Client()
         self._api_key = api_key or smarter_settings.smarter_api_key.get_secret_value()
         if not self.api_key:
             raise ValueError("api_key is required")
+        self._timeout = timeout or smarter_settings.smarter_default_http_timeout
+        self._client = httpx_Client(timeout=self.timeout)
         self._url_endpoint = url_endpoint
         self._httpx_response = self.post(url=self.url)
         self.validate()
@@ -189,6 +195,13 @@ class ApiBase(SmarterHelperMixin):
         to the API.
         """
         return self._api_key
+
+    @cached_property
+    def timeout(self) -> int:
+        """
+        Returns the timeout for the httpx client.
+        """
+        return self._timeout
 
     @cached_property
     def base_url(self) -> str:

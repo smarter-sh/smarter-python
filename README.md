@@ -32,6 +32,8 @@ from smarter import Smarter
 client = Smarter(
     # This is the default and can be omitted
     api_key=os.environ.get("SMARTER_API_KEY"),
+    # This is the default and can be omitted
+    timeout=60
 )
 
 chatbot = client.resources.chatbots.get(name="my-chatbot")
