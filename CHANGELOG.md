@@ -1,3 +1,10 @@
+## [0.1.3](https://github.com/smarter-sh/smarter-python/compare/v0.1.2...v0.1.3) (2025-04-02)
+
+
+### Bug Fixes
+
+* pydantic attribute types for chatbot model ([5b712fa](https://github.com/smarter-sh/smarter-python/commit/5b712fa4bb1d94fad49997d840489544eadd95d0))
+
 ## [0.1.2](https://github.com/smarter-sh/smarter-python/compare/v0.1.1...v0.1.2) (2025-03-28)
 
 
