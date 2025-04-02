@@ -7,7 +7,7 @@ chatbot API endpoint.
 """
 from typing import Any, List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, HttpUrl
 
 from smarter.common.models.base import SmarterApiBaseModel
 
@@ -24,12 +24,12 @@ class ConfigModel(BaseModel):
     appName: Optional[str] = None
     appAssistant: Optional[str] = None
     appWelcomeMessage: Optional[str] = None
-    appExamplePrompts: Optional[str] = None
+    appExamplePrompts: Optional[List[str]] = None
     appPlaceholder: Optional[str] = None
-    appInfoUrl: Optional[str] = None
-    appBackgroundImageUrl: Optional[str] = None
-    appLogoUrl: Optional[str] = None
-    appFileAttachment: Optional[str] = None
+    appInfoUrl: Optional[HttpUrl] = None
+    appBackgroundImageUrl: Optional[HttpUrl] = None
+    appLogoUrl: Optional[HttpUrl] = None
+    appFileAttachment: Optional[bool] = None
     dnsVerificationStatus: str
     tlsCertificateIssuanceStatus: str
 
