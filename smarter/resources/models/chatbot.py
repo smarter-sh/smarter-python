@@ -6,10 +6,28 @@ The models are used to represent the request and response data for the
 chatbot API endpoint.
 """
 from typing import Any, List, Optional
+from urllib.parse import urlparse
 
-from pydantic import BaseModel, HttpUrl
+from pydantic import BaseModel
 
 from smarter.common.models.base import SmarterApiBaseModel
+
+
+class FlexibleUrl(str):
+    """Custom type to allow None, relative URLs, and absolute URLs."""
+
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate
+
+    @classmethod
+    def validate(cls, value, field=None):
+        if value is None or value.startswith("/"):
+            return value  # Allow None or relative URLs
+        parsed = urlparse(value)
+        if parsed.scheme and parsed.netloc:
+            return value  # Allow valid absolute URLs
+        raise ValueError(f"Invalid URL format: {value}")
 
 
 class ConfigModel(BaseModel):
@@ -26,9 +44,9 @@ class ConfigModel(BaseModel):
     appWelcomeMessage: Optional[str] = None
     appExamplePrompts: Optional[List[str]] = None
     appPlaceholder: Optional[str] = None
-    appInfoUrl: Optional[HttpUrl] = None
-    appBackgroundImageUrl: Optional[HttpUrl] = None
-    appLogoUrl: Optional[HttpUrl] = None
+    appInfoUrl: Optional[FlexibleUrl] = None
+    appBackgroundImageUrl: Optional[FlexibleUrl] = None
+    appLogoUrl: Optional[FlexibleUrl] = None
     appFileAttachment: Optional[bool] = None
     dnsVerificationStatus: str
     tlsCertificateIssuanceStatus: str
