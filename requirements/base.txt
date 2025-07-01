@@ -6,7 +6,7 @@
 
 
 setuptools==80.9.0                      # used in common/conf.py
-cachetools==6.0.0                       # Python object caching library
+cachetools==6.1.0                       # Python object caching library
 httpx>=0.23.0                           # HTTP client
 validators==0.35.0                      # Data validation library
 email-validator==2.2.0                  # for validating email addresses
