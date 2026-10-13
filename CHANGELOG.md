@@ -1,3 +1,10 @@
+# [0.2.0](https://github.com/smarter-sh/smarter-python/compare/v0.1.3...v0.2.0) (2026-10-13)
+
+
+### Features
+
+* **sdk:** cover the whole smarter api with typed models and skills ([44cf731](https://github.com/smarter-sh/smarter-python/commit/44cf73180474c48e5930b3db56cebeacb048987f))
+
 ## [0.1.3](https://github.com/smarter-sh/smarter-python/compare/v0.1.2...v0.1.3) (2025-04-02)
 
 
