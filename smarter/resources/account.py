@@ -1,8 +1,8 @@
-"""
-smarter-api Account.
-"""
+"""Smarter-api Account."""
 
-from smarter.common.mixins import SmarterHelperMixin
+from __future__ import annotations
+
+from smarter.core.mixins import SmarterHelperMixin
 
 
 class Account(SmarterHelperMixin):

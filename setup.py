@@ -6,7 +6,6 @@ from typing import Dict
 
 from setuptools import find_packages, setup
 
-
 MODULE_NAME = "smarter"
 HERE = os.path.abspath(os.path.dirname(__file__))
 PROJECT_ROOT = os.path.abspath(os.path.join(HERE, MODULE_NAME))
@@ -75,11 +74,12 @@ def load_readme() -> str:
     # Replace img src for publication on pypi
     return readme.replace(
         "./doc/",
-        "https://github.com/lpm0073/secure-logger/raw/main/doc/",
+        "https://github.com/smarter-sh/smarter-python/raw/main/doc/",
     )
 
 
 def load_requirements(filename) -> list:
+    """Read a requirements file's requirements, without its comments."""
     with open(filename, encoding="utf-8") as f:
         lines = f.read().splitlines()
     # Filter out comments and empty lines
@@ -91,12 +91,12 @@ README = load_readme()
 ABOUT = load_about()
 
 print("Current working directory:", os.getcwd())
-print("Detected packages:", find_packages(exclude=["smarter.tests"]))
+print("Detected packages:", find_packages(exclude=["tests", "tests.*", "smarter.tests", "smarter.tests.*"]))
 print("Detected requirements:", load_requirements("requirements/base.txt"))
 setup(
     name="smarter-api",
     version=get_semantic_version(),
-    description="The official Python library for the Smarter platform Api.",
+    description="The official Python SDK of the Smarter platform's api.",
     long_description=README,
     long_description_content_type="text/markdown",
     author=ABOUT["__author__"],
@@ -107,34 +107,34 @@ setup(
     license=ABOUT["__license__"],
     license_files=("LICENSE.txt",),
     platforms=["any"],
-    packages=find_packages(exclude=["tests", "tests.*"]),
+    packages=find_packages(exclude=["tests", "tests.*", "smarter.tests", "smarter.tests.*"]),
     package_data={
-        "smarter": ["*.md"],
+        "smarter": ["py.typed"],
     },
     python_requires=">=3.10",
     install_requires=load_requirements("requirements/base.txt"),
     extras_require={},
     classifiers=[  # https://pypi.org/classifiers/
-        "Development Status :: 3 - Alpha",
-        "Environment :: Console",
+        "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
+        "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3 :: Only",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
         "Programming Language :: Python :: 3.13",
-        "Programming Language :: Python :: Implementation :: PyPy",
-        "Topic :: Utilities",
+        "Programming Language :: Python :: 3.14",
+        "Topic :: Scientific/Engineering :: Artificial Intelligence",
+        "Topic :: Software Development :: Libraries :: Python Modules",
+        "Typing :: Typed",
     ],
-    keywords="api, smarter, ai",
+    keywords="smarter, sdk, api, llm, ai, agents, manifests",
     project_urls={
         "Source": "https://github.com/smarter-sh/smarter-python",
-        "Documentation": "https://pypi.org/project/smarter-api/",
+        "Documentation": "https://docs.smarter.sh/en/latest/smarter-framework/smarter-python.html",
         "Changelog": "https://github.com/smarter-sh/smarter-python/blob/main/CHANGELOG.md",
         "Security": "https://github.com/smarter-sh/smarter-python/blob/main/SECURITY.md",
         "Code of Conduct": "https://github.com/smarter-sh/smarter-python/blob/main/CODE_OF_CONDUCT.md",
