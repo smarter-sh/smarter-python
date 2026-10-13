@@ -47,6 +47,9 @@ Desktop.ini
 .env
 secrets.json
 config.json
+# sanitized API response fixtures, not secrets
+!tests/data/secrets.json
+!tests/data/config.json
 *.key
 *.pem
 *.p12
