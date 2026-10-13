@@ -91,7 +91,7 @@ class TestContracts(unittest.TestCase):
 
 
 class TestOpenApiContract(SmarterTestBase):
-    """Test the SDK's cli requests against the platform's OpenAPI document of the cli api."""
+    """Test the SDK's requests against the platform's OpenAPI document, for the api families that it covers."""
 
     NOT_CALLED = {"prompt", "prompt_config"}
     """The cli operations that the SDK doesn't call: it prompts through the chat api instead."""
@@ -108,8 +108,8 @@ class TestOpenApiContract(SmarterTestBase):
                 return item[method.lower()]["operationId"]
         self.fail(f"{method} {path} is not in the platform's OpenAPI document.")
 
-    def test_cli_requests_are_published(self):
-        """Every cli request of the SDK is an operation of the document, and the SDK calls every operation."""
+    def test_requests_are_published(self):
+        """Every request of the SDK to a documented family is an operation, and the SDK calls every operation."""
         manifest = json.loads((CONTRACTS.parent / "sam" / "Guardrail.example.json").read_text(encoding="utf-8"))
         calls = [
             lambda: self.client.manifests.apply(manifest),
@@ -126,15 +126,17 @@ class TestOpenApiContract(SmarterTestBase):
             self.client.version,
             self.client.status,
             self.client.kinds,
+            lambda: self.client.llm_clients.config(12),
+            lambda: self.client.llm_clients.prompt("rMTAwMDAxMgx", "Hello"),
+            lambda: list(self.client.llm_clients.stream(12, "Hello").__enter__()),
         ]
         for call in calls:
             try:
                 call()
             except SmarterError:
                 pass  # the requests are answered with 404s: only their paths matter.
-        cli = [request for request in self.requests if request.url.path.startswith("/api/v1/cli/")]
-        self.assertEqual(len(cli), len(calls))
-        called = {self.operation(request.method, request.url.path) for request in cli}
+        self.assertEqual(len(self.requests), len(calls))
+        called = {self.operation(request.method, request.url.path) for request in self.requests}
         published = {
             item[method]["operationId"]
             for item in self.document["paths"].values()
