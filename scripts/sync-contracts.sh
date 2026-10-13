@@ -9,7 +9,8 @@
 # - the JSON Schema and an example manifest of every SAM kind, from which
 #   scripts/generate_sam_models.py generates smarter/models/sam/. Its tests check that every
 #   generated model parses its kind's example.
-# - the cli api's OpenAPI document. Its tests check that every cli request of the SDK is in it.
+# - the api's OpenAPI document. Its tests check that every request of the SDK to a family that the
+#   document covers is in it.
 #
 # Run this after the platform's contracts change (make contracts), then make sam-models, then
 # run the tests.
