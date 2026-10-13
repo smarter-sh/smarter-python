@@ -152,6 +152,11 @@ class TestOpenApiContract(SmarterTestBase):
             lambda: self.client.guardrails.events(1, reviewed=False),
             lambda: self.client.secrets.list(),
             lambda: self.client.secrets.retrieve(1),
+            lambda: self.client.mcp_clients.list(),
+            lambda: self.client.mcp_clients.retrieve("rMTAwMDAwMQx"),
+            lambda: self.client.mcp_clients.tools(1, refresh=True),
+            lambda: self.client.mcp_clients.refresh(1),
+            lambda: self.client.mcp_clients.call_tool(1, "add_numbers", {"a": 1, "b": 2}),
             lambda: self.client.llm_clients.config(12),
             lambda: self.client.llm_clients.prompt("rMTAwMDAxMgx", "Hello"),
             lambda: list(self.client.llm_clients.stream(12, "Hello").__enter__()),
@@ -195,6 +200,8 @@ class TestRecordedResponses(unittest.TestCase):
         "guardrail_eval": ("/guardrails/{id}/evaluate/", "post"),
         "guardrail_events": ("/guardrails/{id}/events/", "get"),
         "secrets": ("/secrets/", "get"),
+        "mcpclients": ("/mcpclients/", "get"),
+        "mcp_tools": ("/mcpclients/{id}/tools/", "get"),
     }
     """Each fixture of tests/data/, by name, and the operation whose 200 response it is."""
 
