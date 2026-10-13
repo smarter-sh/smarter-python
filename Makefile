@@ -117,7 +117,7 @@ sam-models: contracts
 
 # -------------------------------------------------------------------------
 # Copy the platform's api contracts from ../smarter: the chat and journal
-# contracts, the SAM schemas and examples, and the cli api's OpenAPI document.
+# contracts, the SAM schemas and examples, and the api's OpenAPI document.
 # A ref reads them at a commit or tag, e.g. make contracts SMARTER_REF=v0.20.0
 # -------------------------------------------------------------------------
 contracts:
