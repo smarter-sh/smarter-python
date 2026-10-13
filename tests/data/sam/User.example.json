@@ -1,0 +1,31 @@
+{
+  "apiVersion": "smarter.sh/v1",
+  "kind": "User",
+  "metadata": {
+    "name": "example_user",
+    "description": "An example Smarter API manifest for a User",
+    "version": "1.0.0",
+    "tags": [
+      "example"
+    ],
+    "annotations": [],
+    "username": "example_user"
+  },
+  "spec": {
+    "config": {
+      "firstName": "Example",
+      "lastName": "User",
+      "email": "example.user@example.com",
+      "isStaff": false,
+      "isActive": true
+    }
+  },
+  "status": {
+    "recordLocator": "user-example",
+    "created": "2024-01-01T00:00:00Z",
+    "modified": "2024-01-02T00:00:00Z",
+    "dependencies": null,
+    "account_number": "1234-5678-9012",
+    "username": "example_user"
+  }
+}

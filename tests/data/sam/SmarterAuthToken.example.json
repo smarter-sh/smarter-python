@@ -1,0 +1,17 @@
+{
+  "apiVersion": "smarter.sh/v1",
+  "kind": "SmarterAuthToken",
+  "metadata": {
+    "name": "snake-case-name",
+    "description": "An example Smarter API manifest for a SmarterAuthToken",
+    "version": "1.0.0",
+    "tags": [],
+    "annotations": []
+  },
+  "spec": {
+    "config": {
+      "isActive": true,
+      "username": "valid_smarter_username"
+    }
+  }
+}

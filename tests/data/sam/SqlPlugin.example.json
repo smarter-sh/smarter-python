@@ -1,0 +1,88 @@
+{
+  "apiVersion": "smarter.sh/v1",
+  "kind": "SqlPlugin",
+  "metadata": {
+    "name": "sql_example",
+    "description": "Get additional information about courses available at Stackademy.",
+    "version": "0.1.0",
+    "tags": [
+      "db",
+      "sql",
+      "database"
+    ],
+    "annotations": [
+      {
+        "smarter.sh/created_by": "smarter_sql_plugin_broker"
+      },
+      {
+        "smarter.sh/plugin": "sql_example"
+      }
+    ],
+    "pluginClass": "sql"
+  },
+  "spec": {
+    "selector": {
+      "directive": "search_terms",
+      "searchTerms": [
+        "smarter",
+        "users",
+        "admin"
+      ]
+    },
+    "prompt": {
+      "provider": "openai",
+      "systemRole": "You are a helpful sales agent for Stackademy. You can provide information about courses available at Stackademy.\n",
+      "model": "gpt-6-luna",
+      "temperature": 1.0,
+      "maxTokens": 2048
+    },
+    "connection": "example_connection",
+    "sqlData": {
+      "sqlQuery": "SELECT c.course_code, c.course_name, c.description, c.cost, prerequisite.course_code AS prerequisite_course_code, prerequisite.course_name AS prerequisite_course_name FROM courses c LEFT JOIN courses prerequisite ON c.prerequisite_id = prerequisite.course_id WHERE ((c.description LIKE CONCAT('%', {description}, '%')) OR ({description} IS NULL)) AND (c.cost <= {max_cost} OR {max_cost} IS NULL) ORDER BY c.prerequisite_id;\n",
+      "parameters": [
+        {
+          "name": "max_cost",
+          "type": "number",
+          "description": "the maximum cost that a student is willing to pay for a course.",
+          "required": false,
+          "enum": null,
+          "default": null
+        },
+        {
+          "name": "description",
+          "type": "string",
+          "description": "areas of specialization for courses in the catalogue.",
+          "required": false,
+          "enum": [
+            "AI",
+            "mobile",
+            "web",
+            "database",
+            "network",
+            "neural networks"
+          ],
+          "default": null
+        }
+      ],
+      "testValues": [
+        {
+          "name": "description",
+          "value": "AI"
+        },
+        {
+          "name": "max_cost",
+          "value": "500"
+        }
+      ],
+      "limit": 10
+    }
+  },
+  "status": {
+    "recordLocator": "example_record_locator",
+    "created": "2024-01-01T00:00:00",
+    "modified": "2024-01-01T00:00:00",
+    "dependencies": null,
+    "accountNumber": "0123456789",
+    "username": "admin"
+  }
+}

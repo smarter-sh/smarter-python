@@ -1,0 +1,13 @@
+{
+  "folders": [
+    {
+      "path": "../smarter"
+    },
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "cornflakes.linter.executablePath": "../venv/bin/flake8"
+  }
+}

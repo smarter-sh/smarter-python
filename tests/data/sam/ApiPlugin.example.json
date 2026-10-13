@@ -1,0 +1,114 @@
+{
+  "apiVersion": "smarter.sh/v1",
+  "kind": "ApiPlugin",
+  "metadata": {
+    "name": "api_example",
+    "description": "Get additional information about courses available at Stackademy.",
+    "version": "0.1.0",
+    "tags": [
+      "api",
+      "rest"
+    ],
+    "annotations": [
+      {
+        "smarter.sh/created_by": "smarter_api_plugin_broker"
+      },
+      {
+        "smarter.sh/plugin": "api_example"
+      }
+    ],
+    "pluginClass": "api"
+  },
+  "spec": {
+    "selector": {
+      "directive": "search_terms",
+      "searchTerms": [
+        "smarter",
+        "users",
+        "admin"
+      ]
+    },
+    "prompt": {
+      "provider": "openai",
+      "systemRole": "You are a helpful sales agent for Stackademy. You can provide information about courses available at Stackademy.\n",
+      "model": "gpt-6-luna",
+      "temperature": 1.0,
+      "maxTokens": 2048
+    },
+    "connection": "example_connection",
+    "apiData": {
+      "endpoint": "/stackademy/course-catalogue/",
+      "method": "GET",
+      "urlParams": [
+        {
+          "key": "max_cost",
+          "value": "500.00"
+        },
+        {
+          "key": "description",
+          "value": "Python"
+        }
+      ],
+      "headers": [
+        {
+          "name": "X-Debug-Request",
+          "value": "true"
+        },
+        {
+          "name": "X-API-Key",
+          "value": "your_api_key_here"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "X-Request-ID",
+          "value": "12345"
+        }
+      ],
+      "body": {},
+      "parameters": [
+        {
+          "name": "max_cost",
+          "type": "string",
+          "description": "A ceiling on the maximum cost of the course.",
+          "required": false,
+          "enum": null,
+          "default": "500.00"
+        },
+        {
+          "name": "description",
+          "type": "string",
+          "description": "A keyword to search for in the course description.",
+          "required": false,
+          "enum": null,
+          "default": "Python"
+        }
+      ],
+      "testValues": [
+        {
+          "name": "max_cost",
+          "value": "500.00"
+        },
+        {
+          "name": "description",
+          "value": "Python"
+        }
+      ],
+      "limit": 100
+    }
+  },
+  "status": {
+    "recordLocator": "abc123def456",
+    "created": "2024-01-01T00:00:00",
+    "modified": "2024-01-01T00:00:00",
+    "dependencies": null,
+    "accountNumber": "0123456789",
+    "username": "admin"
+  }
+}

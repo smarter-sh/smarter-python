@@ -1,13 +1,14 @@
 # -----------------------------------
 # smarter-python Environment Variables
 #
-# Python:
-# We need to explicitly set the PYTHONPATH
-# for Pylint so that it can find the smarter module
-# in your local file system when running pylint, flake8, or Cornflakes
-# from inside of VS Code. This is unrelated to actually
-# running the Django app from Docker, which sets the
-# PYTHONPATH in the Dockerfile.
+# The SDK reads the SMARTER_* variables: see smarter/common/conf.py.
+# Without SMARTER_BASE_URL, the platform's url is derived from
+# SMARTER_ENVIRONMENT (local, alpha, beta, next or prod) and
+# SMARTER_ROOT_DOMAIN, as the smarter cli derives it.
+#
+# PYTHONPATH must be the repository root, never ./smarter: the
+# package's own directory on the path would shadow the standard
+# library's modules.
 # -----------------------------------
 
 ################################################################
@@ -20,8 +21,7 @@ GH_TOKEN=SET-ME-PLEASE
 # Non-Sensitive Information
 ################################################################
 SMARTER_ENVIRONMENT=prod
-SMARTER_ROOT_DOMAIN=smarter.sh
-SMARTER_SHARED_RESOURCE_IDENTIFIER=smarter
-SMARTER_DEBUG_MODE=True
-SMARTER_DUMP_DEFAULTS=True
-PYTHONPATH=./venv:./smarter
+SMARTER_ROOT_DOMAIN=platform.smarter.sh
+# SMARTER_BASE_URL=http://localhost:9357
+# SMARTER_LOG=info
+PYTHONPATH=.

@@ -1,16 +1,18 @@
 # pylint: disable=C0115
 """
-smarter.resources.models.chatbot
+Smarter.resources.models.chatbot.
+
 This module contains the models for the Smarter API chatbot endpoint.
 The models are used to represent the request and response data for the
 chatbot API endpoint.
 """
+
 from typing import Any, List, Optional
 from urllib.parse import urlparse
 
 from pydantic import BaseModel
 
-from smarter.common.models.base import SmarterApiBaseModel
+from smarter.core.models.base import SmarterApiBaseModel
 
 
 class FlexibleUrl(str):

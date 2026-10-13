@@ -1,20 +1,38 @@
 ---
 #------------------------------------------------------------------------------
-# - Build from Dockerfile
-# - Run manage.py unit tests
+# Run the unit tests on every supported Python version.
 #------------------------------------------------------------------------------
 name: Test
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main, alpha, beta]
+  pull_request:
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
     steps:
       - name: Checkout code
-        id: checkout
         uses: actions/checkout@v4
 
       - name: Test
         uses: ./.github/actions/test
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # one upload is enough: the coverage is the same on every Python version.
+      # Set the repository's CODECOV_TOKEN secret, then make an upload failure fail the job.
+      - name: Upload coverage to Codecov
+        if: matrix.python-version == '3.12'
+        uses: codecov/codecov-action@v7
+        with:
+          files: ./coverage.xml
+          flags: python
+          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}

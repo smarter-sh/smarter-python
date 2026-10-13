@@ -1,0 +1,72 @@
+{
+  "apiVersion": "smarter.sh/v1",
+  "kind": "Vectorstore",
+  "metadata": {
+    "name": "example_knowledge_base",
+    "description": "A self-hosted Qdrant vector database of a company's product documentation.",
+    "version": "1.0.0",
+    "tags": [
+      "example",
+      "rag",
+      "qdrant"
+    ],
+    "annotations": [
+      {
+        "smarter.sh/vectorstore/purpose": "example"
+      }
+    ]
+  },
+  "spec": {
+    "backend": "qdrant",
+    "hosting": "self_hosted",
+    "connection": null,
+    "isActive": true,
+    "index": {
+      "name": null,
+      "dimension": 1536,
+      "metric": "cosine",
+      "deletionProtection": false
+    },
+    "embeddings": {
+      "provider": "openai",
+      "model": "text-embedding-3-small",
+      "dimensions": null,
+      "chunkSize": 1000,
+      "chunkOverlap": 200,
+      "batchSize": 64
+    },
+    "selfHosted": {
+      "image": "qdrant/qdrant:v1.19.1",
+      "storage": "10Gi",
+      "storageClass": null,
+      "cpu": "500m",
+      "memory": "1Gi"
+    },
+    "pinecone": null,
+    "maintenance": {
+      "snapshots": true,
+      "snapshotIntervalHours": 24,
+      "snapshotRetention": 7
+    }
+  },
+  "status": {
+    "recordLocator": "vectorstoremeta-abc123",
+    "created": "2026-10-13T13:17:54.154401",
+    "modified": "2026-10-13T13:17:54.154402",
+    "dependencies": null,
+    "accountNumber": "3141-5926-5359",
+    "username": "admin",
+    "vectorstoreStatus": "pending",
+    "message": null,
+    "indexName": null,
+    "endpoint": null,
+    "apiKeySecret": null,
+    "vectorCount": 0,
+    "documentCount": 0,
+    "snapshotCount": 0,
+    "deployedAt": null,
+    "lastCheckedAt": null,
+    "lastSnapshotAt": null,
+    "lastMaintenanceAt": null
+  }
+}

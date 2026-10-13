@@ -6,11 +6,11 @@ export
 ifeq ($(OS),Windows_NT)
     PYTHON := python.exe
     ACTIVATE_VENV := venv\Scripts\activate
-	PYTHONPATH := $(shell pwd)\venv:$(shell pwd)\smarter
+	PYTHONPATH := $(shell pwd)
 else
     PYTHON := python3.12
     ACTIVATE_VENV := source venv/bin/activate
-	PYTHONPATH := $(shell pwd)/venv:$(shell pwd)/smarter
+	PYTHONPATH := $(shell pwd)
 endif
 PIP := $(PYTHON) -m pip
 
@@ -19,7 +19,7 @@ else
     $(shell cp ./doc/example-dot-env .env)
 endif
 
-.PHONY: init activate build run clean lint analyze coverage pre-commit-init pre-commit-run python-init python-activate python-test force-release publish-test publish-prod help
+.PHONY: init activate build run clean lint analyze coverage test test-live sam-models contracts pre-commit-init pre-commit-run python-init python-activate python-test force-release publish-test publish-prod help
 
 # Default target executed when no arguments are given to make.
 all: help
@@ -60,7 +60,9 @@ analyze:
 	cloc . --exclude-ext=svg,json,zip --fullpath --vcs=git
 
 coverage:
-	echo "Please implement the coverage procedure ..."
+	PYTHONPATH=$(PYTHONPATH) coverage run --rcfile=smarter/.coveragerc -m unittest discover -s tests -t . && \
+	coverage report -m --rcfile=smarter/.coveragerc && \
+	coverage xml --rcfile=smarter/.coveragerc
 
 pre-commit-init:
 	pre-commit install
@@ -91,8 +93,28 @@ python-init:
 # Run Python unit tests
 # -------------------------------------------------------------------------
 test:
-	python -m unittest discover -s smarter/tests/ && \
+	PYTHONPATH=$(PYTHONPATH) python -m unittest discover -s tests -t . && \
 	python -m setup_test
+
+# -------------------------------------------------------------------------
+# Test the SDK against a running Smarter platform, e.g. the local one:
+# SMARTER_BASE_URL=http://localhost:9357 SMARTER_API_KEY=... make test-live
+# These prompt an LLMClient, which makes billable LLM requests.
+# -------------------------------------------------------------------------
+test-live:
+	PYTHONPATH=$(PYTHONPATH) SMARTER_TEST_LIVE=true python -m unittest discover -s tests/live -t . -v
+
+# -------------------------------------------------------------------------
+# Regenerate smarter/models/sam/ from a running platform's JSON Schemas.
+# -------------------------------------------------------------------------
+sam-models:
+	PYTHONPATH=$(PYTHONPATH) python scripts/generate_sam_models.py
+
+# -------------------------------------------------------------------------
+# Copy the platform's chat and journal contracts from ../smarter.
+# -------------------------------------------------------------------------
+contracts:
+	scripts/sync-contracts.sh ../smarter
 
 # -------------------------------------------------------------------------
 # Build the project
@@ -164,11 +186,14 @@ help:
 	@echo '<************************** Code Management **************************>'
 	@echo 'lint                   - Run all code linters and formatters'
 	@echo 'analyze                - Generate code analysis report using cloc'
-	@echo 'coverage               - Generate Docker-based code coverage analysis report'
+	@echo 'coverage               - run the unit tests with a coverage report'
 	@echo 'pre-commit-init        - install and configure pre-commit'
 	@echo 'pre-commit-run         - runs all pre-commit hooks on all files'
 	@echo '<************************** CI/CD **************************>'
 	@echo 'test			- run Python unit tests'
+	@echo 'test-live		- test against a running Smarter platform (SMARTER_BASE_URL, SMARTER_API_KEY)'
+	@echo 'sam-models		- regenerate the SAM models from a running platform'
+	@echo 'contracts		- copy the chat and journal api contracts from ../smarter'
 	@echo 'build			- build the project'
 	@echo 'force-release		- force a new release to be created in GitHub'
 	@echo 'publish-test		- test deployment to PyPi'
