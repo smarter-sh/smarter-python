@@ -1,3 +1,10 @@
+## [0.2.3](https://github.com/smarter-sh/smarter-python/compare/v0.2.2...v0.2.3) (2026-10-13)
+
+
+### Bug Fixes
+
+* **models:** correct the LLMClient api key and custom domain models ([f174b32](https://github.com/smarter-sh/smarter-python/commit/f174b323688a6570dad76a9d16952cd98d49d2fb))
+
 ## [0.2.2](https://github.com/smarter-sh/smarter-python/compare/v0.2.1...v0.2.2) (2026-10-13)
 
 
