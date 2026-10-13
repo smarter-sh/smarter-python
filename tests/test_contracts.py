@@ -104,11 +104,13 @@ class TestOpenApiContract(SmarterTestBase):
         "llmclient_apikey_retrieve",
         "llmclient_customdomain_retrieve",
         "llmclient_function_retrieve",
+        "provider_model",
     }
     """
-    The operations that the SDK doesn't call: the cli's prompt commands, which it replaces with the chat api,.
+    The operations that the SDK doesn't call.
 
-    and the reads of a single related row of an LLMClient, whose lists it reads instead.
+    The cli's prompt commands, which it replaces with the chat api, and the reads of one related row of
+    an LLMClient, or of one model of a Provider, whose lists it reads instead.
     """
 
     def setUp(self):
@@ -176,6 +178,22 @@ class TestOpenApiContract(SmarterTestBase):
             lambda: self.client.vectorstores.snapshots(1),
             lambda: self.client.vectorstores.create_snapshot(1),
             lambda: self.client.vectorstores.restore(1, 3),
+            lambda: self.client.llm_hosts.list(),
+            lambda: self.client.llm_hosts.retrieve("rMTAwMDAwMQx"),
+            lambda: self.client.llm_hosts.status(1),
+            lambda: self.client.llm_hosts.logs(1, tail=20),
+            lambda: self.client.llm_hosts.plan(1),
+            lambda: self.client.llm_hosts.deploy(1),
+            lambda: self.client.llm_hosts.undeploy(1, purge=True),
+            lambda: self.client.llm_hosts.report(),
+            lambda: self.client.llm_hosts.discover(query="llama"),
+            lambda: self.client.llm_hosts.discover_manifest("BAAI/bge-m3"),
+            lambda: self.client.plugins.list(),
+            lambda: self.client.plugins.retrieve(355),
+            lambda: self.client.providers.list(),
+            lambda: self.client.providers.retrieve("openai"),
+            lambda: self.client.providers.models("openai"),
+            lambda: self.client.proxies.list(),
             lambda: self.client.llm_clients.config(12),
             lambda: self.client.llm_clients.prompt("rMTAwMDAxMgx", "Hello"),
             lambda: list(self.client.llm_clients.stream(12, "Hello").__enter__()),
@@ -222,6 +240,13 @@ class TestRecordedResponses(unittest.TestCase):
         "mcpclients": ("/mcpclients/", "get"),
         "mcp_tools": ("/mcpclients/{id}/tools/", "get"),
         "vectorstores": ("/vectorstores/", "get"),
+        "llmhosts": ("/llmhosts/", "get"),
+        "llmhost_status": ("/llmhosts/{id}/status/", "get"),
+        "llmhost_plan": ("/llmhosts/{id}/plan/", "get"),
+        "llmhost_report": ("/llmhosts/report/", "get"),
+        "llmhost_discover": ("/llmhosts/discover/", "get"),
+        "plugins": ("/plugins/", "get"),
+        "proxy": ("/proxy/", "get"),
     }
     """Each fixture of tests/data/, by name, and the operation whose 200 response it is."""
 
