@@ -1,3 +1,10 @@
+# [0.3.0](https://github.com/smarter-sh/smarter-python/compare/v0.2.4...v0.3.0) (2026-10-13)
+
+
+### Features
+
+* **resources:** read user profiles and plugin uses, type history rows ([6661783](https://github.com/smarter-sh/smarter-python/commit/66617835f4cdd0b26947b5cec4705346260bf019))
+
 ## [0.2.4](https://github.com/smarter-sh/smarter-python/compare/v0.2.3...v0.2.4) (2026-10-13)
 
 
