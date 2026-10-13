@@ -1,3 +1,10 @@
+## [0.2.1](https://github.com/smarter-sh/smarter-python/compare/v0.2.0...v0.2.1) (2026-10-13)
+
+
+### Bug Fixes
+
+* **ci:** restore the test fixtures, remove dead legacy modules, and run make targets in the venv ([c9a8673](https://github.com/smarter-sh/smarter-python/commit/c9a8673091ea601d615e374f52c5c6d8a3948415))
+
 # [0.2.0](https://github.com/smarter-sh/smarter-python/compare/v0.1.3...v0.2.0) (2026-10-13)
 
 

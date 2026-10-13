@@ -10,7 +10,8 @@ The platform runs on the newest Python. The SDK runs in its callers' environment
 
 ## Decision
 
-The SDK supports every Python version that is not end-of-life: 3.10 and later. CI tests each one (ADR-010). Code uses `Optional[...]` and `Union[...]`, as the platform does, rather than syntax that a newer minimum would allow.
+The SDK supports every Python version that is not end-of-life: 3.10 and later
+as of October 2026. CI tests each one (ADR-010). Code uses `Optional[...]` and `Union[...]`, as the platform does, rather than syntax that a newer minimum would allow.
 
 ## Alternatives Considered
 
