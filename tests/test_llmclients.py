@@ -41,12 +41,18 @@ class TestLLMClients(SmarterTestBase):
         """An LLMClient's plugins, functions, api keys and custom domains."""
         self.route("GET", "llm-clients/1/plugins/", fixture="llmclient_plugins")
         self.route("GET", "llm-clients/5/functions", fixture="llmclient_functions")
-        self.route("GET", "llm-clients/5/apikeys/", json_body=[{"id": 1, "llmclient": 5, "apiKey": 2}])
-        self.route("GET", "llm-clients/5/customdomains", json_body=[{"id": 3, "llmclient": 5, "customDomain": 4}])
+        api_key_id = "0b8e1c55-2f3a-4c1d-9a51-7d2f4e6b8a90"
+        self.route("GET", "llm-clients/5/apikeys/", json_body=[{"id": 1, "llmclient": 5, "apiKey": api_key_id}])
+        self.route(
+            "GET",
+            "llm-clients/5/customdomains",
+            json_body=[{"id": 3, "name": "example_com", "domainName": "example.com", "verificationStatus": "Failed"}],
+        )
         self.assertEqual(self.client.llm_clients.plugins(1)[0].plugin_meta.plugin_class, "sql")
         self.assertEqual(self.client.llm_clients.functions(5)[0].name, "calculator")
-        self.assertEqual(self.client.llm_clients.api_keys(5)[0].api_key, 2)
-        self.assertEqual(self.client.llm_clients.custom_domains(5)[0].custom_domain, 4)
+        self.assertEqual(self.client.llm_clients.api_keys(5)[0].api_key, api_key_id)
+        domain = self.client.llm_clients.custom_domains(5)[0]
+        self.assertEqual((domain.domain_name, domain.verification_status), ("example.com", "Failed"))
 
     def test_config(self):
         """Config() starts or resumes a chat session."""

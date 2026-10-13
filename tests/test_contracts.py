@@ -14,7 +14,10 @@ import re
 import unittest
 from pathlib import Path
 
+from jsonschema import Draft202012Validator
 from pydantic import BaseModel
+from referencing import Registry, Resource
+from referencing.jsonschema import DRAFT202012
 
 from smarter.core.exceptions import SmarterError
 from smarter.models import chat, journal
@@ -93,8 +96,19 @@ class TestContracts(unittest.TestCase):
 class TestOpenApiContract(SmarterTestBase):
     """Test the SDK's requests against the platform's OpenAPI document, for the api families that it covers."""
 
-    NOT_CALLED = {"prompt", "prompt_config"}
-    """The cli operations that the SDK doesn't call: it prompts through the chat api instead."""
+    NOT_CALLED = {
+        "prompt",
+        "prompt_config",
+        "llmclient_plugin_retrieve",
+        "llmclient_apikey_retrieve",
+        "llmclient_customdomain_retrieve",
+        "llmclient_function_retrieve",
+    }
+    """
+    The operations that the SDK doesn't call: the cli's prompt commands, which it replaces with the chat api,.
+
+    and the reads of a single related row of an LLMClient, whose lists it reads instead.
+    """
 
     def setUp(self):
         super().setUp()
@@ -126,6 +140,12 @@ class TestOpenApiContract(SmarterTestBase):
             self.client.version,
             self.client.status,
             self.client.kinds,
+            lambda: self.client.llm_clients.list(),
+            lambda: self.client.llm_clients.retrieve("rMTAwMDAxMgx"),
+            lambda: self.client.llm_clients.plugins(12),
+            lambda: self.client.llm_clients.functions(12),
+            lambda: self.client.llm_clients.api_keys(12),
+            lambda: self.client.llm_clients.custom_domains(12),
             lambda: self.client.llm_clients.config(12),
             lambda: self.client.llm_clients.prompt("rMTAwMDAxMgx", "Hello"),
             lambda: list(self.client.llm_clients.stream(12, "Hello").__enter__()),
@@ -146,3 +166,40 @@ class TestOpenApiContract(SmarterTestBase):
         self.assertEqual(
             published - called, self.NOT_CALLED, "The platform publishes cli operations that the SDK doesn't call."
         )
+
+
+class TestRecordedResponses(unittest.TestCase):
+    """
+    Test that the responses that the SDK's tests replay, recorded from a real platform, are valid under the platform's OpenAPI document.
+
+    A fixture that drifts from what the platform publishes would let the SDK's tests pass against a
+    response that the platform never sends.
+    """
+
+    URI = "urn:smarter:openapi"
+
+    FIXTURES = {
+        "llmclients": ("/llm-clients/", "get"),
+        "llmclient": ("/llm-clients/{id}/", "get"),
+        "llmclient_plugins": ("/llm-clients/{id}/plugins/", "get"),
+        "llmclient_functions": ("/llm-clients/{id}/functions", "get"),
+        "config": ("/llm-clients/{id}/config/", "post"),
+        "prompt": ("/llm-clients/{id}/prompt/", "post"),
+    }
+    """Each fixture of tests/data/, by name, and the operation whose 200 response it is."""
+
+    def test_fixtures_are_valid(self):
+        document = load("openapi.json")
+        registry = Registry().with_resource(
+            self.URI, Resource.from_contents(document, default_specification=DRAFT202012)
+        )
+        for name, (path, method) in self.FIXTURES.items():
+            with self.subTest(fixture=name):
+                schema = document["paths"][path][method]["responses"]["200"]["content"]["application/json"]["schema"]
+                schema = json.loads(json.dumps(schema).replace('"#/components/', f'"{self.URI}#/components/'))
+                body = json.loads((CONTRACTS.parent / f"{name}.json").read_text(encoding="utf-8"))
+                errors = [
+                    f"{list(error.absolute_path)}: {error.message[:200]}"
+                    for error in Draft202012Validator(schema, registry=registry).iter_errors(body)
+                ]
+                self.assertEqual(errors, [])
