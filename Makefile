@@ -53,7 +53,8 @@ clean:
 lint:
 	make check-python
 	make pre-commit-run
-	pylint smarter
+	$(ACTIVATE_VENV) && \
+	pylint smarter && \
 	black .
 
 analyze:
@@ -66,10 +67,12 @@ coverage:
 	coverage xml --rcfile=smarter/.coveragerc
 
 pre-commit-init:
-	pre-commit install
+	$(ACTIVATE_VENV) && \
+	pre-commit install && \
 	pre-commit autoupdate
 
 pre-commit-run:
+	$(ACTIVATE_VENV) && \
 	pre-commit run --all-files
 
 
@@ -140,19 +143,20 @@ build:
 	@echo "                        Linting and running pre-commit hooks"
 	@echo "-------------------------------------------------------------------------"
 	make init
-	. venv/bin/activate
-	$(PIP) install --upgrade setuptools wheel twine
-	$(PIP) install --upgrade build
+	$(ACTIVATE_VENV) && \
+	$(PIP) install --upgrade setuptools wheel twine build
 	@echo "-------------------------------------------------------------------------"
 	@echo "                   IV. Building the project"
 	@echo "-------------------------------------------------------------------------"
 	rm -rf build dist .pytest_cache smarter_api.egg-info
-	PYTHONPATH=$(PYTHONPATH) $(PYTHON) -m build --sdist ./ --no-isolation
+	$(ACTIVATE_VENV) && \
+	PYTHONPATH=$(PYTHONPATH) $(PYTHON) -m build --sdist ./ --no-isolation && \
 	PYTHONPATH=$(PYTHONPATH) $(PYTHON) -m build --wheel ./
 
 	@echo "-------------------------------------------------------------------------"
 	@echo "                   V. Verifying the build"
 	@echo "-------------------------------------------------------------------------"
+	$(ACTIVATE_VENV) && \
 	twine check dist/*
 
 # -------------------------------------------------------------------------
@@ -168,6 +172,7 @@ force-release:
 publish-test:
 	git rev-parse --abbrev-ref HEAD | grep '^main$$' || (echo 'Not on main branch, aborting' && exit 1)
 	make build
+	$(ACTIVATE_VENV) && \
 	twine upload --verbose --skip-existing --repository testpypi dist/*
 
 # -------------------------------------------------------------------------
@@ -177,6 +182,7 @@ publish-test:
 publish-prod:
 	git rev-parse --abbrev-ref HEAD | grep '^main$$' || (echo 'Not on main branch, aborting' && exit 1)
 	make build
+	$(ACTIVATE_VENV) && \
 	twine upload --verbose --skip-existing dist/*
 
 ######################
