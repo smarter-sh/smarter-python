@@ -24,9 +24,26 @@ class Secret(SmarterResource):
 class Orchestrator(SmarterResource):
     """An orchestrator: a multi-agent workflow that composes LLMClients."""
 
+    strategy: Optional[str] = Field(
+        None, description="How its LLMClients collaborate: sequential, parallel, supervisor, router, voting or debate."
+    )
+    max_iterations: Optional[int] = None
+    is_active: Optional[bool] = None
+    llmclients: list[int] = Field(default_factory=list, description="The ids of its LLMClients.")
+
 
 class Vectorsearch(SmarterResource):
-    """A vectorsearch: a retrieval pipeline over one or more vectorstores."""
+    """A vectorsearch: a retrieval pipeline over a vectorstore."""
+
+    search_type: Optional[str] = Field(None, description="similarity, similarity_score_threshold or mmr.")
+    k: Optional[int] = Field(None, description="The number of chunks to return.")
+    score_threshold: Optional[float] = None
+    fetch_k: Optional[int] = Field(None, description="The candidates of an mmr search.")
+    lambda_mult: Optional[float] = Field(None, description="An mmr search's diversity.")
+    metadata_filter: Optional[SmarterJsonType] = None
+    is_enabled: Optional[bool] = None
+    vectorstore: Optional[int] = Field(None, description="The id of its vectorstore.")
+    auth_secret: Optional[int] = Field(None, description="The id of its Secret, if any.")
 
 
 class PromptSession(SmarterModel):
