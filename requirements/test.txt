@@ -8,3 +8,5 @@
 
 coverage==7.6.10
 jsonschema==4.26.0                      # tests/test_contracts.py: the recorded responses against openapi.json
+setuptools==84.0.0                      # setup_test.py: python setup.py check (Python 3.12 venvs don't include it)
+wheel==0.48.0                           # python -m build --sdist --no-isolation
