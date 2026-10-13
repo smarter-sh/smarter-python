@@ -60,8 +60,9 @@ analyze:
 	cloc . --exclude-ext=svg,json,zip --fullpath --vcs=git
 
 coverage:
+	$(ACTIVATE_VENV) && \
 	PYTHONPATH=$(PYTHONPATH) coverage run --rcfile=smarter/.coveragerc -m unittest discover -s tests -t . && \
-	coverage report -m --rcfile=smarter/.coveragerc && \
+	coverage report -m --rcfile=smarter/.coveragerc --fail-under=90 && \
 	coverage xml --rcfile=smarter/.coveragerc
 
 pre-commit-init:
@@ -93,6 +94,7 @@ python-init:
 # Run Python unit tests
 # -------------------------------------------------------------------------
 test:
+	$(ACTIVATE_VENV) && \
 	PYTHONPATH=$(PYTHONPATH) python -m unittest discover -s tests -t . && \
 	python -m setup_test
 
@@ -102,12 +104,14 @@ test:
 # These prompt an LLMClient, which makes billable LLM requests.
 # -------------------------------------------------------------------------
 test-live:
+	$(ACTIVATE_VENV) && \
 	PYTHONPATH=$(PYTHONPATH) SMARTER_TEST_LIVE=true python -m unittest discover -s tests/live -t . -v
 
 # -------------------------------------------------------------------------
 # Regenerate smarter/models/sam/ from a running platform's JSON Schemas.
 # -------------------------------------------------------------------------
 sam-models:
+	$(ACTIVATE_VENV) && \
 	PYTHONPATH=$(PYTHONPATH) python scripts/generate_sam_models.py
 
 # -------------------------------------------------------------------------

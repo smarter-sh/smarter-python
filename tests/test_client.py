@@ -71,6 +71,14 @@ class TestClient(SmarterTestBase):
         self.assertIn("****beef", repr(self.client))
         self.assertTrue(__version__)
 
+    def test_about(self):
+        """The package metadata that setup.py reads."""
+        from smarter import __about__  # pylint: disable=import-outside-toplevel
+
+        self.assertEqual(__about__.__version__, __version__)
+        self.assertTrue(__about__.__app__.startswith("smarter_"))
+        self.assertEqual(__about__.__license__, "AGPL-3.0-or-later")
+
     def test_context_manager(self):
         """The client closes its connections on exit."""
         with Smarter(api_key=API_KEY, base_url="http://testserver") as client:
