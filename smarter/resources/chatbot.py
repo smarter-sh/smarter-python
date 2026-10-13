@@ -1,23 +1,24 @@
-"""
-smarter-api Chatbot.
-"""
+"""Smarter-api Chatbot."""
+
+from __future__ import annotations
 
 import json
 import logging
 from functools import cached_property
 from urllib.parse import ParseResult, urlparse
 
-from smarter.common.classes import ApiBase
+from smarter.core.classes import ApiBase
 from smarter.resources.models.chatbot import ChatbotModel
 from smarter.resources.models.prompt import MessageModel, PromptResponseModel
-
 
 logger = logging.getLogger(__name__)
 
 
 class Chatbot(ApiBase):
     """
-    A class for working with Smarter Chatbots. To do: initialize by chatbot_id
+    A class for working with Smarter Chatbots.
+
+    To do: initialize by chatbot_id
     """
 
     _name: str = None
@@ -40,7 +41,9 @@ class Chatbot(ApiBase):
 
     def validate(self):
         """
-        Validate the Smarter Api response body. Raise ValueError for any business rule violations that
+        Validate the Smarter Api response body.
+
+        Raise ValueError for any business rule violations that
         Pydantic would not be able to catch.
         """
 
@@ -63,9 +66,7 @@ class Chatbot(ApiBase):
 
     @property
     def model(self) -> ChatbotModel:
-        """
-        Returns the Pydantic model instance.
-        """
+        """Returns the Pydantic model instance."""
         if not self._model:
             if not self.httpx_response:
                 raise ValueError("http response did not return any data.")
@@ -74,15 +75,15 @@ class Chatbot(ApiBase):
 
     @cached_property
     def name(self) -> str:
-        """
-        Get the name of the chatbot.
-        """
+        """Get the name of the chatbot."""
         return self._name
 
     @cached_property
     def chatbot_id(self) -> int:
         """
-        Get the chatbot_id of the chatbot. Corresponds with the Django model id.
+        Get the chatbot_id of the chatbot.
+
+        Corresponds with the Django model id.
         """
         if not self._chatbot_id:
             sandbox_url_path = self.sandbox_url.path
@@ -94,28 +95,26 @@ class Chatbot(ApiBase):
     def chatbot_metadata(self) -> dict:
         """
         Get the metadata of the chatbot.
+
         Deconstructs the metadata Pydantic model into a standard json dictionary.
         """
         return self.model.data.metadata.model_dump()
 
     @cached_property
     def chatbot_description(self) -> str:
-        """
-        Get the description of the chatbot from the manifest metadata.
-        """
+        """Get the description of the chatbot from the manifest metadata."""
         return self.model.data.metadata.description
 
     @cached_property
     def chatbot_version(self) -> str:
-        """
-        Get the version of the chatbot from the manifest metadata.
-        """
+        """Get the version of the chatbot from the manifest metadata."""
         return self.model.data.metadata.version
 
     @cached_property
     def spec(self) -> dict:
         """
         Get the spec of the chatbot from the manifest data.
+
         Deconstructs the spec Pydantic model into a standard json dictionary.
         """
         return self.model.data.spec.model_dump()
@@ -124,6 +123,7 @@ class Chatbot(ApiBase):
     def config(self) -> dict:
         """
         Get the config of the chatbot from the manifest data.
+
         Deconstructs the config Pydantic model into a standard json dictionary.
         """
         return self.model.data.spec.config.model_dump()
@@ -132,6 +132,7 @@ class Chatbot(ApiBase):
     def status(self) -> dict:
         """
         Get the status of the chatbot from the manifest data.
+
         Deconstructs the status Pydantic model into a standard json dictionary.
         """
         return self.model.data.status.model_dump()
@@ -140,6 +141,7 @@ class Chatbot(ApiBase):
     def sandbox_url(self) -> ParseResult:
         """
         Get the sandbox URL of the chatbot from the manifest status and parse it.
+
         example: https://platform.smarter.sh/api/v1/chatbots/36/
         """
         url_string = self.model.data.status.sandboxUrl
@@ -150,6 +152,7 @@ class Chatbot(ApiBase):
     def url_chatapp(self) -> ParseResult:
         """
         Get the chatapp URL of the chatbot from the manifest status and parse it.
+
         example: https://netec-demo.3141-5926-5359.api.smarter.sh/chatapp/
         """
         url_string = self.model.data.status.urlChatapp
@@ -160,6 +163,7 @@ class Chatbot(ApiBase):
     def url_chatbot(self) -> ParseResult:
         """
         Get the chatbot URL of the chatbot from the manifest status and parse it.
+
         example: "https://platform.smarter.sh/api/v1/chatbots/36/chat/"
         """
         url_string = self.model.data.status.urlChatbot
@@ -169,6 +173,7 @@ class Chatbot(ApiBase):
     def prompt(self, message: str, verbose: bool = False) -> dict:
         """
         Chat with the chatbot.
+
         # http://platform.smarter.sh/api/v1/cli/chat/netec-demo/?new_session=true&uid=admin
         """
         # to do: Smarter() should pass in the 'whoami' data (username, etc) to the Chatbot class.

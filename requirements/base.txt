@@ -1,16 +1,12 @@
 #------------------------------------------------------------------------------
-# These packages run inside of the Docker app/worker containers.
-# To the extent that you might have concerns about platform specific
-# issues, you can refer to Dockerfile in the root of this repo.
+# The runtime dependencies of the smarter-api package, which setup.py installs.
+#
+# This is a library, so these are compatible ranges, not pins: an application
+# that installs the SDK must be free to pin its own versions.
 #------------------------------------------------------------------------------
 
-
-setuptools==78.1.0                      # used in common/conf.py
-cachetools==5.5.2                       # Python object caching library
-httpx>=0.23.0                           # HTTP client
-validators==0.34.0                      # Data validation library
-email-validator==2.2.0                  # for validating email addresses
-python-dotenv==1.1.0                    # for reading environment variables from .env files
-pydantic>=2.0.0                         # best data validation library ever!
-pydantic-settings>=2.0.0                # settings management
-typing-extensions>=4.11                 # for type hinting
+httpx>=0.27,<1                          # HTTP client, and Server-Sent Events streaming
+pydantic>=2.7,<3                        # response and manifest models
+pydantic-settings>=2.3,<3               # SMARTER_* environment variables
+PyYAML>=6.0,<7                          # YAML manifests, and the smarter cli's config.yaml
+email-validator>=2.0,<3                 # the SAM models' EmailStr fields (pydantic[email])

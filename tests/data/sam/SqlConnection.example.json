@@ -1,0 +1,53 @@
+{
+  "apiVersion": "smarter.sh/v1",
+  "kind": "SqlConnection",
+  "metadata": {
+    "name": "example_connection",
+    "description": "Example database connection",
+    "version": "0.1.0",
+    "tags": [
+      "example",
+      "sql",
+      "connection"
+    ],
+    "annotations": [
+      {
+        "smarter.sh/connection": "example_connection"
+      },
+      {
+        "smarter.sh/created_by": "smarter_sql_connection_broker"
+      }
+    ]
+  },
+  "spec": {
+    "connection": {
+      "dbEngine": "django.db.backends.mysql",
+      "hostname": "localhost",
+      "port": 3306,
+      "database": "example_db",
+      "username": "example_user",
+      "password": "example_password",
+      "timeout": 30,
+      "useSsl": false,
+      "sslCert": null,
+      "sslKey": null,
+      "sslCa": null,
+      "proxyHost": null,
+      "proxyPort": null,
+      "proxyUsername": null,
+      "proxyPassword": null,
+      "sshKnownHosts": null,
+      "poolSize": 5,
+      "maxOverflow": 10,
+      "authenticationMethod": "tcpip"
+    }
+  },
+  "status": {
+    "recordLocator": "example_record_locator",
+    "created": "2024-01-01T00:00:00",
+    "modified": "2024-01-01T00:00:00",
+    "dependencies": null,
+    "account_number": "123456789012",
+    "username": "example_user"
+  }
+}

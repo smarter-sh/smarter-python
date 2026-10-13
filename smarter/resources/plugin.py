@@ -1,8 +1,8 @@
-"""
-smarter-api Plugin.
-"""
+"""Smarter-api Plugin."""
 
-from smarter.common.mixins import SmarterHelperMixin
+from __future__ import annotations
+
+from smarter.core.mixins import SmarterHelperMixin
 
 
 class Plugin(SmarterHelperMixin):

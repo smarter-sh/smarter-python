@@ -1,0 +1,55 @@
+{
+  "apiVersion": "smarter.sh/v1",
+  "kind": "SkillPlugin",
+  "metadata": {
+    "name": "meeting_notes",
+    "description": "Turns raw meeting transcripts into structured notes with decisions and action items.",
+    "version": "0.1.0",
+    "tags": [
+      "productivity",
+      "meetings"
+    ],
+    "annotations": [
+      {
+        "smarter.sh/created_by": "smarter_skill_plugin_broker"
+      },
+      {
+        "smarter.sh/plugin": "meeting_notes"
+      }
+    ],
+    "pluginClass": "skill"
+  },
+  "spec": {
+    "selector": {
+      "directive": "search_terms",
+      "searchTerms": [
+        "meeting notes",
+        "meeting transcript",
+        "action items",
+        "minutes"
+      ]
+    },
+    "prompt": {
+      "provider": "openai",
+      "systemRole": "You are a helpful assistant that produces clear, accurate meeting notes.",
+      "model": "gpt-6-luna",
+      "temperature": 1.0,
+      "maxTokens": 2048
+    },
+    "skillData": {
+      "skill": "---\nname: meeting-notes\ndescription: Turns raw meeting transcripts or rough notes into structured meeting notes with a summary, decisions, action items and open questions. Use when the user shares a meeting transcript or rough notes and asks for notes, minutes, a recap or action items.\n---\n\n# Meeting notes\n\n## Instructions\n\n1. Read the entire transcript before writing anything.\n2. Fill in [the notes template](assets/template.md), section by section.\n3. Every action item must have an owner. Never invent an owner. Use \"Unassigned\" instead.\n4. Quote decisions as closely to the attendees' own words as possible.\n",
+      "source": null,
+      "resources": {
+        "assets/template.md": "# {Meeting title}\n\n## Summary\n## Decisions\n## Action items\n## Open questions\n"
+      }
+    }
+  },
+  "status": {
+    "recordLocator": "abc123def456",
+    "created": "2025-01-01T00:00:00Z",
+    "modified": "2025-01-01T00:00:00Z",
+    "dependencies": null,
+    "accountNumber": "1234-5678-9012",
+    "username": "example_user"
+  }
+}

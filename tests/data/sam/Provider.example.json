@@ -1,0 +1,55 @@
+{
+  "apiVersion": "smarter.sh/v1",
+  "kind": "Provider",
+  "metadata": {
+    "name": "acme_llm_company",
+    "description": "an example provider manifest for the Smarter API Provider",
+    "version": "1.0.0",
+    "tags": [
+      "example",
+      "provider",
+      "smarter-api"
+    ],
+    "annotations": [
+      {
+        "smarter.sh/provider": "example_provider"
+      },
+      {
+        "smarter.sh/created_by": "smarter_provider_broker"
+      }
+    ]
+  },
+  "spec": {
+    "provider": {
+      "name": "acme_llm_company",
+      "description": "Leading provider of innovative LLM solutions.",
+      "base_url": "https://api.acme-llm.com",
+      "api_key": "sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "connectivity_test_path": "/https://api.acme-llm.com/api/v1/ping/",
+      "logo": "https://www.acme-llm.com/assets/logo.png",
+      "website_url": "https://www.acme-llm.com",
+      "contact_email": "contact@acme-llm.com",
+      "support_email": "support@acme-llm.com",
+      "terms_of_service_url": "https://www.acme-llm.com/terms",
+      "docs_url": "https://docs.acme-llm.com",
+      "privacy_policy_url": "https://www.acme-llm.com/privacy"
+    }
+  },
+  "status": {
+    "recordLocator": "example_record_locator",
+    "created": "2024-01-01T00:00:00Z",
+    "modified": "2024-01-15T12:00:00Z",
+    "dependencies": null,
+    "is_active": true,
+    "is_flagged": false,
+    "is_deprecated": false,
+    "is_suspended": false,
+    "is_verified": true,
+    "ownership_requested": "ceo@acme-llm.com",
+    "contact_email_verified": "2024-01-02T00:00:00Z",
+    "support_email_verified": "2024-01-02T00:00:00Z",
+    "tos_accepted_at": "2024-01-01T00:00:00Z",
+    "tos_accepted_by": "ceo@acme-llm.com",
+    "can_activate": true
+  }
+}
