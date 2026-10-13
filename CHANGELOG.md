@@ -1,3 +1,10 @@
+## [0.2.4](https://github.com/smarter-sh/smarter-python/compare/v0.2.3...v0.2.4) (2026-10-13)
+
+
+### Bug Fixes
+
+* **plugins:** return a plugin's manifest from Plugins.retrieve() ([b59becd](https://github.com/smarter-sh/smarter-python/commit/b59becdfa113217e6a0e7b2b1eaec7acef40173a))
+
 ## [0.2.3](https://github.com/smarter-sh/smarter-python/compare/v0.2.2...v0.2.3) (2026-10-13)
 
 
