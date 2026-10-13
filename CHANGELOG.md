@@ -1,3 +1,10 @@
+# [0.4.0](https://github.com/smarter-sh/smarter-python/compare/v0.3.0...v0.4.0) (2026-10-13)
+
+
+### Features
+
+* **resources:** type orchestrators and vectorsearches ([68a1982](https://github.com/smarter-sh/smarter-python/commit/68a1982c8837daa73c78d7f51b009fe5a6d77e6c))
+
 # [0.3.0](https://github.com/smarter-sh/smarter-python/compare/v0.2.4...v0.3.0) (2026-10-13)
 
 
