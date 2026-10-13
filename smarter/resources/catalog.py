@@ -79,17 +79,17 @@ class Plugins(SmarterKindResource[Plugin]):
         """
         return self._client.manifests.delete(self.kind_of(name), name)
 
-    def retrieve(self, id: SmarterIdType) -> Plugin:  # pylint: disable=redefined-builtin
+    def retrieve(self, id: SmarterIdType) -> Manifest:  # type: ignore[override]  # pylint: disable=redefined-builtin
         """
-        One plugin, by its id.
+        One plugin's manifest, by the plugin's id.
 
         The platform serves this only when its ``ALLOW_API_GET`` waffle switch is on. Otherwise it
         answers 405: use :meth:`find` or :meth:`describe` instead.
 
         :param id: The plugin's id.
-        :returns: The plugin.
+        :returns: The plugin's manifest, whose ``kind`` is the plugin's, e.g. ``SqlPlugin``.
         """
-        return self._http.request("GET", f"{self.path}{resource_id(id)}/", cast_to=Plugin)
+        return self._http.request("GET", f"{self.path}{resource_id(id)}/", cast_to=Manifest)
 
 
 class Orchestrators(SmarterKindResource[Orchestrator]):
