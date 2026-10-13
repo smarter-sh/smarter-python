@@ -146,6 +146,12 @@ class TestOpenApiContract(SmarterTestBase):
             lambda: self.client.llm_clients.functions(12),
             lambda: self.client.llm_clients.api_keys(12),
             lambda: self.client.llm_clients.custom_domains(12),
+            lambda: self.client.guardrails.list(),
+            lambda: self.client.guardrails.retrieve("rMTAwMDAwMQx"),
+            lambda: self.client.guardrails.evaluate(1, "hello"),
+            lambda: self.client.guardrails.events(1, reviewed=False),
+            lambda: self.client.secrets.list(),
+            lambda: self.client.secrets.retrieve(1),
             lambda: self.client.llm_clients.config(12),
             lambda: self.client.llm_clients.prompt("rMTAwMDAxMgx", "Hello"),
             lambda: list(self.client.llm_clients.stream(12, "Hello").__enter__()),
@@ -185,6 +191,10 @@ class TestRecordedResponses(unittest.TestCase):
         "llmclient_functions": ("/llm-clients/{id}/functions", "get"),
         "config": ("/llm-clients/{id}/config/", "post"),
         "prompt": ("/llm-clients/{id}/prompt/", "post"),
+        "guardrails": ("/guardrails/", "get"),
+        "guardrail_eval": ("/guardrails/{id}/evaluate/", "post"),
+        "guardrail_events": ("/guardrails/{id}/events/", "get"),
+        "secrets": ("/secrets/", "get"),
     }
     """Each fixture of tests/data/, by name, and the operation whose 200 response it is."""
 
