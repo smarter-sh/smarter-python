@@ -23,3 +23,12 @@ class TestAccounts(SmarterTestBase):
         self.assertEqual(self.client.accounts.users.retrieve(1).username, "admin")
         self.assertTrue(self.client.accounts.contacts.list()[0].is_primary)
         self.assertEqual(self.client.accounts.contacts.retrieve(1).account.account_number, "1234-5678-9012")  # type: ignore[union-attr]
+
+    def test_user_profiles(self):
+        """The user profiles are listed and retrieved, with their users and accounts."""
+        self.route("GET", "accounts/user-profiles/", fixture="user_profiles")
+        self.route("GET", "accounts/user-profiles/1/", json_body=self.load_json("user_profiles")[0])
+        self.assertEqual(self.client.accounts.user_profiles.list()[0].user.username, "admin")
+        profile = self.client.accounts.user_profiles.retrieve(1)
+        self.assertEqual(profile.account.account_number, "1234-5678-9012")
+        self.assertFalse(profile.is_test)
