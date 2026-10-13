@@ -11,6 +11,7 @@ doesn't publish, or a cli operation that the platform adds and the SDK doesn't c
 
 import json
 import re
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -125,6 +126,10 @@ class TestOpenApiContract(SmarterTestBase):
     def test_requests_are_published(self):
         """Every request of the SDK to a documented family is an operation, and the SDK calls every operation."""
         manifest = json.loads((CONTRACTS.parent / "sam" / "Guardrail.example.json").read_text(encoding="utf-8"))
+        directory = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+        self.addCleanup(directory.cleanup)
+        upload = Path(directory.name) / "notes.txt"
+        upload.write_text("Some notes.", encoding="utf-8")
         calls = [
             lambda: self.client.manifests.apply(manifest),
             lambda: self.client.manifests.validate(manifest),
@@ -157,6 +162,20 @@ class TestOpenApiContract(SmarterTestBase):
             lambda: self.client.mcp_clients.tools(1, refresh=True),
             lambda: self.client.mcp_clients.refresh(1),
             lambda: self.client.mcp_clients.call_tool(1, "add_numbers", {"a": 1, "b": 2}),
+            lambda: self.client.vectorstores.list(),
+            lambda: self.client.vectorstores.retrieve("rMTAwMDAwMQx"),
+            lambda: self.client.vectorstores.status(1),
+            lambda: self.client.vectorstores.deploy(1),
+            lambda: self.client.vectorstores.undeploy(1),
+            lambda: self.client.vectorstores.documents(1),
+            lambda: self.client.vectorstores.add_text(1, "Some text.", name="faq"),
+            lambda: self.client.vectorstores.add_url(1, "https://example.com/page.html"),
+            lambda: self.client.vectorstores.add_files(1, [upload]),
+            lambda: self.client.vectorstores.delete_document(1, 2),
+            lambda: self.client.vectorstores.search(1, "query"),
+            lambda: self.client.vectorstores.snapshots(1),
+            lambda: self.client.vectorstores.create_snapshot(1),
+            lambda: self.client.vectorstores.restore(1, 3),
             lambda: self.client.llm_clients.config(12),
             lambda: self.client.llm_clients.prompt("rMTAwMDAxMgx", "Hello"),
             lambda: list(self.client.llm_clients.stream(12, "Hello").__enter__()),
@@ -171,7 +190,7 @@ class TestOpenApiContract(SmarterTestBase):
         published = {
             item[method]["operationId"]
             for item in self.document["paths"].values()
-            for method in ("get", "post")
+            for method in ("get", "post", "delete")
             if method in item
         }
         self.assertEqual(
@@ -202,6 +221,7 @@ class TestRecordedResponses(unittest.TestCase):
         "secrets": ("/secrets/", "get"),
         "mcpclients": ("/mcpclients/", "get"),
         "mcp_tools": ("/mcpclients/{id}/tools/", "get"),
+        "vectorstores": ("/vectorstores/", "get"),
     }
     """Each fixture of tests/data/, by name, and the operation whose 200 response it is."""
 
