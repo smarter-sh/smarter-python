@@ -1,4 +1,4 @@
-"""Models of accounts, users and account contacts, as ``/api/v1/accounts/`` returns them."""
+"""Models of accounts, users, user profiles and account contacts, as ``/api/v1/accounts/`` returns them."""
 
 from datetime import datetime
 from typing import Optional
@@ -37,6 +37,15 @@ class User(SmarterCamelModel):
     is_superuser: Optional[bool] = None
 
 
+class UserProfile(SmarterResource):
+    """A user's membership of an account, which owns the resources that the user creates in it."""
+
+    user: User
+    account: SmarterAccountRef
+    profile_image_url: Optional[str] = None
+    is_test: Optional[bool] = None
+
+
 class AccountContact(SmarterCamelModel):
     """A contact of an account, who receives its notices."""
 
@@ -53,4 +62,4 @@ class AccountContact(SmarterCamelModel):
     welcomed: Optional[bool] = None
 
 
-__all__ = ["Account", "AccountContact", "User"]
+__all__ = ["Account", "AccountContact", "User", "UserProfile"]

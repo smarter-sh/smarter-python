@@ -8,6 +8,7 @@ from pydantic import Field
 from smarter.core.typing import SmarterJsonObjectType, SmarterJsonType
 
 from .base import SmarterCamelModel, SmarterModel, SmarterResource
+from .plugin import Plugin
 
 
 class Secret(SmarterResource):
@@ -51,7 +52,7 @@ class PromptToolCall(SmarterModel):
     prompt: Union[PromptSession, int, None] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
-    plugin: Optional[SmarterJsonType] = None
+    plugin: Optional[int] = Field(None, description="The id of the plugin that the tool belongs to, if any.")
     function_name: Optional[str] = None
     function_args: Optional[str] = None
     request: SmarterJsonType = None
@@ -65,7 +66,7 @@ class PromptPluginUsage(SmarterModel):
     prompt: Union[PromptSession, int, None] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
-    plugin: Optional[SmarterJsonType] = None
+    plugin: Optional[Plugin] = None
     input_text: Optional[str] = None
 
 
