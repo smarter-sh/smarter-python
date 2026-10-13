@@ -68,9 +68,25 @@ class TestLive(unittest.TestCase):
                 resource.list()
         self.client.accounts.users.list()
         self.client.accounts.contacts.list()
+        self.client.accounts.user_profiles.list()
         self.client.history.sessions()
         self.client.history.tool_calls()
         self.client.history.plugin_usage()
+
+    def test_retrieves(self):
+        """The first row of each list of the accounts and the prompt history is retrieved by its id."""
+        for listed, retrieve in (
+            (self.client.accounts.users.list, self.client.accounts.users.retrieve),
+            (self.client.accounts.user_profiles.list, self.client.accounts.user_profiles.retrieve),
+            (self.client.accounts.contacts.list, self.client.accounts.contacts.retrieve),
+            (self.client.history.sessions, self.client.history.session),
+            (self.client.history.tool_calls, self.client.history.tool_call),
+            (self.client.history.plugin_usage, self.client.history.plugin_use),
+        ):
+            with self.subTest(retrieve=retrieve.__qualname__):
+                rows = listed()
+                if rows:
+                    self.assertEqual(retrieve(rows[0].id).id, rows[0].id)
 
     def test_optional_apis(self):
         """The apis that a platform may disable, or that require a superuser, parse when they answer."""

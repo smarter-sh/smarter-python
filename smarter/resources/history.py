@@ -12,7 +12,11 @@ from .base import SmarterAPIResource, resource_id
 
 
 class PromptHistory(SmarterAPIResource):
-    """The chat sessions of the api key's user, and their tool calls and plugin uses."""
+    """
+    The chat sessions of the api key's user, and their tool calls and plugin uses, newest first.
+
+    An account admin also reads the sessions of their account's users, and a superuser every session.
+    """
 
     path = "prompts/history/"
 
@@ -57,6 +61,15 @@ class PromptHistory(SmarterAPIResource):
         :returns: The plugin uses.
         """
         return self._http.request("GET", f"{self.path}plugin-usage/", cast_to=list[PromptPluginUsage])
+
+    def plugin_use(self, id: SmarterIdType) -> PromptPluginUsage:  # pylint: disable=redefined-builtin
+        """
+        A plugin use, by id.
+
+        :param id: The plugin use's id.
+        :returns: The plugin use.
+        """
+        return self._http.request("GET", f"{self.path}plugin-usage/{resource_id(id)}/", cast_to=PromptPluginUsage)
 
 
 class Journal(SmarterAPIResource):

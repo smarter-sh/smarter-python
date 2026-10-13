@@ -4,7 +4,7 @@ The api resources of a :class:`smarter.Smarter` client.
 Each is an attribute of the client, e.g. ``client.llm_clients`` or ``client.manifests``.
 """
 
-from .accounts import AccountContacts, Accounts, Users
+from .accounts import AccountContacts, Accounts, UserProfiles, Users
 from .base import ManifestInput, SmarterAPIResource, SmarterKindResource
 from .catalog import Orchestrators, Plugins, Secrets, Vectorsearches
 from .guardrails import Guardrails
@@ -46,6 +46,7 @@ __all__ = [
     "SmarterAPIResource",
     "SmarterKindResource",
     "SmarterPromptError",
+    "UserProfiles",
     "Users",
     "Vectorsearches",
     "Vectorstores",

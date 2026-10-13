@@ -11,7 +11,7 @@ working when the platform adds fields. See :mod:`smarter.models.base`.
 - the other modules: the REST api's resources, e.g. ``LLMClient`` and ``Guardrail``
 """
 
-from .account import Account, AccountContact, User
+from .account import Account, AccountContact, User, UserProfile
 from .base import SmarterModel, SmarterResource
 from .chat import (
     PromptChatApiConfig,
@@ -132,6 +132,7 @@ __all__ = [
     "SmarterModel",
     "SmarterResource",
     "User",
+    "UserProfile",
     "Vectorsearch",
     "Vectorstore",
     "VectorstoreDocument",
