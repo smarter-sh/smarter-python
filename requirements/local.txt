@@ -14,6 +14,7 @@
 pytest==8.3.4
 pytest_mock==3.14.0
 coverage==7.6.10
+jsonschema==4.26.0                      # tests/test_contracts.py: the recorded responses against openapi.json
 
 # packaging: the sdist and wheel, and their check
 # ------------

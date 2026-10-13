@@ -39,15 +39,25 @@ class LLMClientApiKey(SmarterCamelModel):
 
     id: int
     llmclient: Optional[int] = None
-    api_key: Optional[int] = None
+    api_key: Optional[str] = Field(None, description="The api key's public key_id, a UUID. Never the key itself.")
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
 
 
 class LLMClientCustomDomain(SmarterCamelModel):
-    """A custom domain on which an LLMClient is deployed."""
+    """A custom domain on which an LLMClient is deployed: the domain itself, and its verification."""
 
     id: int
-    llmclient: Optional[int] = None
-    custom_domain: Optional[int] = None
+    name: Optional[str] = None
+    description: Optional[str] = None
+    version: Optional[str] = None
+    domain_name: Optional[str] = Field(None, description="The domain, e.g. example.com.")
+    verification_status: Optional[str] = Field(None, description="Not Verified, Verifying, Verified or Failed.")
+    verified_at: Optional[datetime] = None
+    verification_message: Optional[str] = None
+    user_profile: Optional[int] = Field(None, description="The owner's user profile id.")
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
 
 
 class LLMClient(SmarterResource):
@@ -69,8 +79,17 @@ class LLMClient(SmarterResource):
     custom_url: Optional[str] = None
     sandbox_host: Optional[str] = None
     sandbox_url: Optional[str] = None
+    url_llmclient: Optional[str] = Field(None, description="Where to send prompts: the chat api's prompt url.")
+    url_chat_config: Optional[str] = Field(None, description="The chat api's configuration url.")
+    ready: Optional[bool] = Field(None, description="Whether the LLMClient can be prompted.")
+    is_authentication_required: Optional[bool] = Field(
+        None, description="Whether prompting the LLMClient requires an api key."
+    )
+    can_delete: Optional[bool] = Field(None, description="Whether the api key's user may delete the LLMClient now.")
     functions: list[LLMClientFunction] = []
     plugins: list[LLMClientPluginRef] = []
+    api_keys: list[LLMClientApiKey] = []
+    custom_domains: list[LLMClientCustomDomain] = []
 
 
 __all__ = [
