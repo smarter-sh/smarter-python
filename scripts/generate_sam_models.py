@@ -1,25 +1,25 @@
 """
-Generate the SDK's SAM models from a running Smarter platform's JSON Schemas.
+Generate the SDK's SAM models from the Smarter platform's committed JSON Schemas.
 
 The platform's SAM (Smarter Application Manifest) models are Pydantic models that depend on Django,
-so the SDK cannot import them. The platform publishes each kind's JSON Schema, generated from
-those models, at ``/api/v1/cli/json-schema/<Kind>/``. This script:
+so the SDK cannot import them. The platform commits each kind's JSON Schema, generated from those
+models, and an example manifest of each kind, in ``smarter/smarter/apps/api/v1/contract/sam/``.
+``scripts/sync-contracts.sh`` copies them into ``tests/data/sam/``. This script:
 
-1. saves each kind's schema, and its example manifest, in ``tests/data/sam/``,
-2. generates ``smarter/models/sam/<kind>.py`` from the schema with datamodel-code-generator, on
-   :class:`smarter.models.sam.base.SAMModel`, and
-3. writes ``smarter/models/sam/__init__.py``, whose ``SAM_MODELS`` maps each kind to its model.
+1. generates ``smarter/models/sam/<kind>.py`` from each kind's schema with
+   datamodel-code-generator, on :class:`smarter.models.sam.base.SAMModel`, and
+2. writes ``smarter/models/sam/__init__.py``, whose ``SAM_MODELS`` maps each kind to its model.
 
 The tests check that every generated model parses its kind's example manifest.
 
-usage, from the repository root, with the SDK's usual configuration (SMARTER_API_KEY, SMARTER_BASE_URL):
+usage, from the repository root (``make sam-models`` runs both):
 
-    python scripts/generate_sam_models.py
-    python scripts/generate_sam_models.py --offline   # regenerate from the saved schemas
+    scripts/sync-contracts.sh ../smarter
+    python scripts/generate_sam_models.py            # every kind
+    python scripts/generate_sam_models.py Guardrail  # only these kinds
 """
 
 import argparse
-import json
 import subprocess  # nosec B404 - runs datamodel-codegen, with fixed arguments
 import sys
 from pathlib import Path
@@ -39,23 +39,6 @@ Do not edit: run ``scripts/generate_sam_models.py``. See :mod:`smarter.models.sa
 def module_name(kind: str) -> str:
     """The module of a kind's model, e.g. ``llmclient`` for ``LLMClient``."""
     return kind.lower()
-
-
-def fetch(kinds_filter: list[str]) -> list[str]:
-    """Save each kind's schema and example manifest from the platform, and return the kinds."""
-    sys.path.insert(0, str(ROOT))
-    from smarter import Smarter  # pylint: disable=import-outside-toplevel
-
-    DATA.mkdir(parents=True, exist_ok=True)
-    with Smarter() as client:
-        kinds = [kind.api_kind for kind in client.kinds() if not kinds_filter or kind.api_kind in kinds_filter]
-        for kind in kinds:
-            schema = client.manifests.json_schema(kind)
-            example = client.manifests.example_manifest(kind).model_dump(mode="json", exclude_none=True)
-            (DATA / f"{kind}.schema.json").write_text(json.dumps(schema, indent=2, sort_keys=True) + "\n")
-            (DATA / f"{kind}.example.json").write_text(json.dumps(example, indent=2) + "\n")
-            print(f"fetched {kind}")
-    return kinds
 
 
 def generate(kind: str) -> None:
@@ -157,18 +140,23 @@ __all__ = [
 
 
 def main() -> None:
-    """Fetch the schemas (unless ``--offline``), and generate the models."""
+    """Generate the models of the schemas in ``tests/data/sam/``."""
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--offline", action="store_true", help="regenerate from the schemas in tests/data/sam/")
     parser.add_argument("kinds", nargs="*", help="only these kinds")
     args = parser.parse_args()
-    if args.offline:
-        kinds = sorted(path.name.split(".")[0] for path in DATA.glob("*.schema.json"))
-    else:
-        kinds = fetch(args.kinds)
-    for kind in kinds:
-        generate(kind)
     all_kinds = sorted(path.name.split(".")[0] for path in DATA.glob("*.schema.json"))
+    if not all_kinds:
+        sys.exit(f"No schemas in {DATA}. Run scripts/sync-contracts.sh first.")
+    unknown = sorted(set(args.kinds) - set(all_kinds))
+    if unknown:
+        sys.exit(f"No schemas of {', '.join(unknown)} in {DATA}.")
+    for kind in args.kinds or all_kinds:
+        generate(kind)
+    # remove the models of kinds that the platform no longer has.
+    for module in PACKAGE.glob("*.py"):
+        if module.stem not in {"__init__", "base"} | {module_name(kind) for kind in all_kinds}:
+            module.unlink()
+            print(f"removed {module.relative_to(ROOT)}")
     write_package(all_kinds)
 
 

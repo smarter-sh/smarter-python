@@ -1,3 +1,10 @@
+## [0.2.2](https://github.com/smarter-sh/smarter-python/compare/v0.2.1...v0.2.2) (2026-10-13)
+
+
+### Bug Fixes
+
+* **ci:** make the release tag and smarter/__version__.py match ([34fe7f5](https://github.com/smarter-sh/smarter-python/commit/34fe7f53f42251b68233ff3e626a7eb464abd342))
+
 ## [0.2.1](https://github.com/smarter-sh/smarter-python/compare/v0.2.0...v0.2.1) (2026-10-13)
 
 

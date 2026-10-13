@@ -2,17 +2,15 @@
   "apiVersion": "smarter.sh/v1",
   "kind": "Prompt",
   "metadata": {
-    "name": "snake-case-name",
     "description": "An example Smarter API manifest for a Prompt",
-    "version": "1.0.0",
-    "tags": [],
-    "annotations": []
+    "name": "snake-case-name",
+    "version": "1.0.0"
   },
   "spec": {
-    "sessionKey": "dde3dde5e3b97134f5bce5edf26ec05134da71d8485a86dfc9231149aaf0b0af",
-    "llmclient": "example-llmclient",
     "ipAddress": "192.168.1.1",
-    "userAgent": "Mozilla/5.0",
-    "url": "https://example-llmclient.3141-5926-5359.api.example.com/"
+    "llmclient": "example-llmclient",
+    "sessionKey": "dde3dde5e3b97134f5bce5edf26ec05134da71d8485a86dfc9231149aaf0b0af",
+    "url": "https://example-llmclient.3141-5926-5359.api.example.com/",
+    "userAgent": "Mozilla/5.0"
   }
 }
