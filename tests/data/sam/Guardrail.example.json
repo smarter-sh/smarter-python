@@ -2,61 +2,49 @@
   "apiVersion": "smarter.sh/v1",
   "kind": "Guardrail",
   "metadata": {
-    "name": "example_guardrail",
-    "description": "Redacts credit card numbers and social security numbers from the user's message.",
-    "version": "1.0.0",
-    "tags": [
-      "example",
-      "pii"
-    ],
     "annotations": [
       {
         "smarter.sh/guardrail/purpose": "example"
       }
-    ]
+    ],
+    "description": "Redacts credit card numbers and social security numbers from the user's message.",
+    "name": "example_guardrail",
+    "tags": [
+      "example",
+      "pii"
+    ],
+    "version": "1.0.0"
   },
   "spec": {
     "config": {
-      "stage": "input",
-      "category": "pii",
-      "strategy": "detector",
-      "pattern": null,
-      "flags": [
-        "IGNORECASE"
-      ],
-      "keywords": [],
+      "action": "redact",
       "caseSensitive": false,
-      "wholeWord": true,
+      "categories": [],
+      "category": "pii",
       "detectors": [
         "credit_card",
         "us_ssn"
       ],
-      "referenceTexts": [],
-      "categories": [],
-      "judgePrompt": null,
-      "threshold": null,
-      "model": null,
-      "provider": null,
-      "action": "redact",
-      "replacement": "[REDACTED {label}]",
-      "message": null,
-      "severity": 4,
-      "mode": "enforce",
       "failClosed": false,
+      "flags": [
+        "IGNORECASE"
+      ],
+      "isActive": true,
+      "judgePrompt": null,
+      "keywords": [],
+      "message": null,
+      "mode": "enforce",
+      "model": null,
+      "pattern": null,
       "priority": 10,
-      "isActive": true
+      "provider": null,
+      "referenceTexts": [],
+      "replacement": "[REDACTED {label}]",
+      "severity": 4,
+      "stage": "input",
+      "strategy": "detector",
+      "threshold": null,
+      "wholeWord": true
     }
-  },
-  "status": {
-    "recordLocator": "abc123def456",
-    "created": "2026-10-13T13:17:52.047",
-    "modified": "2026-10-13T13:17:52.047",
-    "dependencies": null,
-    "accountNumber": "3141-5926-5359",
-    "username": "admin",
-    "triggered": null,
-    "blocked": null,
-    "errors": null,
-    "lastTriggered": null
   }
 }

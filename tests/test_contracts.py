@@ -1,18 +1,25 @@
 """
 Test that the SDK's mirrors of the platform's api contracts are current.
 
-``tests/data/contracts/`` holds the platform's published JSON Schemas and examples (see
-``scripts/sync-contracts.sh``). A field that the platform adds to a contract, and that the SDK's
-model doesn't declare yet, fails :meth:`TestContracts.test_models_declare_every_field`.
+``tests/data/contracts/`` holds the platform's published JSON Schemas and examples, and the cli
+api's OpenAPI document (see ``scripts/sync-contracts.sh``). A field that the platform adds to a
+contract, and that the SDK's model doesn't declare yet, fails
+:meth:`TestContracts.test_models_declare_every_field`. A cli request of the SDK that the platform
+doesn't publish, or a cli operation that the platform adds and the SDK doesn't call yet, fails
+:class:`TestOpenApiContract`.
 """
 
 import json
+import re
 import unittest
 from pathlib import Path
 
 from pydantic import BaseModel
 
+from smarter.core.exceptions import SmarterError
 from smarter.models import chat, journal
+
+from .base import SmarterTestBase
 
 CONTRACTS = Path(__file__).resolve().parent / "data" / "contracts"
 
@@ -81,3 +88,59 @@ class TestContracts(unittest.TestCase):
                 models[name].model_validate(example)
                 parsed += 1
         self.assertGreaterEqual(parsed, 8)
+
+
+class TestOpenApiContract(SmarterTestBase):
+    """Test the SDK's cli requests against the platform's OpenAPI document of the cli api."""
+
+    NOT_CALLED = {"prompt", "prompt_config"}
+    """The cli operations that the SDK doesn't call: it prompts through the chat api instead."""
+
+    def setUp(self):
+        super().setUp()
+        self.document = load("openapi.json")
+
+    def operation(self, method: str, path: str) -> str:
+        """The operationId of a request, from the document's path templates, or fail."""
+        for template, item in self.document["paths"].items():
+            pattern = "^/api/v1" + re.sub(r"\\{[^/]+\\}", "[^/]+", re.escape(template)) + "$"
+            if re.match(pattern, path) and method.lower() in item:
+                return item[method.lower()]["operationId"]
+        self.fail(f"{method} {path} is not in the platform's OpenAPI document.")
+
+    def test_cli_requests_are_published(self):
+        """Every cli request of the SDK is an operation of the document, and the SDK calls every operation."""
+        manifest = json.loads((CONTRACTS.parent / "sam" / "Guardrail.example.json").read_text(encoding="utf-8"))
+        calls = [
+            lambda: self.client.manifests.apply(manifest),
+            lambda: self.client.manifests.validate(manifest),
+            lambda: self.client.manifests.get("Guardrail"),
+            lambda: self.client.manifests.describe("Guardrail", "example"),
+            lambda: self.client.manifests.delete("Guardrail", "example"),
+            lambda: self.client.manifests.deploy("LLMClient", "example"),
+            lambda: self.client.manifests.undeploy("LLMClient", "example"),
+            lambda: self.client.manifests.logs("LLMClient", "example"),
+            lambda: self.client.manifests.example_manifest("Guardrail"),
+            lambda: self.client.manifests.json_schema("Guardrail"),
+            self.client.whoami,
+            self.client.version,
+            self.client.status,
+            self.client.kinds,
+        ]
+        for call in calls:
+            try:
+                call()
+            except SmarterError:
+                pass  # the requests are answered with 404s: only their paths matter.
+        cli = [request for request in self.requests if request.url.path.startswith("/api/v1/cli/")]
+        self.assertEqual(len(cli), len(calls))
+        called = {self.operation(request.method, request.url.path) for request in cli}
+        published = {
+            item[method]["operationId"]
+            for item in self.document["paths"].values()
+            for method in ("get", "post")
+            if method in item
+        }
+        self.assertEqual(
+            published - called, self.NOT_CALLED, "The platform publishes cli operations that the SDK doesn't call."
+        )
