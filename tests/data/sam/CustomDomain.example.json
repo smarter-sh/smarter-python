@@ -2,36 +2,21 @@
   "apiVersion": "smarter.sh/v1",
   "kind": "CustomDomain",
   "metadata": {
-    "name": "example_custom_domain",
-    "description": "Serves the company's LLMClients from llmclients.example.com.",
-    "version": "1.0.0",
-    "tags": [
-      "example"
-    ],
     "annotations": [
       {
         "smarter.sh/custom-domain/purpose": "example"
       }
-    ]
+    ],
+    "description": "Serves the company's LLMClients from llmclients.example.com.",
+    "name": "example_custom_domain",
+    "tags": [
+      "example"
+    ],
+    "version": "1.0.0"
   },
   "spec": {
     "config": {
       "domainName": "llmclients.example.com"
     }
-  },
-  "status": {
-    "recordLocator": "abc123def456",
-    "created": "2026-10-13T13:17:52.676",
-    "modified": "2026-10-13T13:17:52.676",
-    "dependencies": null,
-    "accountNumber": "3141-5926-5359",
-    "username": "admin",
-    "awsHostedZoneId": "Z0123456789ABCDEFGHIJ",
-    "verificationStatus": "Verifying",
-    "verifiedAt": null,
-    "verificationMessage": "The NS records of llmclients.example.com are not delegated to Smarter yet.",
-    "dnsRecords": [
-      "llmclients.example.com 172800 NS ns-123.awsdns-45.com."
-    ]
   }
 }

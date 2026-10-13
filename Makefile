@@ -108,17 +108,20 @@ test-live:
 	PYTHONPATH=$(PYTHONPATH) SMARTER_TEST_LIVE=true python -m unittest discover -s tests/live -t . -v
 
 # -------------------------------------------------------------------------
-# Regenerate smarter/models/sam/ from a running platform's JSON Schemas.
+# Regenerate smarter/models/sam/ from the platform's committed JSON Schemas.
 # -------------------------------------------------------------------------
-sam-models:
+sam-models: contracts
 	$(ACTIVATE_VENV) && \
-	PYTHONPATH=$(PYTHONPATH) python scripts/generate_sam_models.py
+	PYTHONPATH=$(PYTHONPATH) python scripts/generate_sam_models.py && \
+	(ls smarter/models/sam/*.py | xargs pre-commit run --files > /dev/null || true)
 
 # -------------------------------------------------------------------------
-# Copy the platform's chat and journal contracts from ../smarter.
+# Copy the platform's api contracts from ../smarter: the chat and journal
+# contracts, the SAM schemas and examples, and the cli api's OpenAPI document.
+# A ref reads them at a commit or tag, e.g. make contracts SMARTER_REF=v0.20.0
 # -------------------------------------------------------------------------
 contracts:
-	scripts/sync-contracts.sh ../smarter
+	scripts/sync-contracts.sh ../smarter $(SMARTER_REF)
 
 # -------------------------------------------------------------------------
 # Build the project
@@ -196,8 +199,8 @@ help:
 	@echo '<************************** CI/CD **************************>'
 	@echo 'test			- run Python unit tests'
 	@echo 'test-live		- test against a running Smarter platform (SMARTER_BASE_URL, SMARTER_API_KEY)'
-	@echo 'sam-models		- regenerate the SAM models from a running platform'
-	@echo 'contracts		- copy the chat and journal api contracts from ../smarter'
+	@echo 'sam-models		- copy the contracts, and regenerate the SAM models from their schemas'
+	@echo 'contracts		- copy the api contracts, SAM schemas and OpenAPI document from ../smarter'
 	@echo 'build			- build the project'
 	@echo 'force-release		- force a new release to be created in GitHub'
 	@echo 'publish-test		- test deployment to PyPi'

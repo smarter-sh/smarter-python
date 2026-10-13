@@ -2,86 +2,79 @@
   "apiVersion": "smarter.sh/v1",
   "kind": "LLMHost",
   "metadata": {
-    "name": "example_llmhost",
+    "annotations": [
+      {
+        "smarter.sh/llmhost/purpose": "example"
+      }
+    ],
     "description": "Meta Llama 3.1 8B Instruct, served by vLLM on one NVIDIA A10G GPU, with tool calling.",
-    "version": "1.0.0",
+    "name": "example_llmhost",
     "tags": [
       "example",
       "llama",
       "vllm"
     ],
-    "annotations": [
-      {
-        "smarter.sh/llmhost/purpose": "example"
-      }
-    ]
+    "version": "1.0.0"
   },
   "spec": {
-    "model": {
-      "source": "huggingface",
-      "repository": "meta-llama/Llama-3.1-8B-Instruct",
-      "revision": "main",
-      "servedName": "llama-3.1-8b-instruct",
-      "task": "text-generation",
-      "tokenSecret": "huggingface_token",
-      "license": "llama3.1",
-      "architecture": "llama",
-      "parameterCount": 8030261248,
-      "contextWindow": 131072,
-      "quantization": "bf16",
-      "capabilities": {
-        "streaming": true,
-        "functionCalling": true,
-        "vision": false,
-        "reasoning": false
-      }
-    },
+    "compute": "gpu_a10g_1x",
     "engine": {
-      "name": "vllm",
       "apiFormat": "openai_compatible",
-      "contextLength": 16384,
-      "gpuMemoryUtilization": 0.9,
-      "trustRemoteCode": false,
       "args": [
         "--enable-auto-tool-choice",
         "--tool-call-parser",
         "llama3_json"
       ],
-      "env": {}
+      "contextLength": 16384,
+      "env": {},
+      "gpuMemoryUtilization": 0.9,
+      "name": "vllm",
+      "trustRemoteCode": false
     },
-    "compute": "gpu_a10g_1x",
-    "resources": {
-      "gpuCount": 1,
-      "gpuResource": "nvidia.com/gpu",
-      "vramRequiredGb": 21,
-      "cpu": "4",
-      "memory": "24Gi",
-      "shmSize": "8Gi",
-      "nodeSelector": {},
-      "tolerations": []
+    "healthCheck": {
+      "periodSeconds": 10,
+      "startupTimeoutSeconds": 3600
     },
-    "storage": {
-      "size": "50Gi",
-      "accessMode": "ReadWriteOnce",
-      "retain": true
+    "model": {
+      "architecture": "llama",
+      "capabilities": {
+        "functionCalling": true,
+        "reasoning": false,
+        "streaming": true,
+        "vision": false
+      },
+      "contextWindow": 131072,
+      "license": "llama3.1",
+      "parameterCount": 8030261248,
+      "quantization": "bf16",
+      "repository": "meta-llama/Llama-3.1-8B-Instruct",
+      "revision": "main",
+      "servedName": "llama-3.1-8b-instruct",
+      "source": "huggingface",
+      "task": "text-generation",
+      "tokenSecret": "huggingface_token"
     },
     "network": {
-      "ingress": false,
-      "allowUnauthenticated": false
+      "allowUnauthenticated": false,
+      "ingress": false
+    },
+    "resources": {
+      "cpu": "4",
+      "gpuCount": 1,
+      "gpuResource": "nvidia.com/gpu",
+      "memory": "24Gi",
+      "nodeSelector": {},
+      "shmSize": "8Gi",
+      "tolerations": [],
+      "vramRequiredGb": 21
     },
     "scaling": {
       "replicas": 1
     },
-    "healthCheck": {
-      "startupTimeoutSeconds": 3600,
-      "periodSeconds": 10
+    "storage": {
+      "accessMode": "ReadWriteOnce",
+      "retain": true,
+      "size": "50Gi"
     }
-  },
-  "status": {
-    "recordLocator": "abc123def456",
-    "created": "2026-10-13T13:17:52.870117",
-    "modified": "2026-10-13T13:17:52.870118",
-    "accountNumber": "3141-5926-5359",
-    "username": "admin"
   }
 }

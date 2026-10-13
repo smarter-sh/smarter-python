@@ -2,48 +2,41 @@
   "apiVersion": "smarter.sh/v1",
   "kind": "LLMHostCompute",
   "metadata": {
-    "name": "example_gpu_l4_1x",
+    "annotations": [
+      {
+        "smarter.sh/llmhostcompute/purpose": "example"
+      }
+    ],
     "description": "One NVIDIA L4 with 24 GB, 8 vCPUs and 32 GiB.",
-    "version": "1.0.0",
+    "name": "example_gpu_l4_1x",
     "tags": [
       "example",
       "gpu",
       "l4"
     ],
-    "annotations": [
-      {
-        "smarter.sh/llmhostcompute/purpose": "example"
-      }
-    ]
+    "version": "1.0.0"
   },
   "spec": {
+    "cost": {
+      "currency": "USD",
+      "perHour": "0.9776"
+    },
     "node": {
-      "instanceType": "g6.2xlarge",
+      "capacityType": "ON_DEMAND",
       "cpu": 8,
-      "memoryGb": 32,
+      "diskSizeGb": 100,
       "gpu": {
-        "type": "L4",
         "count": 1,
         "memoryGb": 24,
-        "resource": "nvidia.com/gpu"
+        "resource": "nvidia.com/gpu",
+        "type": "L4"
       },
-      "diskSizeGb": 100,
-      "capacityType": "ON_DEMAND"
+      "instanceType": "g6.2xlarge",
+      "memoryGb": 32
     },
     "nodeGroup": {
       "maxNodes": 4,
       "subnetIds": []
-    },
-    "cost": {
-      "perHour": "0.9776",
-      "currency": "USD"
     }
-  },
-  "status": {
-    "recordLocator": "abc123def456",
-    "created": "2026-10-13T13:17:53.047677",
-    "modified": "2026-10-13T13:17:53.047678",
-    "accountNumber": "3141-5926-5359",
-    "username": "admin"
   }
 }

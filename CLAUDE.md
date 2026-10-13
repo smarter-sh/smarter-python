@@ -55,8 +55,8 @@ The SDK's user documentation lives in the platform's repository:
 make test                                   # unit tests
 make coverage                               # unit tests with coverage
 SMARTER_BASE_URL=http://localhost:9357 SMARTER_API_KEY=... make test-live
-make sam-models                             # regenerate smarter/models/sam from a platform
-make contracts                              # copy the chat and journal contracts from ../smarter
+make sam-models                             # make contracts, then regenerate smarter/models/sam
+make contracts                              # copy the platform's contracts, SAM schemas and openapi.json from ../smarter
 PYTHONPATH=. venv/bin/python scripts/generate_reference.py   # api reference into ../smarter
 git diff --name-only | xargs venv/bin/pre-commit run --files
 ```

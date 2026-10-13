@@ -2,47 +2,37 @@
   "apiVersion": "smarter.sh/v1",
   "kind": "Proxy",
   "metadata": {
-    "name": "example_anthropic",
-    "description": "Passthrough access to Anthropic's Messages API, with an API key that Smarter keeps.",
-    "version": "1.0.0",
-    "tags": [
-      "example",
-      "anthropic"
-    ],
     "annotations": [
       {
         "smarter.sh/proxy/documentation": "https://docs.claude.com/en/api/messages"
       }
-    ]
+    ],
+    "description": "Passthrough access to Anthropic's Messages API, with an API key that Smarter keeps.",
+    "name": "example_anthropic",
+    "tags": [
+      "example",
+      "anthropic"
+    ],
+    "version": "1.0.0"
   },
   "spec": {
-    "provider": "anthropic",
-    "apiKey": "anthropic_api_key",
-    "baseUrl": "https://api.anthropic.com/v1/",
-    "auth": {
-      "header": "x-api-key",
-      "scheme": ""
-    },
-    "headers": {
-      "anthropic-version": "2023-06-01"
-    },
     "allowedPaths": [
       "messages",
       "messages/count_tokens",
       "models",
       "models/*"
     ],
-    "timeout": 120,
-    "isActive": true
-  },
-  "status": {
-    "recordLocator": "abc123def456",
-    "created": "2026-10-13T13:17:53.806382",
-    "modified": "2026-10-13T13:17:53.806383",
-    "accountNumber": "3141-5926-5359",
-    "username": "admin",
-    "url": "http://localhost:9357/api/v1/proxy/example_anthropic/",
-    "upstreamUrl": "https://api.anthropic.com/v1/",
-    "apiKeySecret": "anthropic_api_key"
+    "apiKey": "anthropic_api_key",
+    "auth": {
+      "header": "x-api-key",
+      "scheme": ""
+    },
+    "baseUrl": "https://api.anthropic.com/v1/",
+    "headers": {
+      "anthropic-version": "2023-06-01"
+    },
+    "isActive": true,
+    "provider": "anthropic",
+    "timeout": 120
   }
 }

@@ -89,12 +89,17 @@ add an ADR when you make a new decision of that size.
   event's type) are `str`, not `Literal`.
 - **The platform's Pydantic models can't be imported**: both packages are
   named `smarter`, and the platform's models depend on Django. So:
-  - the **SAM models** are generated from the JSON Schema that the platform
-    publishes per kind (`scripts/generate_sam_models.py`, `make sam-models`),
+  - the **SAM models** are generated from the JSON Schema of each kind that
+    the platform commits in `smarter/smarter/apps/api/v1/contract/sam/`
+    (`scripts/generate_sam_models.py`, `make sam-models`), and tested against
+    the platform's committed example manifests,
   - the **chat and journal contracts** are hand-mirrored in
     `smarter/models/chat.py` and `journal.py`, and `tests/test_contracts.py`
     checks them against the platform's committed schemas and examples
     (`scripts/sync-contracts.sh`, `make contracts`),
+  - the **cli api** is published as `openapi.json`, beside the SAM schemas,
+    and `tests/test_contracts.py` checks that every cli request of the SDK is
+    one of its operations, and that the SDK calls every operation,
   - the **React contract** (`smarter/models/react.py`) is pure Pydantic, and
     is copied from `smarter.lib.django.templatetags.smarter_react_contract`.
 - **Configuration follows ADR-007**: one Pydantic settings model,

@@ -57,20 +57,20 @@ git -C ../smarter diff <base>..origin/main -- <path>
 git -C ../smarter show <sha>
 ```
 
-| Area in the report               | What to check, and what to change in the SDK                                                                                                 |
-| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| Manifest (cli) api               | New or changed verbs, parameters, responses: `smarter/resources/manifests.py`, `smarter/client.py` (`whoami`, `version`, `kinds`)            |
-| REST urls and views              | New endpoints to cover, changed paths, parameters, bodies or permissions: `smarter/resources/<family>.py`                                    |
-| Serializers                      | Changed REST response fields: `smarter/models/<family>.py`, and the fixtures in `tests/data/`                                                |
-| SAM manifest models and kinds    | A new, renamed or removed kind, or a changed spec: `make sam-models`, then a resource class for a new kind with a REST api                   |
-| Chat and journal contracts       | `scripts/sync-contracts.sh ../smarter origin/main`, then fix `smarter/models/chat.py` or `journal.py` until `tests/test_contracts.py` passes |
-| Django-React contract            | Copy the change into `smarter/models/react.py`                                                                                               |
-| Authentication                   | Headers, schemes, token formats: `smarter/core/http.py`                                                                                      |
-| Platform settings that gate apis | e.g. a new `SMARTER_ENABLE_*` switch: the docs, and the live tests' skips                                                                    |
-| ADRs                             | A new or changed platform ADR that the SDK follows or adapts: `doc/adr/`                                                                     |
-| Skills                           | A change to a platform skill that a skill here adapts: the adapted copy in `skills/`                                                         |
-| Lint standard                    | Hook or tool configuration changes: `.pre-commit-config.yaml`, `pyproject.toml`, `.flake8`                                                   |
-| The SDK's own docs pages         | Someone edited them in the platform: keep the edit, and make sure the generated reference still matches                                      |
+| Area in the report                      | What to check, and what to change in the SDK                                                                                                                         |
+| --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Manifest (cli) api                      | New or changed verbs, parameters, responses: `smarter/resources/manifests.py`, `smarter/client.py` (`whoami`, `version`, `kinds`)                                    |
+| REST urls and views                     | New endpoints to cover, changed paths, parameters, bodies or permissions: `smarter/resources/<family>.py`                                                            |
+| Serializers                             | Changed REST response fields: `smarter/models/<family>.py`, and the fixtures in `tests/data/`                                                                        |
+| SAM manifest models and kinds           | A new, renamed or removed kind, or a changed spec: `make sam-models SMARTER_REF=origin/main`, then a resource class for a new kind with a REST api                   |
+| Chat and journal contracts, cli OpenAPI | `make contracts SMARTER_REF=origin/main`, then fix `smarter/models/chat.py`, `journal.py` or `smarter/resources/manifests.py` until `tests/test_contracts.py` passes |
+| Django-React contract                   | Copy the change into `smarter/models/react.py`                                                                                                                       |
+| Authentication                          | Headers, schemes, token formats: `smarter/core/http.py`                                                                                                              |
+| Platform settings that gate apis        | e.g. a new `SMARTER_ENABLE_*` switch: the docs, and the live tests' skips                                                                                            |
+| ADRs                                    | A new or changed platform ADR that the SDK follows or adapts: `doc/adr/`                                                                                             |
+| Skills                                  | A change to a platform skill that a skill here adapts: the adapted copy in `skills/`                                                                                 |
+| Lint standard                           | Hook or tool configuration changes: `.pre-commit-config.yaml`, `pyproject.toml`, `.flake8`                                                                           |
+| The SDK's own docs pages                | Someone edited them in the platform: keep the edit, and make sure the generated reference still matches                                                              |
 
 Follow the pattern in `smarter-python-development` ("Covering a platform
 endpoint") for every change: probe the real endpoint (`smarter-api-testing`),
@@ -79,10 +79,15 @@ safe.
 
 Notes:
 
-- **`make sam-models` reads the running local platform**, which runs
-  `../smarter`'s working tree, not `origin/main`. If the two differ in the SAM
-  models, say so, and regenerate from a platform that runs the ref you sync
-  with, or record the mismatch in your report.
+- **Everything comes from the platform's committed contract**, in
+  `../smarter/smarter/smarter/apps/api/v1/contract/` (the SAM schemas and
+  examples, and `openapi.json`), plus the chat and journal contracts. Pass the
+  ref you sync with, e.g. `SMARTER_REF=origin/main`, so that the files are read
+  with `git show` at that ref, not from `../smarter`'s working tree. No running
+  platform is needed.
+- **`tests/test_contracts.py` fails when the platform adds a cli operation**
+  that the SDK doesn't call (`TestOpenApiContract`). Cover it, or add it to
+  `NOT_CALLED` with a reason.
 - **Removals and renames are breaking changes** for the SDK's users. Keep the
   old name as a deprecated alias for a release when that is cheap, and say so
   in the commit body.
@@ -93,8 +98,7 @@ Notes:
 ### 3. Refresh what is generated
 
 ```console
-make sam-models                                     # if the SAM area changed
-scripts/sync-contracts.sh ../smarter origin/main    # if the contracts changed
+make sam-models SMARTER_REF=origin/main    # copies every contract, then regenerates smarter/models/sam/
 PYTHONPATH=. venv/bin/python scripts/generate_reference.py
 skills/smarter-sphinx-docs/scripts/check-sdk-pages.sh
 ```

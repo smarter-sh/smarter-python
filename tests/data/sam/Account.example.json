@@ -2,35 +2,28 @@
   "apiVersion": "smarter.sh/v1",
   "kind": "Account",
   "metadata": {
-    "name": "example_account",
+    "accountNumber": "123456789",
+    "annotations": [],
     "description": "An example Smarter API manifest for an Account",
-    "version": "0.1.0",
+    "name": "example_account",
     "tags": [
       "example"
     ],
-    "annotations": [],
-    "accountNumber": "123456789"
+    "version": "0.1.0"
   },
   "spec": {
     "config": {
-      "companyName": "Example Company Inc.",
-      "phoneNumber": "555-123-4567",
       "address1": "123 Example St.",
       "address2": "Suite 100",
       "city": "Exampleville",
-      "state": "EX",
-      "postalCode": "12345",
+      "companyName": "Example Company Inc.",
       "country": "US",
+      "currency": "USD",
       "language": "en-US",
-      "timezone": "America/New_York",
-      "currency": "USD"
+      "phoneNumber": "555-123-4567",
+      "postalCode": "12345",
+      "state": "EX",
+      "timezone": "America/New_York"
     }
-  },
-  "status": {
-    "recordLocator": "abc123",
-    "created": "2024-01-01T00:00:00Z",
-    "modified": "2024-01-02T00:00:00Z",
-    "dependencies": null,
-    "adminAccount": "123456789"
   }
 }
