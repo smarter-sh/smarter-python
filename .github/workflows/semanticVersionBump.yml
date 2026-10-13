@@ -6,7 +6,12 @@
 # Calculate the version of the 'next' branch based on semantic-release rules.
 # Compares the existing value of __version__.py to the calculated value.
 # If they are different, it will update __version__.py and push the changes
-# to the main branch.
+# to the branch.
+#
+# Not run on main: there, semantic-release writes __version__.py itself
+# (see release.config.js) and commits it in the release commit, so the
+# release tag and the file always match. Running this workflow on main as
+# well would race semantic-release's push.
 #------------------------------------------------------------------------------
 name: Semantic Version Bump
 
@@ -14,9 +19,13 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - main
       - alpha
       - beta
+
+# Serialize runs per branch so two version bumps never race each other.
+concurrency:
+  group: semantic-version-bump-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   bump-version-next:
@@ -56,15 +65,23 @@ jobs:
       - name: Sync __version__.py with latest GitHub release
         if: env.CURRENT_VERSION != env.LATEST_RELEASE
         run: |
-          if python -c 'import sys; sys.exit(0 if "${{ env.CURRENT_VERSION }}" < "${{ env.LATEST_RELEASE }}" else 1)'; then
-            echo "# DO NOT EDIT." >> ${{ env.VERSION_FILE }}
-            echo "# Managed via automated CI/CD in .github/workflows/semanticVersionBump.yml." >> ${{ env.VERSION_FILE }}
+          # sort -V compares semantically; a plain string compare says 0.10.0 < 0.9.0.
+          if [ "$(printf '%s\n%s\n' "${{ env.CURRENT_VERSION }}" "${{ env.LATEST_RELEASE }}" | sort -V | tail -n1)" = "${{ env.LATEST_RELEASE }}" ]; then
+            echo "# DO NOT EDIT." > ${{ env.VERSION_FILE }}
+            echo "# Managed via automated CI/CD in release.config.js and .github/workflows/semanticVersionBump.yml." >> ${{ env.VERSION_FILE }}
             echo "__version__ = \"${{ env.LATEST_RELEASE }}\"" >>  ${{ env.VERSION_FILE }}
             git config --local user.email "action@github.com"
             git config --local user.name "GitHub Action"
             git add ${{ env.VERSION_FILE }}
             git commit -m "chore: [gh] Sync __version__.py with latest GitHub release ${{ env.LATEST_RELEASE }} [skip ci]"
-            git push https://${{ secrets.PAT }}@github.com/${{ github.repository }}.git HEAD:${{ github.ref }}
+            # Other workflows (pushMain.yml semantic-release) push to this
+            # branch on the same trigger, so rebase onto it before pushing.
+            REMOTE=https://${{ secrets.PAT }}@github.com/${{ github.repository }}.git
+            for attempt in 1 2 3 4 5; do
+              git pull --rebase "$REMOTE" "${{ github.ref_name }}" && git push "$REMOTE" "HEAD:${{ github.ref }}" && break
+              [ "$attempt" = 5 ] && exit 1
+              sleep $((attempt * 5))
+            done
           fi
         env:
           VERSION_FILE: ${{ env.PACKAGE_PATH }}${{ env.VERSION_FILE }}
@@ -90,13 +107,20 @@ jobs:
         run: |
           cd ${{ env.PACKAGE_PATH }}
           echo "# DO NOT EDIT." > ${{ env.VERSION_FILE }}
-          echo "# Managed via automated CI/CD in .github/workflows/semanticVersionBump.yml." >> ${{ env.VERSION_FILE }}
+          echo "# Managed via automated CI/CD in release.config.js and .github/workflows/semanticVersionBump.yml." >> ${{ env.VERSION_FILE }}
           echo "__version__ = \"${{ env.NEXT_VERSION }}\"" >>  ${{ env.VERSION_FILE }}
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add ${{ env.VERSION_FILE }}
           git commit -m "chore: [gh] Update __version__.py to ${{ env.NEXT_VERSION }} [skip ci]"
-          git push https://${{ secrets.PAT }}@github.com/${{ github.repository }}.git HEAD:${{ github.ref }}
+          # Other workflows (pushMain.yml semantic-release) push to this
+          # branch on the same trigger, so rebase onto it before pushing.
+          REMOTE=https://${{ secrets.PAT }}@github.com/${{ github.repository }}.git
+          for attempt in 1 2 3 4 5; do
+            git pull --rebase "$REMOTE" "${{ github.ref_name }}" && git push "$REMOTE" "HEAD:${{ github.ref }}" && break
+            [ "$attempt" = 5 ] && exit 1
+            sleep $((attempt * 5))
+          done
         env:
           VERSION_FILE: ${{ env.PACKAGE_PATH }}${{ env.VERSION_FILE }}
           GITHUB_TOKEN: ${{ secrets.PAT }}
