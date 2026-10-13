@@ -1,0 +1,10 @@
+# -----------------------------------------------------------------------------
+# usage:      The unit tests' Python requirements: the SDK's runtime dependencies,
+#             and what the tests need besides them. CI installs this file
+#             (.github/actions/test/action.yml), and local.txt includes it.
+# -----------------------------------------------------------------------------
+
+-r base.txt
+
+coverage==7.6.10
+jsonschema==4.26.0                      # tests/test_contracts.py: the recorded responses against openapi.json
