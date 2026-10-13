@@ -20,7 +20,13 @@ class TestCatalog(SmarterTestBase):
         plugins = self.load_json("plugins")
         plugins[0]["kind"] = "SqlPlugin"
         self.route("GET", "plugins/", json_body=plugins)
-        self.route("GET", "plugins/355/", json_body=plugins[0])
+        manifest = {
+            "apiVersion": "smarter.sh/v1",
+            "kind": "SqlPlugin",
+            "metadata": {"name": plugins[0]["name"]},
+            "spec": {},
+        }
+        self.route("GET", "plugins/355/", json_body=manifest)
         self.route(
             "POST",
             "cli/describe/SqlPlugin/",
@@ -31,7 +37,8 @@ class TestCatalog(SmarterTestBase):
         self.assertEqual(self.client.plugins.kind_of(name), "SqlPlugin")
         self.assertEqual(self.client.plugins.describe(name).kind, "SqlPlugin")
         self.assertEqual(self.client.plugins.delete(name).message, "deleted")
-        self.assertEqual(self.client.plugins.retrieve(355).name, name)
+        retrieved = self.client.plugins.retrieve(355)
+        self.assertEqual((retrieved.kind, retrieved.metadata.name), ("SqlPlugin", name))
 
     def test_plugin_apply(self):
         """Apply() accepts any plugin kind, and refuses other kinds."""
