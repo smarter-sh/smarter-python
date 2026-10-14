@@ -35,3 +35,4 @@ The platform's Pydantic models are the source of truth of its api: the SAM model
 - [ADR-001: Scope and Purpose of the SDK](001-scope.md)
 - [ADR-004: Pydantic Models, Forward Compatible](004-pydantic-models.md)
 - [ADR-009: Testing](009-testing.md)
+- [ADR-022: A Pinned Copy of the Platform's OpenAPI Document](022-pinned-openapi.md)
