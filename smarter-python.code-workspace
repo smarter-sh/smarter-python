@@ -5,6 +5,33 @@
     },
     {
       "path": "."
+    },
+    {
+      "path": "../smarter-nodejs"
+    },
+    {
+      "path": "../smarter-golang"
+    },
+    {
+      "path": "../smarter-cli"
+    },
+    {
+      "path": "../smarter-chat"
+    },
+    {
+      "path": "../smarter-wordpress"
+    },
+    {
+      "path": "../smarter-drupal"
+    },
+    {
+      "path": "../smarter-docs-site-generators"
+    },
+    {
+      "path": "../smarter-gtm-template"
+    },
+    {
+      "path": "../smarter-shopify"
     }
   ],
   "settings": {

@@ -69,6 +69,10 @@ The SDK's documentation lives in the **platform's** repository:
    `SmarterJsonObjectType`. See `smarter-python-typing`.
 10. **Docstrings are reStructuredText** (`:param:`, `:returns:`, `:raises:`),
     exactly as in the platform. See `smarter-docstrings`.
+11. **Type annotations are required** for every public function and method,
+    and for every attribute of a Pydantic model. See `smarter-python-typing`.
+12. **GitHub Actions** should host a build, tests (with coverage), and publish to PyPI. See `smarter-python-testing`. The workflows should be logically/instructionally consistent with Makefile targets, and with the platform's own CI.
+13. **smarter Sphinx docs** should build the SDK's pages in the smarter/docs/source/smarter-framework/. See `smarter-sphinx-docs`.
 
 ## Architecture, and why
 
