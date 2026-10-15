@@ -30,7 +30,7 @@
         "tlsCertificateIssuanceStatus": "Issued"
       },
       "plugins": [],
-      "functions": [],
+      "extensions": [],
       "apiKey": null
     },
     "status": {

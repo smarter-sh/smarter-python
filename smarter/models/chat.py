@@ -274,11 +274,14 @@ class PromptChatApiLLMClientPlugin(PromptChatApiOrmModel):
     plugin_meta: PromptChatApiPluginMeta
 
 
-class PromptChatApiLLMClientFunction(PromptChatApiOrmModel):
-    """A built-in function of the LLMClient."""
+class PromptChatApiLLMClientExtension(PromptChatApiOrmModel):
+    """An extension of the LLMClient, whose tools it offers the LLM."""
 
     llmclient: int
-    name: Optional[str] = Field(None, description="get_current_weather, date_calculator or calculator.")
+    extension: int = Field(..., description="The Extension's id.")
+    name: str = Field(..., description="The Extension's slug, e.g. weather.")
+    version: Optional[str] = Field(None, description="The Extension's installed version, e.g. 1.0.0.")
+    enabled: bool = Field(..., description="Whether the Extension is enabled, so that its tools are offered.")
 
 
 class PromptChatApiPromptRequest(SmarterModel):
@@ -346,12 +349,12 @@ class PromptChatApiMetaData(SmarterModel):
 
 
 class PromptChatApiListMetaData(SmarterModel):
-    """The counts of a list of the LLMClient's plugins or functions."""
+    """The counts of a list of the LLMClient's plugins or extensions."""
 
     total_plugins: Optional[int] = None
     plugins_returned: Optional[int] = None
-    total_functions: Optional[int] = None
-    functions_returned: Optional[int] = None
+    total_extensions: Optional[int] = None
+    extensions_returned: Optional[int] = None
 
 
 class PromptChatApiPluginList(SmarterModel):
@@ -361,16 +364,16 @@ class PromptChatApiPluginList(SmarterModel):
     plugins: list[PromptChatApiLLMClientPlugin] = Field(default_factory=list)
 
 
-class PromptChatApiFunctionList(SmarterModel):
-    """The LLMClient's built-in functions."""
+class PromptChatApiExtensionList(SmarterModel):
+    """The LLMClient's extensions."""
 
     meta_data: PromptChatApiListMetaData
-    functions: list[PromptChatApiLLMClientFunction] = Field(default_factory=list)
+    extensions: list[PromptChatApiLLMClientExtension] = Field(default_factory=list)
 
 
 class PromptChatApiConfig(SmarterModel):
     """
-    An LLMClient's chat configuration: the LLMClient, the chat session's key and history, and its plugins and functions.
+    An LLMClient's chat configuration: the LLMClient, the chat session's key and history, and its plugins and extensions.
 
     A new session's configuration has an empty history. Pass its ``session_key`` to the prompt api
     to continue the session.
@@ -384,7 +387,7 @@ class PromptChatApiConfig(SmarterModel):
     llmclient: PromptChatApiLLMClient
     history: PromptChatApiHistory
     plugins: PromptChatApiPluginList
-    functions: Optional[PromptChatApiFunctionList] = None
+    extensions: Optional[PromptChatApiExtensionList] = None
 
 
 class PromptChatApiConfigRequest(SmarterModel):
@@ -533,17 +536,17 @@ __all__ = [
     "PromptChatApiEnvelope",
     "PromptChatApiErrorBody",
     "PromptChatApiErrorResponse",
+    "PromptChatApiExtensionList",
     "PromptChatApiFileRef",
     "PromptChatApiFilePart",
     "PromptChatApiFunctionCall",
-    "PromptChatApiFunctionList",
     "PromptChatApiHistory",
     "PromptChatApiImagePart",
     "PromptChatApiImageUrl",
     "PromptChatApiInputAudio",
     "PromptChatApiJournalMetadata",
     "PromptChatApiLLMClient",
-    "PromptChatApiLLMClientFunction",
+    "PromptChatApiLLMClientExtension",
     "PromptChatApiLLMClientPlugin",
     "PromptChatApiLLMClientRequest",
     "PromptChatApiListMetaData",
