@@ -1,4 +1,4 @@
-"""Models of LLMClients and their plugins, MCPClients, guardrails, built-in functions, api keys and custom domains."""
+"""Models of LLMClients and their plugins, MCPClients, guardrails, extensions, api keys and custom domains."""
 
 from datetime import datetime
 from typing import Optional
@@ -31,22 +31,23 @@ class LLMClientGuardrailRef(SmarterCamelModel):
 
 
 class LLMClientTool(SmarterCamelModel):
-    """Something that an LLMClient adds to a prompt: a built-in function, plugin, MCPClient or guardrail."""
+    """Something that an LLMClient adds to a prompt: an extension, plugin, MCPClient or guardrail."""
 
     id: int = Field(
-        ..., description="The id of the link row: the LLMClient's function, plugin, MCPClient or guardrail."
+        ..., description="The id of the link row: the LLMClient's extension, plugin, MCPClient or guardrail."
     )
-    name: str = Field(..., description="The function's name, or the linked resource's.")
+    name: str = Field(..., description="The extension's slug, or the linked resource's name.")
     kind: str = Field(
-        ..., description="Function, or the linked resource's manifest kind: Plugin, MCPClient or Guardrail."
+        ..., description="Extension, or the linked resource's manifest kind: Plugin, MCPClient or Guardrail."
     )
 
 
-class LLMClientFunction(SmarterCamelModel):
-    """A built-in function of an LLMClient, e.g. ``calculator``."""
+class LLMClientExtension(SmarterCamelModel):
+    """An extension of an LLMClient, whose tools the LLMClient offers the LLM, e.g. ``calculator``."""
 
     id: int
-    name: Optional[str] = None
+    name: Optional[str] = Field(None, description="The extension's slug, e.g. weather.")
+    extension: Optional[int] = Field(None, description="The Extension's id.")
     llmclient: Optional[int] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
@@ -88,7 +89,7 @@ class LLMClientCustomDomain(SmarterCamelModel):
 
 class LLMClient(SmarterResource):
     """
-    An LLMClient: a deployable AI agent, built from an LLM provider and model, a system prompt, plugins and functions.
+    An LLMClient: a deployable AI agent, built from an LLM provider and model, a system prompt, plugins and extensions.
 
     Prompt it with :meth:`smarter.resources.llmclients.LLMClients.prompt`, or start a chat with
     :meth:`smarter.resources.llmclients.LLMClients.chat`.
@@ -112,13 +113,13 @@ class LLMClient(SmarterResource):
         None, description="Whether prompting the LLMClient requires an api key."
     )
     can_delete: Optional[bool] = Field(None, description="Whether the api key's user may delete the LLMClient now.")
-    functions: list[LLMClientFunction] = []
+    extensions: list[LLMClientExtension] = []
     plugins: list[LLMClientPluginRef] = []
     mcpclients: list[LLMClientMCPClientRef] = []
     guardrails: list[LLMClientGuardrailRef] = []
     tools: list[LLMClientTool] = Field(
         default_factory=list,
-        description="Everything that the LLMClient adds to a prompt: its functions, plugins, MCPClients and "
+        description="Everything that the LLMClient adds to a prompt: its extensions, plugins, MCPClients and "
         "guardrails, in that order.",
     )
     api_keys: list[LLMClientApiKey] = []
@@ -129,7 +130,7 @@ __all__ = [
     "LLMClient",
     "LLMClientApiKey",
     "LLMClientCustomDomain",
-    "LLMClientFunction",
+    "LLMClientExtension",
     "LLMClientGuardrailRef",
     "LLMClientMCPClientRef",
     "LLMClientPlugin",

@@ -1,3 +1,10 @@
+# [0.5.0](https://github.com/smarter-sh/smarter-python/compare/v0.4.2...v0.5.0) (2026-10-15)
+
+
+### Features
+
+* **llmclients:** add mcpclients, guardrails and tools to llmclient ([00abdd3](https://github.com/smarter-sh/smarter-python/commit/00abdd39d9ca999b3626e7d7d39e3499e1daeca9))
+
 ## [0.4.2](https://github.com/smarter-sh/smarter-python/compare/v0.4.1...v0.4.2) (2026-10-15)
 
 

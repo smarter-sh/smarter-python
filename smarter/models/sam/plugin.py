@@ -113,11 +113,11 @@ class SAMPluginCommonSpecPrompt(SAMModel):
 
     Optional. The provider of the LLM. Defaults to openai. The provider is the vendor name for the LLM service that will be used to generate the prompt response.
     """
-    systemRole: str = Field(..., title="Systemrole")
+    systemRole: constr(max_length=32768) = Field(..., title="Systemrole")
     """
     Plugin.spec.prompt.systemRole[str].
 
-    Required. The system role that the Plugin will use for the LLM text completion prompt. Be verbose and specific. Ensure that systemRole accurately conveys to the LLM how you want it to use the Plugin data that is returned.
+    Required. The system role that the Plugin will use for the LLM text completion prompt. Be verbose and specific. Ensure that systemRole accurately conveys to the LLM how you want it to use the Plugin data that is returned. The maximum length is 32768 characters.
     """
     temperature: confloat(ge=0.0, le=1.0) | None = Field(1.0, title="Temperature")
     """
