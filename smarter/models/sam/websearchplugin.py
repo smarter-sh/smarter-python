@@ -7,6 +7,7 @@ Do not edit: run ``scripts/generate_sam_models.py``. See :mod:`smarter.models.sa
 from __future__ import annotations
 
 from datetime import date, datetime
+from enum import Enum
 from typing import Any, Optional, Union
 from uuid import UUID
 
@@ -198,6 +199,42 @@ class WebsearchFetch(SAMModel):
     """WebsearchPlugin.spec.fetch.respectRobotsTxt[bool]: whether to obey websites' robots.txt files."""
 
 
+class Freshness(Enum):
+    """
+    WebsearchPlugin.spec.search.freshness[str]: by default, restrict results to those published within the last ['day', 'week', 'month', 'year'].
+
+    The LLM can override this per search.
+    """
+
+    day = "day"
+    week = "week"
+    month = "month"
+    year = "year"
+
+
+class Provider(Enum):
+    """
+    WebsearchPlugin.spec.search.provider[str]: the web search API.
+
+    One of: ['brave', 'tavily']
+    """
+
+    brave = "brave"
+    tavily = "tavily"
+
+
+class SafeSearch(Enum):
+    """
+    WebsearchPlugin.spec.search.safeSearch[str]: adult content filtering.
+
+    One of: ['off', 'moderate', 'strict']
+    """
+
+    off = "off"
+    moderate = "moderate"
+    strict = "strict"
+
+
 class WebsearchSearch(SAMModel):
     """Smarter API - WebsearchPlugin.spec.websearchData.search: web search, via a web search API."""
 
@@ -209,7 +246,7 @@ class WebsearchSearch(SAMModel):
     """
     country: str | None = Field(None, title="Country")
     """WebsearchPlugin.spec.search.country[str]: an ISO 3166-1 alpha-2 country code, e.g. us, to localize results."""
-    freshness: str | None = Field(None, title="Freshness")
+    freshness: Freshness | None = Field(None, title="Freshness")
     """
     WebsearchPlugin.spec.search.freshness[str]: by default, restrict results to those published within the last ['day', 'week', 'month', 'year'].
 
@@ -219,13 +256,13 @@ class WebsearchSearch(SAMModel):
     """WebsearchPlugin.spec.search.language[str]: an ISO 639-1 language code, e.g. en, to localize results."""
     maxResults: conint(ge=1, le=20) | None = Field(5, title="Maxresults")
     """WebsearchPlugin.spec.search.maxResults[int]: the maximum number of results per search, 1 to 20."""
-    provider: str = Field(..., title="Provider")
+    provider: Provider = Field(..., title="Provider")
     """
     WebsearchPlugin.spec.search.provider[str]: the web search API.
 
     One of: ['brave', 'tavily']
     """
-    safeSearch: str | None = Field("moderate", title="Safesearch")
+    safeSearch: SafeSearch | None = Field("moderate", title="Safesearch")
     """
     WebsearchPlugin.spec.search.safeSearch[str]: adult content filtering.
 

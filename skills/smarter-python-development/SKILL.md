@@ -148,16 +148,17 @@ message rather than fail, and report the bug to the user.
 
 ## Which skill to load
 
-| Task                                                       | Skill                    |
-| ---------------------------------------------------------- | ------------------------ |
-| Unit tests, live tests, fixtures, coverage                 | `smarter-python-testing` |
-| Probing the platform's api by hand                         | `smarter-api-testing`    |
-| Python docstrings                                          | `smarter-docstrings`     |
-| Type annotations, `Any`, the `smarter.core.typing` aliases | `smarter-python-typing`  |
-| The SDK's pages in the platform's Sphinx docs              | `smarter-sphinx-docs`    |
-| Lint, format, pre-commit                                   | `smarter-code-quality`   |
-| Writing a commit message                                   | `smarter-git-commits`    |
-| Monthly sync with the platform, and requirements updates   | `monthly-maintenance`    |
+| Task                                                           | Skill                    |
+| -------------------------------------------------------------- | ------------------------ |
+| Unit tests, live tests, fixtures, coverage                     | `smarter-python-testing` |
+| Probing the platform's api by hand                             | `smarter-api-testing`    |
+| Python docstrings                                              | `smarter-docstrings`     |
+| Type annotations, `Any`, the `smarter.core.typing` aliases     | `smarter-python-typing`  |
+| The SDK's pages in the platform's Sphinx docs                  | `smarter-sphinx-docs`    |
+| Lint, format, pre-commit                                       | `smarter-code-quality`   |
+| Writing a commit message                                       | `smarter-git-commits`    |
+| Monthly sync with the platform, and requirements updates       | `monthly-maintenance`    |
+| A platform contract change to follow now, between maintenances | `smarter-contract-sync`  |
 
 The platform's own skills (`../smarter/skills/`) apply whenever you change the
 platform itself, e.g. to fix a bug that the SDK found.

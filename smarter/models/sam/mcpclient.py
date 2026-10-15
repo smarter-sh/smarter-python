@@ -7,6 +7,7 @@ Do not edit: run ``scripts/generate_sam_models.py``. See :mod:`smarter.models.sa
 from __future__ import annotations
 
 from datetime import date, datetime
+from enum import Enum
 from typing import Any, Optional, Union
 from uuid import UUID
 
@@ -86,6 +87,30 @@ class SAMMCPClientMetadata(SAMModel):
     """
 
 
+class AuthType(Enum):
+    """
+    MCPClient.spec.config.authType[str]: how to authenticate with the MCP server.
+
+    One of: ['none', 'api_key', 'bearer_token', 'oauth2']. oauth2 sends an OAuth access token, obtained elsewhere, as a bearer token.
+    """
+
+    none = "none"
+    api_key = "api_key"
+    bearer_token = "bearer_token"
+    oauth2 = "oauth2"
+
+
+class Transport(Enum):
+    """
+    MCPClient.spec.config.transport[str]: the MCP transport.
+
+    One of: ['http', 'sse']. http is Streamable HTTP, and sse is the legacy HTTP+SSE transport.
+    """
+
+    http = "http"
+    sse = "sse"
+
+
 class SAMMCPClientSpecConfig(SAMModel):
     """Smarter API MCPClient Manifest MCPClient.spec.config."""
 
@@ -103,7 +128,7 @@ class SAMMCPClientSpecConfig(SAMModel):
     """
     apiKeyHeader: str | None = Field("X-API-Key", title="Apikeyheader")
     """MCPClient.spec.config.apiKeyHeader[str]: the HTTP header that carries an api_key credential."""
-    authType: str | None = Field("none", title="Authtype")
+    authType: AuthType | None = Field("none", title="Authtype")
     """
     MCPClient.spec.config.authType[str]: how to authenticate with the MCP server.
 
@@ -141,7 +166,7 @@ class SAMMCPClientSpecConfig(SAMModel):
     """
     timeout: conint(ge=1, le=120) | None = Field(30, title="Timeout")
     """MCPClient.spec.config.timeout[int]: seconds to wait for the MCP server to connect and respond."""
-    transport: str | None = Field("http", title="Transport")
+    transport: Transport | None = Field("http", title="Transport")
     """
     MCPClient.spec.config.transport[str]: the MCP transport.
 
