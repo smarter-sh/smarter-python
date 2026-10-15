@@ -1,4 +1,4 @@
-"""Models of LLMClients and their plugins, built-in functions, api keys and custom domains."""
+"""Models of LLMClients and their plugins, MCPClients, guardrails, built-in functions, api keys and custom domains."""
 
 from datetime import datetime
 from typing import Optional
@@ -14,6 +14,32 @@ class LLMClientPluginRef(SmarterCamelModel):
 
     id: int
     name: Optional[str] = None
+
+
+class LLMClientMCPClientRef(SmarterCamelModel):
+    """An MCPClient of an LLMClient, by the link's id and the MCPClient's name."""
+
+    id: int
+    name: Optional[str] = None
+
+
+class LLMClientGuardrailRef(SmarterCamelModel):
+    """A guardrail of an LLMClient, by the link's id and the guardrail's name."""
+
+    id: int
+    name: Optional[str] = None
+
+
+class LLMClientTool(SmarterCamelModel):
+    """Something that an LLMClient adds to a prompt: a built-in function, plugin, MCPClient or guardrail."""
+
+    id: int = Field(
+        ..., description="The id of the link row: the LLMClient's function, plugin, MCPClient or guardrail."
+    )
+    name: str = Field(..., description="The function's name, or the linked resource's.")
+    kind: str = Field(
+        ..., description="Function, or the linked resource's manifest kind: Plugin, MCPClient or Guardrail."
+    )
 
 
 class LLMClientFunction(SmarterCamelModel):
@@ -88,6 +114,13 @@ class LLMClient(SmarterResource):
     can_delete: Optional[bool] = Field(None, description="Whether the api key's user may delete the LLMClient now.")
     functions: list[LLMClientFunction] = []
     plugins: list[LLMClientPluginRef] = []
+    mcpclients: list[LLMClientMCPClientRef] = []
+    guardrails: list[LLMClientGuardrailRef] = []
+    tools: list[LLMClientTool] = Field(
+        default_factory=list,
+        description="Everything that the LLMClient adds to a prompt: its functions, plugins, MCPClients and "
+        "guardrails, in that order.",
+    )
     api_keys: list[LLMClientApiKey] = []
     custom_domains: list[LLMClientCustomDomain] = []
 
@@ -97,6 +130,9 @@ __all__ = [
     "LLMClientApiKey",
     "LLMClientCustomDomain",
     "LLMClientFunction",
+    "LLMClientGuardrailRef",
+    "LLMClientMCPClientRef",
     "LLMClientPlugin",
     "LLMClientPluginRef",
+    "LLMClientTool",
 ]
