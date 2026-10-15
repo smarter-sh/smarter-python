@@ -37,6 +37,28 @@ class TestLLMClients(SmarterTestBase):
         with self.assertRaises(ResourceNotFoundError):
             self.client.llm_clients.find("nope")
 
+    def test_tools(self):
+        """An LLMClient's MCPClients, guardrails, and tools: its functions, plugins, MCPClients and guardrails."""
+        self.route("GET", "llm-clients/", fixture="llmclients")
+        self.route("GET", "llm-clients/5/", fixture="llmclient")
+        llmclient = self.client.llm_clients.retrieve(5)
+        self.assertEqual(llmclient.mcpclients, [])
+        self.assertEqual(llmclient.guardrails, [])
+        self.assertEqual([(tool.id, tool.name, tool.kind) for tool in llmclient.tools], [(1, "calculator", "Function")])
+        self.assertEqual(
+            [[tool.kind for tool in llmclient.tools] for llmclient in self.client.llm_clients.list()],
+            [["Plugin"], ["Plugin"]],
+        )
+
+    def test_tools_default_to_empty(self):
+        """An LLMClient from a platform that predates the tools has none, rather than failing to validate."""
+        data = self.load_json("llmclient")
+        for key in ("mcpclients", "guardrails", "tools"):
+            del data[key]
+        self.route("GET", "llm-clients/5/", json_body=data)
+        llmclient = self.client.llm_clients.retrieve(5)
+        self.assertEqual((llmclient.mcpclients, llmclient.guardrails, llmclient.tools), ([], [], []))
+
     def test_children(self):
         """An LLMClient's plugins, functions, api keys and custom domains."""
         self.route("GET", "llm-clients/1/plugins/", fixture="llmclient_plugins")
