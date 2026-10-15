@@ -1,3 +1,10 @@
+## [0.4.2](https://github.com/smarter-sh/smarter-python/compare/v0.4.1...v0.4.2) (2026-10-15)
+
+
+### Bug Fixes
+
+* **contracts:** sync with smarter v0.25.1 and regenerate sam models ([e066b03](https://github.com/smarter-sh/smarter-python/commit/e066b03e7ab491931bad66062448da341876c709))
+
 ## [0.4.1](https://github.com/smarter-sh/smarter-python/compare/v0.4.0...v0.4.1) (2026-10-13)
 
 
