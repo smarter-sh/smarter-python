@@ -31,7 +31,7 @@ from .llmclient import (
     LLMClient,
     LLMClientApiKey,
     LLMClientCustomDomain,
-    LLMClientFunction,
+    LLMClientExtension,
     LLMClientPlugin,
 )
 from .llmhost import (
@@ -94,7 +94,7 @@ __all__ = [
     "LLMClient",
     "LLMClientApiKey",
     "LLMClientCustomDomain",
-    "LLMClientFunction",
+    "LLMClientExtension",
     "LLMClientPlugin",
     "LLMHost",
     "LLMHostLogs",

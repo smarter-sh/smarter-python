@@ -49,7 +49,7 @@ from smarter.models.llmclient import (
     LLMClient,
     LLMClientApiKey,
     LLMClientCustomDomain,
-    LLMClientFunction,
+    LLMClientExtension,
     LLMClientPlugin,
 )
 
@@ -378,14 +378,14 @@ class LLMClients(SmarterKindResource[LLMClient]):
         """
         return self._http.request("GET", f"{self.path}{resource_id(id)}/plugins/", cast_to=list[LLMClientPlugin])
 
-    def functions(self, id: SmarterIdType) -> list[LLMClientFunction]:  # pylint: disable=redefined-builtin
+    def extensions(self, id: SmarterIdType) -> list[LLMClientExtension]:  # pylint: disable=redefined-builtin
         """
-        An LLMClient's built-in functions, e.g. ``calculator``.
+        The extensions whose tools an LLMClient offers the LLM, e.g. ``calculator``.
 
         :param id: The LLMClient's integer id.
-        :returns: The functions.
+        :returns: The extensions.
         """
-        return self._http.request("GET", f"{self.path}{resource_id(id)}/functions", cast_to=list[LLMClientFunction])
+        return self._http.request("GET", f"{self.path}{resource_id(id)}/extensions", cast_to=list[LLMClientExtension])
 
     def api_keys(self, id: SmarterIdType) -> list[LLMClientApiKey]:  # pylint: disable=redefined-builtin
         """

@@ -103,7 +103,7 @@ class TestOpenApiContract(SmarterTestBase):
         "llmclient_plugin_retrieve",
         "llmclient_apikey_retrieve",
         "llmclient_customdomain_retrieve",
-        "llmclient_function_retrieve",
+        "llmclient_extension_retrieve",
         "provider_model",
     }
     """
@@ -150,7 +150,7 @@ class TestOpenApiContract(SmarterTestBase):
             lambda: self.client.llm_clients.list(),
             lambda: self.client.llm_clients.retrieve("rMTAwMDAxMgx"),
             lambda: self.client.llm_clients.plugins(12),
-            lambda: self.client.llm_clients.functions(12),
+            lambda: self.client.llm_clients.extensions(12),
             lambda: self.client.llm_clients.api_keys(12),
             lambda: self.client.llm_clients.custom_domains(12),
             lambda: self.client.guardrails.list(),
@@ -250,7 +250,7 @@ class TestRecordedResponses(unittest.TestCase):
         "llmclients": ("/llm-clients/", "get"),
         "llmclient": ("/llm-clients/{id}/", "get"),
         "llmclient_plugins": ("/llm-clients/{id}/plugins/", "get"),
-        "llmclient_functions": ("/llm-clients/{id}/functions", "get"),
+        "llmclient_extensions": ("/llm-clients/{id}/extensions", "get"),
         "config": ("/llm-clients/{id}/config/", "post"),
         "prompt": ("/llm-clients/{id}/prompt/", "post"),
         "guardrails": ("/guardrails/", "get"),

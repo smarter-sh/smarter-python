@@ -167,7 +167,7 @@ class TestLive(unittest.TestCase):
         response = self.client.llm_clients.prompt(llmclient.id, "What is 17 times 23? Use the calculator.")
         self.assertIn("391", response.text.replace(",", ""))
         self.assertIn(("calculator", "Function"), [(tool.name, tool.kind) for tool in llmclient.tools])
-        self.client.llm_clients.functions(llmclient.id)
+        self.client.llm_clients.extensions(llmclient.id)
         self.client.llm_clients.plugins(llmclient.id)
         self.client.llm_clients.api_keys(llmclient.id)
         self.client.llm_clients.custom_domains(llmclient.id)
