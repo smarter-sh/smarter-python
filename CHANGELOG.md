@@ -1,3 +1,10 @@
+## [0.4.1](https://github.com/smarter-sh/smarter-python/compare/v0.4.0...v0.4.1) (2026-10-13)
+
+
+### Bug Fixes
+
+* **ci:** remove commitlint's missing parser preset ([b707761](https://github.com/smarter-sh/smarter-python/commit/b7077616167098525def8b83769ac7c33f895baf))
+
 # [0.4.0](https://github.com/smarter-sh/smarter-python/compare/v0.3.0...v0.4.0) (2026-10-13)
 
 
