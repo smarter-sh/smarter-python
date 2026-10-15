@@ -15,6 +15,7 @@ See: [Michael Nygard's ADRs](https://cognitect.com/blog/2011/11/15/documenting-a
 - **Explain the decision**, and **describe its consequences**, positive and negative.
 - **Use simple language**, for future contributors without today's context.
 - **Use the same format** as the others, and **reference related ADRs**.
+- **Keep the numbering aligned** with the other SDKs and the smarter cli: a decision that every SDK shares takes this SDK's number. A shared decision made later takes the next number free in every repository, which is why 020 and 021 (language-specific ADRs of the Node.js and Go SDKs) are unused here.
 
 ## Index
 
@@ -37,3 +38,4 @@ See: [Michael Nygard's ADRs](https://cognitect.com/blog/2011/11/15/documenting-a
 - [ADR-017: No Response Caching](017-caching.md)
 - [ADR-018: A Synchronous Client First](018-synchronous-client.md)
 - [ADR-019: Supported Python Versions](019-python-versions.md)
+- [ADR-022: A Pinned Copy of the Platform's OpenAPI Document](022-pinned-openapi.md)

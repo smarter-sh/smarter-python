@@ -69,6 +69,10 @@ The SDK's documentation lives in the **platform's** repository:
    `SmarterJsonObjectType`. See `smarter-python-typing`.
 10. **Docstrings are reStructuredText** (`:param:`, `:returns:`, `:raises:`),
     exactly as in the platform. See `smarter-docstrings`.
+11. **Type annotations are required** for every public function and method,
+    and for every attribute of a Pydantic model. See `smarter-python-typing`.
+12. **GitHub Actions** should host a build, tests (with coverage), and publish to PyPI. See `smarter-python-testing`. The workflows should be logically/instructionally consistent with Makefile targets, and with the platform's own CI.
+13. **smarter Sphinx docs** should build the SDK's pages in the smarter/docs/source/smarter-framework/. See `smarter-sphinx-docs`.
 
 ## Architecture, and why
 
@@ -144,16 +148,17 @@ message rather than fail, and report the bug to the user.
 
 ## Which skill to load
 
-| Task                                                       | Skill                    |
-| ---------------------------------------------------------- | ------------------------ |
-| Unit tests, live tests, fixtures, coverage                 | `smarter-python-testing` |
-| Probing the platform's api by hand                         | `smarter-api-testing`    |
-| Python docstrings                                          | `smarter-docstrings`     |
-| Type annotations, `Any`, the `smarter.core.typing` aliases | `smarter-python-typing`  |
-| The SDK's pages in the platform's Sphinx docs              | `smarter-sphinx-docs`    |
-| Lint, format, pre-commit                                   | `smarter-code-quality`   |
-| Writing a commit message                                   | `smarter-git-commits`    |
-| Monthly sync with the platform, and requirements updates   | `monthly-maintenance`    |
+| Task                                                           | Skill                    |
+| -------------------------------------------------------------- | ------------------------ |
+| Unit tests, live tests, fixtures, coverage                     | `smarter-python-testing` |
+| Probing the platform's api by hand                             | `smarter-api-testing`    |
+| Python docstrings                                              | `smarter-docstrings`     |
+| Type annotations, `Any`, the `smarter.core.typing` aliases     | `smarter-python-typing`  |
+| The SDK's pages in the platform's Sphinx docs                  | `smarter-sphinx-docs`    |
+| Lint, format, pre-commit                                       | `smarter-code-quality`   |
+| Writing a commit message                                       | `smarter-git-commits`    |
+| Monthly sync with the platform, and requirements updates       | `monthly-maintenance`    |
+| A platform contract change to follow now, between maintenances | `smarter-contract-sync`  |
 
 The platform's own skills (`../smarter/skills/`) apply whenever you change the
 platform itself, e.g. to fix a bug that the SDK found.

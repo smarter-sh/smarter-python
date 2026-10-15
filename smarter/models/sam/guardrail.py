@@ -7,6 +7,7 @@ Do not edit: run ``scripts/generate_sam_models.py``. See :mod:`smarter.models.sa
 from __future__ import annotations
 
 from datetime import date, datetime
+from enum import Enum
 from typing import Any, Optional, Union
 from uuid import UUID
 
@@ -86,10 +87,79 @@ class SAMGuardrailMetadata(SAMModel):
     """
 
 
+class Action(Enum):
+    """
+    Guardrail.spec.config.action[str]: what the guardrail does when it triggers.
+
+    One of: ['log', 'flag', 'redact', 'transform', 'block', 'escalate'].
+    """
+
+    log = "log"
+    flag = "flag"
+    redact = "redact"
+    transform = "transform"
+    block = "block"
+    escalate = "escalate"
+
+
+class Category(Enum):
+    """
+    Guardrail.spec.config.category[str]: the risk the guardrail addresses.
+
+    One of: ['pii', 'secrets', 'prompt_injection', 'jailbreak', 'toxicity', 'self_harm', 'hallucination', 'off_topic', 'compliance', 'formatting', 'custom'].
+    """
+
+    pii = "pii"
+    secrets = "secrets"
+    prompt_injection = "prompt_injection"
+    jailbreak = "jailbreak"
+    toxicity = "toxicity"
+    self_harm = "self_harm"
+    hallucination = "hallucination"
+    off_topic = "off_topic"
+    compliance = "compliance"
+    formatting = "formatting"
+    custom = "custom"
+
+
+class Mode(Enum):
+    """Guardrail.spec.config.mode[str]: enforce, to take the action, or monitor, to only record what the action would have been."""
+
+    enforce = "enforce"
+    monitor = "monitor"
+
+
+class Stage(Enum):
+    """
+    Guardrail.spec.config.stage[str]: when the guardrail runs.
+
+    One of: ['input', 'output', 'both'].
+    """
+
+    input = "input"
+    output = "output"
+    both = "both"
+
+
+class Strategy(Enum):
+    """
+    Guardrail.spec.config.strategy[str]: how the guardrail detects.
+
+    One of: ['regex', 'keyword', 'detector', 'semantic', 'moderation', 'llm_judge'].
+    """
+
+    regex = "regex"
+    keyword = "keyword"
+    detector = "detector"
+    semantic = "semantic"
+    moderation = "moderation"
+    llm_judge = "llm_judge"
+
+
 class SAMGuardrailSpecConfig(SAMModel):
     """Smarter API Guardrail Manifest Guardrail.spec.config."""
 
-    action: str = Field(..., title="Action")
+    action: Action = Field(..., title="Action")
     """
     Guardrail.spec.config.action[str]: what the guardrail does when it triggers.
 
@@ -103,7 +173,7 @@ class SAMGuardrailSpecConfig(SAMModel):
 
     Empty means all. Any of: ['harassment', 'harassment/threatening', 'hate', 'hate/threatening', 'illicit', 'illicit/violent', 'self-harm', 'self-harm/intent', 'self-harm/instructions', 'sexual', 'sexual/minors', 'violence', 'violence/graphic'].
     """
-    category: str | None = Field("custom", title="Category")
+    category: Category | None = Field("custom", title="Category")
     """
     Guardrail.spec.config.category[str]: the risk the guardrail addresses.
 
@@ -139,7 +209,7 @@ class SAMGuardrailSpecConfig(SAMModel):
     """Guardrail.spec.config.keywords[list]: the keyword strategy's words and phrases."""
     message: str | None = Field(None, title="Message")
     """Guardrail.spec.config.message[str]: what block returns to the user, instead of the LLM's reply."""
-    mode: str | None = Field("enforce", title="Mode")
+    mode: Mode | None = Field("enforce", title="Mode")
     """Guardrail.spec.config.mode[str]: enforce, to take the action, or monitor, to only record what the action would have been."""
     model: str | None = Field(None, title="Model")
     """Guardrail.spec.config.model[str]: the model of the semantic, moderation and llm_judge strategies."""
@@ -167,13 +237,13 @@ class SAMGuardrailSpecConfig(SAMModel):
     """
     severity: conint(ge=1, le=5) | None = Field(3, title="Severity")
     """Guardrail.spec.config.severity[int]: from 1 (low) to 5 (critical), for reporting and review."""
-    stage: str = Field(..., title="Stage")
+    stage: Stage = Field(..., title="Stage")
     """
     Guardrail.spec.config.stage[str]: when the guardrail runs.
 
     One of: ['input', 'output', 'both'].
     """
-    strategy: str = Field(..., title="Strategy")
+    strategy: Strategy = Field(..., title="Strategy")
     """
     Guardrail.spec.config.strategy[str]: how the guardrail detects.
 

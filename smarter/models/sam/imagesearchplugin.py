@@ -7,6 +7,7 @@ Do not edit: run ``scripts/generate_sam_models.py``. See :mod:`smarter.models.sa
 from __future__ import annotations
 
 from datetime import date, datetime
+from enum import Enum
 from typing import Any, Optional, Union
 from uuid import UUID
 
@@ -42,6 +43,17 @@ class ImageSearchFilters(SAMModel):
     """ImageSearchPlugin.spec.filters.minWidth[int]: only images at least this many pixels wide. Images whose width Brave does not report are skipped."""
 
 
+class Safesearch(Enum):
+    """
+    ImageSearchPlugin.spec.searchParams.safesearch[str]: adult content filtering.
+
+    One of: ['off', 'strict']
+    """
+
+    off = "off"
+    strict = "strict"
+
+
 class ImageSearchParams(SAMModel):
     """
     Smarter API - ImageSearchPlugin.spec.imageSearchData.searchParams.
@@ -54,7 +66,7 @@ class ImageSearchParams(SAMModel):
     """ImageSearchPlugin.spec.searchParams.count[int]: the maximum number of images per search, 1 to 20."""
     country: str | None = Field(None, title="Country")
     """ImageSearchPlugin.spec.searchParams.country[str]: a two letter country code, e.g. us, or all for worldwide results."""
-    safesearch: str | None = Field("strict", title="Safesearch")
+    safesearch: Safesearch | None = Field("strict", title="Safesearch")
     """
     ImageSearchPlugin.spec.searchParams.safesearch[str]: adult content filtering.
 

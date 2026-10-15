@@ -7,6 +7,7 @@ Do not edit: run ``scripts/generate_sam_models.py``. See :mod:`smarter.models.sa
 from __future__ import annotations
 
 from datetime import date, datetime
+from enum import Enum
 from typing import Any, Optional, Union
 from uuid import UUID
 
@@ -32,6 +33,35 @@ class SAMDependency(SAMModel):
     """
 
 
+class ApiFormat(Enum):
+    """
+    LLMHost.spec.engine.apiFormat[str]: the wire protocol.
+
+    One of: ['openai_compatible', 'huggingface', 'ollama_native', 'custom'].
+    """
+
+    openai_compatible = "openai_compatible"
+    huggingface = "huggingface"
+    ollama_native = "ollama_native"
+    custom = "custom"
+
+
+class Name(Enum):
+    """
+    LLMHost.spec.engine.name[str]: the inference server.
+
+    One of: ['vllm', 'tgi', 'sglang', 'llama_cpp', 'ollama', 'tei', 'custom'].
+    """
+
+    vllm = "vllm"
+    tgi = "tgi"
+    sglang = "sglang"
+    llama_cpp = "llama_cpp"
+    ollama = "ollama"
+    tei = "tei"
+    custom = "custom"
+
+
 class SAMLLMHostEngineConfig(SAMModel):
     """
     Spec.engine: the inference server.
@@ -44,7 +74,7 @@ class SAMLLMHostEngineConfig(SAMModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    apiFormat: str | None = Field("openai_compatible", title="Apiformat")
+    apiFormat: ApiFormat | None = Field("openai_compatible", title="Apiformat")
     """
     LLMHost.spec.engine.apiFormat[str]: the wire protocol.
 
@@ -74,7 +104,7 @@ class SAMLLMHostEngineConfig(SAMModel):
     """
     maxConcurrentRequests: conint(ge=1) | None = Field(None, title="Maxconcurrentrequests")
     """LLMHost.spec.engine.maxConcurrentRequests[int]: the requests that one replica serves at once."""
-    name: str = Field(..., title="Name")
+    name: Name = Field(..., title="Name")
     """
     LLMHost.spec.engine.name[str]: the inference server.
 
@@ -170,6 +200,51 @@ class SAMLLMHostMetadata(SAMModel):
 
     Example: 0.1.0
     """
+
+
+class Quantization(Enum):
+    """
+    LLMHost.spec.model.quantization[str]: the weights' precision.
+
+    One of: ['none', 'fp32', 'fp16', 'bf16', 'fp8', 'mxfp4', 'int8', 'int4', 'gguf', 'awq', 'gptq'].
+    """
+
+    none = "none"
+    fp32 = "fp32"
+    fp16 = "fp16"
+    bf16 = "bf16"
+    fp8 = "fp8"
+    mxfp4 = "mxfp4"
+    int8 = "int8"
+    int4 = "int4"
+    gguf = "gguf"
+    awq = "awq"
+    gptq = "gptq"
+
+
+class Source(Enum):
+    """
+    LLMHost.spec.model.source[str]: where the weights come from.
+
+    One of: ['huggingface', 'ollama', 's3', 'url', 'pvc'].
+    """
+
+    huggingface = "huggingface"
+    ollama = "ollama"
+    s3 = "s3"
+    url = "url"
+    pvc = "pvc"
+
+
+class Task(Enum):
+    """
+    LLMHost.spec.model.task[str]: what the model does.
+
+    One of: ['text-generation', 'embedding'].
+    """
+
+    text_generation = "text-generation"
+    embedding = "embedding"
 
 
 class SAMLLMHostModelCapabilities(SAMModel):
@@ -401,6 +476,14 @@ class SAMLLMHostStatus(SAMModel):
     """
 
 
+class AccessMode(Enum):
+    """LLMHost.spec.storage.accessMode[str]: One of: ['ReadWriteOnce', 'ReadWriteMany', 'ReadOnlyMany']."""
+
+    ReadWriteOnce = "ReadWriteOnce"
+    ReadWriteMany = "ReadWriteMany"
+    ReadOnlyMany = "ReadOnlyMany"
+
+
 class SAMLLMHostStorage(SAMModel):
     """
     Spec.storage: the model volume, a PersistentVolumeClaim mounted at /models.
@@ -412,7 +495,7 @@ class SAMLLMHostStorage(SAMModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    accessMode: str | None = Field("ReadWriteOnce", title="Accessmode")
+    accessMode: AccessMode | None = Field("ReadWriteOnce", title="Accessmode")
     """LLMHost.spec.storage.accessMode[str]: One of: ['ReadWriteOnce', 'ReadWriteMany', 'ReadOnlyMany']."""
     existingClaim: str | None = Field(None, title="Existingclaim")
     """
@@ -456,7 +539,7 @@ class SAMLLMHostModel(SAMModel):
     """LLMHost.spec.model.license[str]: e.g. apache-2.0."""
     parameterCount: conint(ge=0) | None = Field(None, title="Parametercount")
     """LLMHost.spec.model.parameterCount[int]: the number of parameters."""
-    quantization: str | None = Field("none", title="Quantization")
+    quantization: Quantization | None = Field("none", title="Quantization")
     """
     LLMHost.spec.model.quantization[str]: the weights' precision.
 
@@ -476,13 +559,13 @@ class SAMLLMHostModel(SAMModel):
 
     Defaults to the LLMHost's name. Ollama always uses repository.
     """
-    source: str | None = Field("huggingface", title="Source")
+    source: Source | None = Field("huggingface", title="Source")
     """
     LLMHost.spec.model.source[str]: where the weights come from.
 
     One of: ['huggingface', 'ollama', 's3', 'url', 'pvc'].
     """
-    task: str | None = Field("text-generation", title="Task")
+    task: Task | None = Field("text-generation", title="Task")
     """
     LLMHost.spec.model.task[str]: what the model does.
 

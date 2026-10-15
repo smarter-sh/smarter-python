@@ -24,17 +24,18 @@ Start with `smarter-python-development`. It sets out the rules that apply to
 every change, the SDK's architecture, and which narrower skill to load for each
 kind of task.
 
-| Skill                        | Use it when                                                                   |
-| ---------------------------- | ----------------------------------------------------------------------------- |
-| `smarter-python-development` | You're making any change. Start here.                                         |
-| `smarter-python-testing`     | You're writing or running the unit or live tests, or raising coverage.        |
-| `smarter-api-testing`        | You're probing the platform's api by hand, e.g. to build a fixture.           |
-| `smarter-docstrings`         | You're writing docstrings, which become the api reference on docs.smarter.sh. |
-| `smarter-python-typing`      | You're writing type annotations, especially with `Any`.                       |
-| `smarter-sphinx-docs`        | You're editing the SDK's pages in the platform's `docs/source`.               |
-| `smarter-code-quality`       | You're about to finish a change and need to run the pre-commit hooks.         |
-| `smarter-git-commits`        | You've been asked to write a commit message.                                  |
-| `monthly-maintenance`        | It's time to sync the SDK with the platform, and update its requirements.     |
+| Skill                        | Use it when                                                                         |
+| ---------------------------- | ----------------------------------------------------------------------------------- |
+| `smarter-python-development` | You're making any change. Start here.                                               |
+| `smarter-python-testing`     | You're writing or running the unit or live tests, or raising coverage.              |
+| `smarter-api-testing`        | You're probing the platform's api by hand, e.g. to build a fixture.                 |
+| `smarter-docstrings`         | You're writing docstrings, which become the api reference on docs.smarter.sh.       |
+| `smarter-python-typing`      | You're writing type annotations, especially with `Any`.                             |
+| `smarter-sphinx-docs`        | You're editing the SDK's pages in the platform's `docs/source`.                     |
+| `smarter-code-quality`       | You're about to finish a change and need to run the pre-commit hooks.               |
+| `smarter-git-commits`        | You've been asked to write a commit message.                                        |
+| `monthly-maintenance`        | It's time to sync the SDK with the platform, and update its requirements.           |
+| `smarter-contract-sync`      | The platform's api contract changed, and this repository's copy must follow it now. |
 
 The bundled scripts are ordinary shell scripts that you can run yourself from
 the repository root:
