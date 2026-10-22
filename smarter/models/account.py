@@ -3,6 +3,8 @@
 from datetime import datetime
 from typing import Optional
 
+from pydantic import Field
+
 from .base import SmarterAccountRef, SmarterCamelModel, SmarterResource
 
 
@@ -42,7 +44,10 @@ class UserProfile(SmarterResource):
 
     user: User
     account: SmarterAccountRef
-    profile_image_url: Optional[str] = None
+    profile_image: Optional[str] = Field(
+        None, description="The url of the image that the user uploaded, which takes precedence over profile_image_url."
+    )
+    profile_image_url: Optional[str] = Field(None, description="The url of the image that the oauth provider supplied.")
     is_test: Optional[bool] = None
 
 
