@@ -11,7 +11,7 @@ from enum import Enum
 from typing import Any, Optional, Union
 from uuid import UUID
 
-from pydantic import ConfigDict, Field, confloat, conint, constr
+from pydantic import ConfigDict, Field, confloat, conint
 
 from smarter.models.sam.base import SAMModel
 
@@ -152,24 +152,7 @@ class SAMLLMHostMetadata(SAMModel):
     """Smarter API LLMHost Manifest - Metadata class."""
 
     annotations: None | (
-        list[
-            dict[
-                str,
-                (
-                    str
-                    | int
-                    | float
-                    | bool
-                    | date
-                    | datetime
-                    | constr(pattern=r"^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$")
-                    | UUID
-                    | bytes
-                    | list
-                    | dict[str, Any]
-                ),
-            ]
-        ]
+        list[dict[str, str | int | float | bool | date | datetime | UUID | bytes | list | dict[str, Any]]]
     ) = Field(None, title="Annotations")
     """
     The manifest annotations.
@@ -406,7 +389,7 @@ class SAMLLMHostStatus(SAMModel):
 
     Read only.
     """
-    estimatedCost: float | constr(pattern=r"^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$") | None = Field(None, title="Estimatedcost")
+    estimatedCost: float | str | None = Field(None, title="Estimatedcost")
     """LLMHost.status.estimatedCost: uptimeHours times replicas times each replica's share of its compute's node price. Read only."""
     healthy: bool | None = Field(None, title="Healthy")
     """

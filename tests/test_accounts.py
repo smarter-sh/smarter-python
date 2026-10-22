@@ -32,3 +32,12 @@ class TestAccounts(SmarterTestBase):
         profile = self.client.accounts.user_profiles.retrieve(1)
         self.assertEqual(profile.account.account_number, "1234-5678-9012")
         self.assertFalse(profile.is_test)
+        self.assertIsNone(profile.profile_image)
+
+    def test_user_profile_image(self):
+        """A user profile has the url of the image that the user uploaded, beside the oauth provider's."""
+        body = {**self.load_json("user_profiles")[0], "profileImage": "https://example.com/uploaded.png"}
+        self.route("GET", "accounts/user-profiles/1/", json_body=body)
+        self.assertEqual(
+            self.client.accounts.user_profiles.retrieve(1).profile_image, "https://example.com/uploaded.png"
+        )

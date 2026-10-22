@@ -109,6 +109,11 @@ with chat.stream("Now take its square root.") as stream:
     print(stream.response.text)
 ```
 
+`client.llm_clients.config(llmclient.id)` returns the chat configuration that a
+session starts with. It has what a chat needs, and only the counts of the
+LLMClient's plugins and extensions. Pass `verbose=True` for the complete
+configuration, with their lists and the session's tool calls.
+
 ### Errors
 
 ```python

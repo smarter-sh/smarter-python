@@ -108,6 +108,10 @@ class JournalPagination(SmarterCamelModel):
     search: str = ""
     ordering: str = ""
     sort_fields: list[str] = []
+    filter: str = Field(
+        "", description="The named filter that narrows the list, e.g. pending, or an empty string for none."
+    )
+    filters: list[str] = Field(default_factory=list, description="The named filters that the list offers.")
 
 
 class JournalPage(SmarterModel):

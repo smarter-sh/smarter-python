@@ -273,18 +273,31 @@ class LLMClients(SmarterKindResource[LLMClient]):
     model = LLMClient
 
     def config(
-        self, id: SmarterIdType, *, session_key: str | None = None
+        self, id: SmarterIdType, *, session_key: str | None = None, verbose: bool = False
     ) -> PromptChatApiConfig:  # pylint: disable=redefined-builtin
         """
         An LLMClient's chat configuration, and a chat session.
 
+        By default the configuration has what a chat needs: the LLMClient, the session's key and chat
+        history, a short ``meta_data``, and the counts of the LLMClient's plugins and extensions, whose
+        lists are empty. ``verbose=True`` asks for the complete configuration, which adds those lists,
+        the session's tool calls (``history.prompt_tool_call_history``) and the complete ``meta_data``.
+
+        .. code-block:: python
+
+            config = client.llm_clients.config(llmclient.id, verbose=True)
+            print([plugin.plugin_meta.name for plugin in config.plugins.plugins])
+
         :param id: The LLMClient's id or hashed id.
         :param session_key: An existing session's key, to resume it with its history, or None for a new session.
+        :param verbose: True for the complete configuration, with the lists of the LLMClient's plugins
+            and extensions, and the session's tool calls. A deployed LLMClient's own host ignores it.
         :returns: The configuration, whose ``session_key`` identifies the session.
         """
         response = self._http.request(
             "POST",
             f"{self.path}{resource_id(id)}/config/",
+            params={"verbose": verbose or None},
             json={"session_key": session_key},
             cast_to=PromptChatApiConfigResponse,
         )

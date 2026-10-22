@@ -49,24 +49,7 @@ class SAMPluginCommonMetadata(SAMModel):
     """Smarter API Plugin Manifest - common Metadata class."""
 
     annotations: None | (
-        list[
-            dict[
-                str,
-                (
-                    str
-                    | int
-                    | float
-                    | bool
-                    | date
-                    | datetime
-                    | constr(pattern=r"^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$")
-                    | UUID
-                    | bytes
-                    | list
-                    | dict[str, Any]
-                ),
-            ]
-        ]
+        list[dict[str, str | int | float | bool | date | datetime | UUID | bytes | list | dict[str, Any]]]
     ) = Field(None, title="Annotations")
     """
     The manifest annotations.

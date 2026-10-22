@@ -87,6 +87,40 @@ class TestLLMClients(SmarterTestBase):
         self.assertEqual(config.extensions.meta_data.total_extensions, 1)
         self.assertEqual([(e.name, e.enabled) for e in config.extensions.extensions], [("calculator", True)])
         self.assertEqual(self.request_json(), {"session_key": "abc"})
+        self.assertNotIn("verbose", self.last_request.url.params)
+
+    def test_config_verbose(self):
+        """Config(verbose=True) asks for the complete configuration, with the lists and the tool calls."""
+        self.route("POST", "llm-clients/5/config/", fixture="config")
+        config = self.client.llm_clients.config(5, verbose=True)
+        self.assertEqual(self.last_request.url.params["verbose"], "true")
+        self.assertEqual(self.request_json(), {"session_key": None})
+        self.assertEqual(config.history.prompt_tool_call_history, [])
+        self.assertFalse(config.meta_data.is_custom_domain)
+        self.assertFalse(config.meta_data.is_authentication_required)
+
+    def test_config_short(self):
+        """Without verbose, the configuration has the counts of the plugins and extensions, and no lists."""
+        response = self.load_json("config")
+        data = response["data"]
+        data["meta_data"] = {
+            "ready": True,
+            "is_deployed": False,
+            "is_custom_domain": False,
+            "is_authentication_required": True,
+        }
+        data["plugins"] = {"meta_data": {"total_plugins": 2, "plugins_returned": 0}}
+        data["extensions"] = {"meta_data": {"total_extensions": 1, "extensions_returned": 0}}
+        data["llmclient"]["total_tools"] = 3
+        del data["history"]["prompt_tool_call_history"]
+        self.route("POST", "llm-clients/5/config/", json_body=response)
+        config = self.client.llm_clients.config(5)
+        self.assertNotIn("verbose", self.last_request.url.params)
+        self.assertEqual((config.plugins.meta_data.total_plugins, config.plugins.plugins), (2, []))
+        self.assertEqual((config.extensions.meta_data.total_extensions, config.extensions.extensions), (1, []))
+        self.assertEqual(config.llmclient.total_tools, 3)
+        self.assertIsNone(config.history.prompt_tool_call_history)
+        self.assertTrue(config.meta_data.is_authentication_required)
 
     def test_prompt(self):
         """Prompt() sends the user's message, and returns the LLM's reply."""

@@ -1,3 +1,10 @@
+## [0.5.1](https://github.com/smarter-sh/smarter-python/compare/v0.5.0...v0.5.1) (2026-10-15)
+
+
+### Bug Fixes
+
+* **contracts:** sync with smarter v0.27.1, functions become extensions ([e65f6a1](https://github.com/smarter-sh/smarter-python/commit/e65f6a1eb1cc9400e79950e7855ecf9153ac3bfc))
+
 # [0.5.0](https://github.com/smarter-sh/smarter-python/compare/v0.4.2...v0.5.0) (2026-10-15)
 
 
