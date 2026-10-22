@@ -30,6 +30,7 @@ class TestHistory(SmarterTestBase):
         self.route("GET", "journal/", fixture="journal")
         page = self.client.journal.list(page=2, page_size=10, search="apply", ordering="-createdAt")
         self.assertEqual(page.pagination.page_size, 25)
+        self.assertEqual((page.pagination.filter, page.pagination.filters), ("", []))
         self.assertEqual(
             dict(self.last_request.url.params),
             {"page": "2", "page_size": "10", "search": "apply", "ordering": "-createdAt"},

@@ -11,7 +11,7 @@ from enum import Enum
 from typing import Any, Optional, Union
 from uuid import UUID
 
-from pydantic import Field, PositiveInt, confloat, constr
+from pydantic import Field, PositiveInt, confloat
 
 from smarter.models.sam.base import SAMModel
 
@@ -37,24 +37,7 @@ class SAMVectorsearchMetadata(SAMModel):
     """Smarter API Vectorsearch Manifest - Metadata class."""
 
     annotations: None | (
-        list[
-            dict[
-                str,
-                (
-                    str
-                    | int
-                    | float
-                    | bool
-                    | date
-                    | datetime
-                    | constr(pattern=r"^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$")
-                    | UUID
-                    | bytes
-                    | list
-                    | dict[str, Any]
-                ),
-            ]
-        ]
+        list[dict[str, str | int | float | bool | date | datetime | UUID | bytes | list | dict[str, Any]]]
     ) = Field(None, title="Annotations")
     """
     The manifest annotations.

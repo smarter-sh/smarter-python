@@ -20,24 +20,7 @@ class SAMBudgetMetadata(SAMModel):
     """Smarter API Budget Manifest - Metadata class."""
 
     annotations: None | (
-        list[
-            dict[
-                str,
-                (
-                    str
-                    | int
-                    | float
-                    | bool
-                    | date
-                    | datetime
-                    | constr(pattern=r"^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$")
-                    | UUID
-                    | bytes
-                    | list
-                    | dict[str, Any]
-                ),
-            ]
-        ]
+        list[dict[str, str | int | float | bool | date | datetime | UUID | bytes | list | dict[str, Any]]]
     ) = Field(None, title="Annotations")
     """
     The manifest annotations.
@@ -96,9 +79,7 @@ class Unit(Enum):
 class SAMBudgetSpecConfig(SAMModel):
     """Smarter API Budget Manifest Budget.spec.config: the budget's limits."""
 
-    absoluteLimit: confloat(ge=0.0) | constr(pattern=r"^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$") | None = Field(
-        "0", title="Absolutelimit"
-    )
+    absoluteLimit: confloat(ge=0.0) | str | None = Field("0", title="Absolutelimit")
     """
     Budget.spec.config.absoluteLimit: the most that may be spent in total, from when the budget is attached.
 
@@ -120,9 +101,7 @@ class SAMBudgetSpecConfig(SAMModel):
     """
     period: Period | None = Field("month", title="Period")
     """Budget.spec.config.period: the billing period of periodicLimit and duration."""
-    periodicLimit: confloat(ge=0.0) | constr(pattern=r"^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$") | None = Field(
-        "0", title="Periodiclimit"
-    )
+    periodicLimit: confloat(ge=0.0) | str | None = Field("0", title="Periodiclimit")
     """
     Budget.spec.config.periodicLimit: the most that may be spent in a billing period.
 
@@ -193,7 +172,7 @@ class SAMBudgetStatusResource(SAMModel):
     Read only.
     """
 
-    absoluteActual: float | constr(pattern=r"^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$") = Field(..., title="Absoluteactual")
+    absoluteActual: float | str = Field(..., title="Absoluteactual")
     """Budget.status.resources.absoluteActual: spending since startDate."""
     absolutePercent: float | None = Field(None, title="Absolutepercent")
     """Budget.status.resources.absolutePercent: absoluteActual, as a percentage of the limit."""
@@ -205,7 +184,7 @@ class SAMBudgetStatusResource(SAMModel):
     """Budget.status.resources.isLocked: whether the budget refuses further charges."""
     lockReason: str | None = Field(None, title="Lockreason")
     """Budget.status.resources.lockReason: which limit was reached."""
-    periodicActual: float | constr(pattern=r"^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$") = Field(..., title="Periodicactual")
+    periodicActual: float | str = Field(..., title="Periodicactual")
     """Budget.status.resources.periodicActual: spending this billing period."""
     periodicPercent: float | None = Field(None, title="Periodicpercent")
     """Budget.status.resources.periodicPercent: periodicActual, as a percentage of the limit."""

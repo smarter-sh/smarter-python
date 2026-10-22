@@ -98,24 +98,7 @@ class SAMVectorstoreMetadata(SAMModel):
     """Smarter API Vectorstore Manifest - Metadata class."""
 
     annotations: None | (
-        list[
-            dict[
-                str,
-                (
-                    str
-                    | int
-                    | float
-                    | bool
-                    | date
-                    | datetime
-                    | constr(pattern=r"^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$")
-                    | UUID
-                    | bytes
-                    | list
-                    | dict[str, Any]
-                ),
-            ]
-        ]
+        list[dict[str, str | int | float | bool | date | datetime | UUID | bytes | list | dict[str, Any]]]
     ) = Field(None, title="Annotations")
     """
     The manifest annotations.

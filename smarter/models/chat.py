@@ -246,6 +246,9 @@ class PromptChatApiLLMClient(SmarterModel):
     app_info_url: Optional[str] = None
     app_file_attachment: Optional[bool] = None
     styles: Optional[PromptChatApiStyles] = None
+    total_tools: Optional[int] = Field(
+        None, description="The number of the LLMClient's extensions, plugins and MCPClients."
+    )
 
 
 class PromptChatApiOrmModel(SmarterModel):
@@ -329,7 +332,11 @@ class PromptChatApiPluginSelection(PromptChatApiOrmModel):
 
 
 class PromptChatApiHistory(SmarterModel):
-    """The chat session's history."""
+    """
+    The chat session's history.
+
+    ``prompt_tool_call_history`` is returned only in the complete configuration, with ``verbose=True``.
+    """
 
     chat_history: list[PromptChatApiMessage] = Field(
         default_factory=list, description="The session's messages, which restore the chat thread."
@@ -341,11 +348,20 @@ class PromptChatApiHistory(SmarterModel):
 
 
 class PromptChatApiMetaData(SmarterModel):
-    """The LLMClient's state."""
+    """
+    The LLMClient's state.
+
+    The complete configuration, from :meth:`~smarter.resources.llmclients.LLMClients.config` with
+    ``verbose=True``, adds the platform's other details of the LLMClient, which this model accepts as extra fields.
+    """
 
     ready: Optional[bool] = None
     is_valid: Optional[bool] = None
     is_deployed: Optional[bool] = None
+    is_authentication_required: Optional[bool] = Field(
+        None, description="True if the LLMClient requires a Smarter api key, or a logged-in user."
+    )
+    is_custom_domain: Optional[bool] = Field(None, description="True if the request's host is a custom domain.")
 
 
 class PromptChatApiListMetaData(SmarterModel):
@@ -358,14 +374,24 @@ class PromptChatApiListMetaData(SmarterModel):
 
 
 class PromptChatApiPluginList(SmarterModel):
-    """The LLMClient's plugins."""
+    """
+    The LLMClient's plugins.
+
+    The list itself is returned only in the complete configuration, with ``verbose=True``. Otherwise
+    ``plugins`` is empty, and ``meta_data`` has the counts.
+    """
 
     meta_data: PromptChatApiListMetaData
     plugins: list[PromptChatApiLLMClientPlugin] = Field(default_factory=list)
 
 
 class PromptChatApiExtensionList(SmarterModel):
-    """The LLMClient's extensions."""
+    """
+    The LLMClient's extensions.
+
+    The list itself is returned only in the complete configuration, with ``verbose=True``. Otherwise
+    ``extensions`` is empty, and ``meta_data`` has the counts.
+    """
 
     meta_data: PromptChatApiListMetaData
     extensions: list[PromptChatApiLLMClientExtension] = Field(default_factory=list)

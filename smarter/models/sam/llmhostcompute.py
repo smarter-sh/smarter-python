@@ -40,7 +40,7 @@ class SAMLLMHostComputeCost(SAMModel):
     )
     currency: str | None = Field("USD", title="Currency")
     """LLMHostCompute.spec.cost.currency[str]: e.g. USD."""
-    perHour: confloat(ge=0.0) | constr(pattern=r"^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$") | None = Field(None, title="Perhour")
+    perHour: confloat(ge=0.0) | str | None = Field(None, title="Perhour")
     """LLMHostCompute.spec.cost.perHour[decimal]: the cost per hour of one node, e.g. its on-demand price."""
 
 
@@ -64,24 +64,7 @@ class SAMLLMHostComputeMetadata(SAMModel):
     """Smarter API LLMHostCompute Manifest - Metadata class."""
 
     annotations: None | (
-        list[
-            dict[
-                str,
-                (
-                    str
-                    | int
-                    | float
-                    | bool
-                    | date
-                    | datetime
-                    | constr(pattern=r"^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$")
-                    | UUID
-                    | bytes
-                    | list
-                    | dict[str, Any]
-                ),
-            ]
-        ]
+        list[dict[str, str | int | float | bool | date | datetime | UUID | bytes | list | dict[str, Any]]]
     ) = Field(None, title="Annotations")
     """
     The manifest annotations.
