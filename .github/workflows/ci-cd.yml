@@ -26,7 +26,7 @@ jobs:
     steps:
       - name: Checkout code
         id: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - id: check
         run: |
@@ -49,7 +49,7 @@ jobs:
     steps:
       - name: Checkout code
         id: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Test
         uses: ./.github/actions/test
@@ -60,7 +60,7 @@ jobs:
     steps:
       - name: Checkout code
         id: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Build
         uses: ./.github/actions/build
