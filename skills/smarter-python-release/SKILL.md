@@ -105,6 +105,15 @@ gh run watch
 6. `publish-pypi`, then `verify-pypi`: PyPI, **from `main` only**, when
    `PUBLISH_TO_PYPI` is `"true"`, and only if the rehearsal passed or is off.
    Prereleases from `alpha` and `beta` stop at TestPyPI.
+7. `publish-docs`: once `verify-pypi` passed, and when `PUBLISH_DOCS` is
+   `"true"`, builds the Sphinx site from the release tag (warnings are errors),
+   syncs it to the docs bucket, invalidates CloudFront, and waits until
+   https://docs.smarter-python.smarter.sh/ shows the new version. It runs in
+   the `docs` environment and signs in to AWS with GitHub's OIDC token, as the
+   role in `terraform/docs/github_actions.tf`, which only that environment can
+   assume and which can only sync the bucket and invalidate the distribution.
+   So the site always documents what PyPI serves, and prereleases never reach
+   it. The job is cache-results' `publish-docs`; keep the two the same.
 
 - Releasing and publishing are **one workflow**, so that a tagged release
   can't miss PyPI. There is no `make publish-*` and no `twine upload`.
@@ -119,7 +128,13 @@ gh run watch
 
 Secrets: `CODECOV_TOKEN` (coverage), and `PAT` only when `main` is protected
 against `GITHUB_TOKEN`'s pushes. Variables: `PUBLISH_TO_TESTPYPI` and
-`PUBLISH_TO_PYPI`, `"false"` until the trusted publishers are registered.
+`PUBLISH_TO_PYPI`, `"false"` until the trusted publishers are registered;
+`PUBLISH_DOCS`, `"false"` until the publisher role exists; and
+`DOCS_AWS_ROLE_ARN`, `DOCS_BUCKET` and `DOCS_DISTRIBUTION_ID`, which are
+`terraform/docs`' outputs `publisher_role_arn`, `bucket_name` and
+`distribution_id`. They are repository variables, not files, because this
+public repository must not contain an account or distribution id. The `docs`
+environment allows only `main`, as `pypi` does.
 
 ## Dependencies and requirements
 

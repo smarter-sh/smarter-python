@@ -32,3 +32,4 @@ context, the alternatives considered, and its consequences.
    adr/024-release-workflow
    adr/025-packaging
    adr/026-release-on-push
+   adr/027-publish-docs-on-release

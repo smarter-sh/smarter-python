@@ -20,7 +20,7 @@ The SDK's documentation lives in this repository, in ``docs/source/``, and is pu
 
 - It is built by Sphinx with the Read the Docs theme, as the platform's documentation is. ``make sphinx-build`` treats every warning as an error, and CI builds it on every push and pull request.
 - The api reference is autodoc of the SDK itself, from its reStructuredText docstrings.
-- The site is static: a private S3 bucket behind CloudFront, with a certificate and DNS records in the ``smarter.sh`` zone, all declared in ``terraform/docs/``. ``make sphinx-publish`` uploads a build.
+- The site is static: a private S3 bucket behind CloudFront, with a certificate and DNS records in the ``smarter.sh`` zone, all declared in ``terraform/docs/``. The Release workflow publishes the site after every release from ``main``, once PyPI has it (:doc:`ADR-027 <027-publish-docs-on-release>`), and ``make sphinx-publish`` publishes between releases.
 - Every page's footer says that the SDK is part of The Smarter Project, and links to https://smarter.sh.
 - The platform's documentation keeps a short page about the SDK that links here.
 
@@ -50,4 +50,5 @@ Related ADRs
 
 - :doc:`ADR-012: Docstrings and Documentation <012-documentation>`
 - :doc:`ADR-024: CI and the Release Workflow <024-release-workflow>`
+- :doc:`ADR-027: Publish the Docs Site From the Release Workflow <027-publish-docs-on-release>`
 - `Smarter ADR-029: Docstring Style <https://github.com/smarter-sh/smarter/blob/main/docs/source/adr/029-docstrings.rst>`__

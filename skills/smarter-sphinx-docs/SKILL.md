@@ -118,9 +118,12 @@ One decision each, in Michael Nygard's format, in the format of the platform's
 make sphinx-publish   # sphinx-build, aws s3 sync --delete, CloudFront invalidation of /*
 ```
 
-It reads the bucket and distribution from the Terraform outputs, so it needs
-`make terraform-init` once, and AWS credentials for the account. The user
-publishes; publish yourself only when asked.
+The Release workflow's `publish-docs` job publishes the site the same way after
+every release from `main`, once PyPI has it (`smarter-python-release`), so a
+release needs no step here. `make sphinx-publish` is for publishing between
+releases, e.g. a docs fix. It reads the bucket and distribution from the
+Terraform outputs, so it needs `make terraform-init` once, and AWS credentials
+for the account. The user publishes; publish yourself only when asked.
 
 ## The site's AWS resources (`terraform/docs/`)
 
@@ -133,7 +136,12 @@ aws cli:
   the bucket policy);
 - a CloudFront distribution: HTTPS only, the managed CachingOptimized policy,
   `404.html` for missing pages (S3 answers 403 for them), HTTP/2 and 3, IPv6;
-- A and AAAA alias records in the `smarter.sh` zone.
+- A and AAAA alias records in the `smarter.sh` zone;
+- the `smarter-python-docs-publisher` role that the Release workflow's `docs`
+  environment assumes, allowed only to sync the bucket and invalidate the
+  distribution (`github_actions.tf`). It trusts GitHub's OIDC provider, which
+  is one per account and is created by cache-results' `terraform/docs`, so
+  this stack only reads it: apply cache-results' stack first.
 
 ```console
 make terraform-init    # once: the S3 backend (state key smarter-python/docs/terraform.tfstate)

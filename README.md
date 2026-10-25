@@ -153,7 +153,7 @@ make coverage       # the unit tests, with a coverage report
 SMARTER_BASE_URL=http://localhost:9357 SMARTER_API_KEY=... make test-live
 make lint           # run the pre-commit hooks on every file
 make sphinx-build   # build the Sphinx docs into docs/build/html
-make sphinx-publish # publish them to docs.smarter-python.smarter.sh
+make sphinx-publish # publish them to docs.smarter-python.smarter.sh (releases do it themselves)
 make build          # build the sdist and wheel, and check them
 make python-requirements  # recompile the pinned requirements/*.txt
 ```
@@ -164,7 +164,9 @@ build and a package build, on every pull request, and on every push to `main`,
 reported to [Codecov](https://codecov.io/gh/smarter-sh/smarter-python). When CI
 passes, the Release workflow releases with semantic-release, from the
 conventional commit messages, and publishes to PyPI from `main` (or to TestPyPI
-from `alpha` and `beta`). `make release-dry-run` shows the next version.
+from `alpha` and `beta`). Once PyPI has a release from `main`, the same
+workflow publishes its documentation to docs.smarter-python.smarter.sh.
+`make release-dry-run` shows the next version.
 
 The agent skills in [skills/](./skills/) describe how this repository is
 developed, tested and documented, for people and for AI coding agents.
