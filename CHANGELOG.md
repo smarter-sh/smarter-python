@@ -1,4 +1,4 @@
-## [0.5.3-alpha.1](https://github.com/smarter-sh/smarter-python/compare/v0.5.2...v0.5.3-alpha.1) (2026-10-25)
+## [0.5.3](https://github.com/smarter-sh/smarter-python/compare/v0.5.2...v0.5.3) (2026-10-25)
 
 
 ### Bug Fixes
