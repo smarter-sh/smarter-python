@@ -63,19 +63,17 @@ config.json
 *.p7b
 *.p7c
 
-# Local .terraform directories
+# Terraform: local state, plans and providers. .terraform.lock.hcl is committed.
 # -------------------------------------
-.terragrunt-cache/
-.terraform.lock.hcl
-*.tfstate
-*.tfstate.*
 .terraform/
-.terraform.lock.hcl
 *.tfstate
 *.tfstate.*
-# don't ignore this file
-!tfmodule-template.tf
+*.tfplan
+tfplan
 
+# Sphinx
+# -------------------------------------
+docs/build/
 
 # Python
 # -------------------------------------
@@ -89,8 +87,7 @@ venv
 *.pyo
 *.pyd
 
-# ReactJS
-node_modules
-package-lock.json
+# node, for the commitlint hook
+node_modules/
 
 *.code-workspace

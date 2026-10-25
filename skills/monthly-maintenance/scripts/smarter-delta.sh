@@ -58,10 +58,10 @@ AREAS=(
   "Django-React contract|copy into smarter/models/react.py|smarter/smarter/lib/django/templatetags/smarter_react_contract.py"
   "Authentication|smarter/core/http.py|smarter/smarter/lib/drf/ smarter/smarter/apps/proxy/authentication.py"
   "Platform settings that gate apis|docs, live tests|smarter/smarter/common/conf/"
-  "ADRs|doc/adr/|docs/source/adr/"
+  "ADRs|docs/source/adr/ (this repository)|docs/source/adr/"
   "Skills|skills/ (the adapted copies)|skills/"
   "Lint standard|.pre-commit-config.yaml, pyproject.toml, .flake8|.pre-commit-config.yaml pyproject.toml .flake8 codespell.txt"
-  "The SDK's own docs pages|regenerate the reference if they were edited by hand|docs/source/smarter-framework/smarter-python.rst docs/source/smarter-framework/smarter-python/"
+  "The platform's page about the SDK|carry anything new into docs/source/|docs/source/smarter-framework/smarter-python.rst"
 )
 
 for area in "${AREAS[@]}"; do

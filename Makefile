@@ -1,214 +1,229 @@
 SHELL := /bin/bash
-include .env
-export PATH := /usr/local/bin:$(PATH)
-export
 
-ifeq ($(OS),Windows_NT)
-    PYTHON := python.exe
-    ACTIVATE_VENV := venv\Scripts\activate
-	PYTHONPATH := $(shell pwd)
-else
-    PYTHON := python3.12
-    ACTIVATE_VENV := source venv/bin/activate
-	PYTHONPATH := $(shell pwd)
-endif
-PIP := $(PYTHON) -m pip
+PYTHON ?= python3
+VENV := venv
+BIN := $(VENV)/bin
 
-ifneq ("$(wildcard .env)","")
-else
+# .env holds SMARTER_API_KEY and SMARTER_BASE_URL for make test-live, and GH_TOKEN for gh.
+# A new checkout starts from doc/example-dot-env.
+ifeq ("$(wildcard .env)","")
     $(shell cp ./doc/example-dot-env .env)
 endif
+-include .env
+export
 
-.PHONY: init activate build run clean lint analyze coverage test test-live sam-models contracts pre-commit-init pre-commit-run python-init python-activate python-test force-release publish-test publish-prod help
+# PYTHONPATH is the repository root, never ./smarter, which would shadow the standard library.
+export PYTHONPATH := $(CURDIR)
+
+# The documentation site's Terraform stack (terraform/docs). The account id is read from the
+# caller's AWS credentials when a target needs it, never written into this public repository.
+TF := terraform -chdir=terraform/docs
+AWS_ACCOUNT_ID = $(shell aws sts get-caller-identity --query Account --output text)
+TF_STATE_BUCKET = $(AWS_ACCOUNT_ID)-terraform-tfstate-smarter
+
+.PHONY: all help init check-python test test-live coverage build clean \
+	python-requirements sam-models contracts lint analyze pre-commit-init pre-commit-run \
+	sphinx-build sphinx-linkcheck sphinx-publish terraform-init terraform-plan terraform-apply \
+	release-dry-run release
 
 # Default target executed when no arguments are given to make.
 all: help
 
-# initialize local development environment.
-# takes around 5 minutes to complete
+# ---------------------------------------------------------
+# Development
+# ---------------------------------------------------------
+# this repository's own virtual environment, from its own pinned requirements: never another project's venv.
 init:
-	make check-python		# verify Python 3.11 is installed
-	make python-init		# create/replace Python virtual environment and install dependencies
-	make pre-commit-init	# install and configure pre-commit
-
-activate:
-	./scripts/activate.sh
-
-# -------------------------------------------------------------------------
-# Destroy all build artifacts and Python temporary files
-# -------------------------------------------------------------------------
-clean:
-	find ./smarter/ -name __pycache__ -type d -exec rm -rf {} + && \
-	rm -rf venv .pytest_cache __pycache__ .pytest_cache node_modules && \
-	rm -rf build dist smarter.egg-info
-
-# ---------------------------------------------------------
-# Code management
-# ---------------------------------------------------------
-
-# -------------------------------------------------------------------------
-# Run black and pre-commit hooks.
-# includes prettier, isort, flake8, pylint, etc.
-# -------------------------------------------------------------------------
-lint:
+	@echo "==============================================================================="
+	@echo "Creating $(VENV) from requirements/local.txt, installing the package, and the git hooks ..."
+	@echo "==============================================================================="
 	make check-python
-	make pre-commit-run
-	$(ACTIVATE_VENV) && \
-	pylint smarter && \
-	black .
+	rm -rf $(VENV)
+	$(PYTHON) -m venv $(VENV)
+	$(BIN)/pip install --upgrade pip
+	$(BIN)/pip install -r requirements/local.txt
+	$(BIN)/pip install -e . --no-deps
+	make pre-commit-init
 
-analyze:
-	cloc . --exclude-ext=svg,json,zip --fullpath --vcs=git
+# requirements/in/*.in, each constrained by constraints.in, compile into the pinned requirements/*.txt.
+# --no-strip-extras keeps extras such as coverage[toml], which pip-tools 8 would drop.
+python-requirements:
+	@echo "==============================================================================="
+	@echo "Compiling and updating Python dependency files using pip-compile ..."
+	@echo "==============================================================================="
+	$(BIN)/pip install --upgrade "pip-tools>=7.6.1"
+	$(BIN)/pip-compile --upgrade --no-strip-extras requirements/in/base.in -o requirements/base.txt
+	$(BIN)/pip-compile --upgrade --no-strip-extras requirements/in/local.in -o requirements/local.txt
+	$(BIN)/pip install -r requirements/local.txt
+	$(BIN)/pip install -e . --no-deps
 
-coverage:
-	$(ACTIVATE_VENV) && \
-	PYTHONPATH=$(PYTHONPATH) coverage run --rcfile=smarter/.coveragerc -m unittest discover -s tests -t . && \
-	coverage report -m --rcfile=smarter/.coveragerc --fail-under=90 && \
-	coverage xml --rcfile=smarter/.coveragerc
-
-pre-commit-init:
-	$(ACTIVATE_VENV) && \
-	pre-commit install && \
-	pre-commit autoupdate
-
-pre-commit-run:
-	$(ACTIVATE_VENV) && \
-	pre-commit run --all-files
-
-
-
-# ---------------------------------------------------------
-# Python
-# ---------------------------------------------------------
 check-python:
-	@command -v $(PYTHON) >/dev/null 2>&1 || { echo >&2 "This project requires $(PYTHON) but it's not installed.  Aborting."; exit 1; }
+	@command -v $(PYTHON) >/dev/null 2>&1 || { echo >&2 "$(PYTHON) is not installed. Aborting."; exit 1; }
+	@$(PYTHON) -c "import sys; sys.exit(sys.version_info < (3, 10))" || { \
+		echo >&2 "smarter-python needs Python 3.10 or newer. $(PYTHON) is $$($(PYTHON) --version)."; exit 1; }
 
-python-init:
-	mkdir -p .pypi_cache && \
-	make check-python
-	make clean && \
-	npm install && \
-	$(PYTHON) -m venv venv && \
-	$(ACTIVATE_VENV) && \
-	PIP_CACHE_DIR=.pypi_cache $(PIP) install --upgrade pip && \
-	PIP_CACHE_DIR=.pypi_cache $(PIP) install -r requirements/local.txt
-
-# -------------------------------------------------------------------------
-# Run Python unit tests
-# -------------------------------------------------------------------------
+# the unit tests never reach a platform: an httpx MockTransport answers every request.
 test:
-	$(ACTIVATE_VENV) && \
-	PYTHONPATH=$(PYTHONPATH) python -m unittest discover -s tests -t . && \
-	python -m setup_test
+	@echo "==============================================================================="
+	@echo "Running the unit tests ..."
+	@echo "==============================================================================="
+	$(BIN)/python -m unittest discover -s tests -t .
 
-# -------------------------------------------------------------------------
-# Test the SDK against a running Smarter platform, e.g. the local one:
+# the SDK against a running Smarter platform, e.g. the local one:
 # SMARTER_BASE_URL=http://localhost:9357 SMARTER_API_KEY=... make test-live
 # These prompt an LLMClient, which makes billable LLM requests.
-# -------------------------------------------------------------------------
 test-live:
-	$(ACTIVATE_VENV) && \
-	PYTHONPATH=$(PYTHONPATH) SMARTER_TEST_LIVE=true python -m unittest discover -s tests/live -t . -v
+	@echo "==============================================================================="
+	@echo "Running the live tests against $(SMARTER_BASE_URL) ..."
+	@echo "==============================================================================="
+	SMARTER_TEST_LIVE=true $(BIN)/python -m unittest discover -s tests/live -t . -v
 
-# -------------------------------------------------------------------------
-# Regenerate smarter/models/sam/ from the platform's committed JSON Schemas.
-# -------------------------------------------------------------------------
-sam-models: contracts
-	$(ACTIVATE_VENV) && \
-	PYTHONPATH=$(PYTHONPATH) python scripts/generate_sam_models.py && \
-	(ls smarter/models/sam/*.py | xargs pre-commit run --files > /dev/null || true)
+coverage:
+	@echo "==============================================================================="
+	@echo "Running the unit tests with a coverage report ..."
+	@echo "==============================================================================="
+	$(BIN)/coverage run -m unittest discover -s tests -t .
+	$(BIN)/coverage report
+	$(BIN)/coverage xml
 
-# -------------------------------------------------------------------------
-# Copy the platform's api contracts from ../smarter: the chat and journal
-# contracts, the SAM schemas and examples, and the api's OpenAPI document.
-# A ref reads them at a commit or tag, e.g. make contracts SMARTER_REF=v0.20.0
-# -------------------------------------------------------------------------
+build:
+	@echo "==============================================================================="
+	@echo "Building the sdist and wheel into dist/, and checking them with twine ..."
+	@echo "==============================================================================="
+	rm -rf dist
+	$(BIN)/python -m build
+	$(BIN)/twine check --strict dist/*
+
+clean:
+	@echo "==============================================================================="
+	@echo "Removing build, test and coverage artifacts ..."
+	@echo "==============================================================================="
+	rm -rf build dist docs/build .pytest_cache .coverage coverage.xml htmlcov node_modules *.egg-info
+	find . -name __pycache__ -type d -prune -not -path "./$(VENV)/*" -exec rm -rf {} +
+
+# ---------------------------------------------------------
+# The platform's contracts
+# ---------------------------------------------------------
+# Copy the platform's api contracts from ../smarter: the chat and journal contracts, the SAM
+# schemas and examples, and the api's OpenAPI document. A ref reads them at a commit or tag,
+# e.g. make contracts SMARTER_REF=v0.20.0
 contracts:
 	scripts/sync-contracts.sh ../smarter $(SMARTER_REF)
 
-# -------------------------------------------------------------------------
-# Build the project
-# -------------------------------------------------------------------------
-build:
-	@echo "-------------------------------------------------------------------------"
-	@echo "                   I. Unit tests"
-	@echo "-------------------------------------------------------------------------"
-	make test
-	@echo "-------------------------------------------------------------------------"
-	@echo "                   II. Check version"
-	@echo "-------------------------------------------------------------------------"
-	npx semantic-release --doctor --dry-run
-	@echo "-------------------------------------------------------------------------"
-	@echo "                   III. Initializing the project,"
-	@echo "                        Linting and running pre-commit hooks"
-	@echo "-------------------------------------------------------------------------"
-	make init
-	$(ACTIVATE_VENV) && \
-	$(PIP) install --upgrade setuptools wheel twine build
-	@echo "-------------------------------------------------------------------------"
-	@echo "                   IV. Building the project"
-	@echo "-------------------------------------------------------------------------"
-	rm -rf build dist .pytest_cache smarter_api.egg-info
-	$(ACTIVATE_VENV) && \
-	PYTHONPATH=$(PYTHONPATH) $(PYTHON) -m build --sdist ./ --no-isolation && \
-	PYTHONPATH=$(PYTHONPATH) $(PYTHON) -m build --wheel ./
+# Regenerate smarter/models/sam/ from the platform's committed JSON Schemas.
+sam-models: contracts
+	$(BIN)/python scripts/generate_sam_models.py
+	ls smarter/models/sam/*.py | xargs $(BIN)/pre-commit run --files > /dev/null || true
 
-	@echo "-------------------------------------------------------------------------"
-	@echo "                   V. Verifying the build"
-	@echo "-------------------------------------------------------------------------"
-	$(ACTIVATE_VENV) && \
-	twine check dist/*
+# ---------------------------------------------------------
+# Code Management
+# ---------------------------------------------------------
+lint:
+	make pre-commit-run
 
-# -------------------------------------------------------------------------
-# Force a new semantic release to be created in GitHub
-# -------------------------------------------------------------------------
-force-release:
-	git commit -m "fix: force a new release" --allow-empty && git push
+analyze:
+	@echo "==============================================================================="
+	@echo "Generating code analysis report using cloc ..."
+	@echo "==============================================================================="
+	cloc . --exclude-ext=svg,json,zip --fullpath --vcs=git
 
-# -------------------------------------------------------------------------
-# Publish to PyPi Test
-# https://test.pypi.org/project/smarter-api/
-# -------------------------------------------------------------------------
-publish-test:
-	git rev-parse --abbrev-ref HEAD | grep '^main$$' || (echo 'Not on main branch, aborting' && exit 1)
-	make build
-	$(ACTIVATE_VENV) && \
-	twine upload --verbose --skip-existing --repository testpypi dist/*
+pre-commit-init:
+	@echo "==============================================================================="
+	@echo "Installing and configuring pre-commit ..."
+	@echo "==============================================================================="
+	$(BIN)/pre-commit install
+	$(BIN)/pre-commit autoupdate
 
-# -------------------------------------------------------------------------
-# Publish to PyPi
-# https://pypi.org/project/smarter-api/
-# -------------------------------------------------------------------------
-publish-prod:
-	git rev-parse --abbrev-ref HEAD | grep '^main$$' || (echo 'Not on main branch, aborting' && exit 1)
-	make build
-	$(ACTIVATE_VENV) && \
-	twine upload --verbose --skip-existing dist/*
+pre-commit-run:
+	@echo "==============================================================================="
+	@echo "Running pre-commit hooks on all files ..."
+	@echo "==============================================================================="
+	$(BIN)/pre-commit run --all-files
 
-######################
-# HELP
-######################
+# ---------------------------------------------------------
+# Sphinx documentation: docs.smarter-python.smarter.sh
+# ---------------------------------------------------------
+sphinx-build:
+	@echo "==============================================================================="
+	@echo "Building the Sphinx documentation into docs/build/html, warnings as errors ..."
+	@echo "==============================================================================="
+	rm -rf docs/build
+	$(BIN)/sphinx-build -W --keep-going -b html -d docs/build/doctrees docs/source docs/build/html
+
+sphinx-linkcheck:
+	$(BIN)/sphinx-build -b linkcheck -d docs/build/doctrees docs/source docs/build/linkcheck
+
+# the bucket and distribution come from the Terraform stack's outputs (make terraform-apply).
+sphinx-publish: sphinx-build
+	@echo "==============================================================================="
+	@echo "Publishing docs/build/html to https://docs.smarter-python.smarter.sh/ ..."
+	@echo "==============================================================================="
+	BUCKET=$$($(TF) output -raw bucket_name) && \
+	DISTRIBUTION=$$($(TF) output -raw distribution_id) && \
+	aws s3 sync docs/build/html "s3://$$BUCKET/" --delete --exclude ".doctrees/*" --exclude ".buildinfo" && \
+	aws cloudfront create-invalidation --distribution-id "$$DISTRIBUTION" --paths "/*" --query Invalidation.Id --output text
+
+# ---------------------------------------------------------
+# Terraform: the documentation site's AWS resources (terraform/docs)
+# ---------------------------------------------------------
+terraform-init:
+	$(TF) init -backend-config="bucket=$(TF_STATE_BUCKET)"
+
+# writes the plan to terraform/docs/tfplan, which terraform-apply applies exactly.
+terraform-plan:
+	TF_VAR_aws_account_id=$(AWS_ACCOUNT_ID) $(TF) plan -out=tfplan
+
+terraform-apply:
+	TF_VAR_aws_account_id=$(AWS_ACCOUNT_ID) $(TF) apply tfplan
+	rm -f terraform/docs/tfplan
+
+# ---------------------------------------------------------
+# Release
+# ---------------------------------------------------------
+# main makes a release, published to TestPyPI then PyPI. RELEASE_BRANCH=alpha or beta makes a
+# prerelease, published to TestPyPI only. See .github/workflows/release.yml.
+RELEASE_BRANCH ?= main
+
+release-dry-run:
+	@echo "==============================================================================="
+	@echo "Starting the Release workflow on $(RELEASE_BRANCH) as a dry run: CI, then the next version ..."
+	@echo "==============================================================================="
+	gh workflow run release.yml --ref $(RELEASE_BRANCH) -f dry_run=true
+	@echo "Follow it with: gh run watch"
+
+release:
+	@echo "==============================================================================="
+	@echo "Starting the Release workflow on $(RELEASE_BRANCH): CI, release, TestPyPI and PyPI ..."
+	@echo "==============================================================================="
+	gh workflow run release.yml --ref $(RELEASE_BRANCH) -f dry_run=false
+	@echo "Follow it with: gh run watch"
 
 help:
 	@echo '===================================================================='
-	@echo 'init                   - Initialize local and Docker environments'
-	@echo 'activate               - activates Python virtual environment'
-	@echo 'clean                  - delete all local artifacts, virtual environment, node_modules, and Docker containers'
-	@echo 'python-init            - Create a Python virtual environment and install dependencies'
-	@echo 'clean                  - Destroy the Python virtual environment and remove __pycache__ directories'
+	@echo 'init                   - Create venv from requirements/local.txt, install the package and the git hooks'
+	@echo 'python-requirements    - Compile requirements/in/*.in into the pinned requirements/*.txt, and install them'
+	@echo 'check-python           - Verify that Python 3.10 or newer is installed'
+	@echo 'test                   - Run the unit tests, which never reach a platform'
+	@echo 'test-live              - Test against a running Smarter platform (SMARTER_BASE_URL, SMARTER_API_KEY)'
+	@echo 'coverage               - Run the unit tests with a coverage report, and write coverage.xml'
+	@echo 'build                  - Build the sdist and wheel into dist/, and check them'
+	@echo 'clean                  - Remove build, test and coverage artifacts'
+	@echo '<************************** Contracts **************************>'
+	@echo 'contracts              - Copy the api contracts, SAM schemas and OpenAPI document from ../smarter'
+	@echo 'sam-models             - Copy the contracts, and regenerate the SAM models from their schemas'
 	@echo '<************************** Code Management **************************>'
 	@echo 'lint                   - Run all code linters and formatters'
 	@echo 'analyze                - Generate code analysis report using cloc'
-	@echo 'coverage               - run the unit tests with a coverage report'
-	@echo 'pre-commit-init        - install and configure pre-commit'
-	@echo 'pre-commit-run         - runs all pre-commit hooks on all files'
-	@echo '<************************** CI/CD **************************>'
-	@echo 'test			- run Python unit tests'
-	@echo 'test-live		- test against a running Smarter platform (SMARTER_BASE_URL, SMARTER_API_KEY)'
-	@echo 'sam-models		- copy the contracts, and regenerate the SAM models from their schemas'
-	@echo 'contracts		- copy the api contracts, SAM schemas and OpenAPI document from ../smarter'
-	@echo 'build			- build the project'
-	@echo 'force-release		- force a new release to be created in GitHub'
-	@echo 'publish-test		- test deployment to PyPi'
-	@echo 'publish-prod		- production deployment to PyPi'
+	@echo 'pre-commit-init        - Install and configure pre-commit'
+	@echo 'pre-commit-run         - Run all pre-commit hooks on all files'
+	@echo '<************************** Documentation **************************>'
+	@echo 'sphinx-build           - Build the Sphinx docs into docs/build/html, warnings as errors'
+	@echo 'sphinx-linkcheck       - Check every external link in the docs'
+	@echo 'sphinx-publish         - Build the docs, upload them to S3 and invalidate CloudFront'
+	@echo 'terraform-init         - Initialize the docs site stack (terraform/docs) and its state'
+	@echo 'terraform-plan         - Plan changes to the docs site AWS resources, into terraform/docs/tfplan'
+	@echo 'terraform-apply        - Apply terraform/docs/tfplan'
+	@echo '<************************** Release **************************>'
+	@echo 'release-dry-run        - Run the Release workflow as a dry run: CI, then the next version'
+	@echo 'release                - Release and publish: CI, tag, GitHub release, TestPyPI, PyPI (RELEASE_BRANCH)'
 	@echo '===================================================================='
