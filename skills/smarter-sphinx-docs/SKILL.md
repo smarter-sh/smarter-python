@@ -1,71 +1,149 @@
 ---
 name: smarter-sphinx-docs
-description: Use when adding or editing the smarter-python SDK's documentation, which lives in the Smarter platform's Sphinx docs (../smarter/docs/source/smarter-framework/smarter-python*, published to docs.smarter.sh), or when regenerating the SDK's api reference pages. Covers where each page goes, the generated reference and why it is generated, the evergreen-prose rule, and how to verify without the platform's 20-minute build.
+description: Use when adding or editing the smarter-python SDK's Sphinx documentation in docs/source, published to https://docs.smarter-python.smarter.sh/ - the getting-started pages, the user guide, the api reference generated from docstrings by autodoc, the architectural decision records (ADRs) in docs/source/adr - or when building, publishing, or changing the site's AWS hosting (terraform/docs). Covers the layout, headings and toctrees, autodoc pages, the generated SAM models' pages, how to write an ADR, links to the platform's docs, the evergreen-prose rule, make sphinx-build (warnings are errors), make sphinx-publish, and the Terraform stack.
 ---
 
 # The SDK's Sphinx Documentation
 
-The SDK has no docs folder of its own. Its documentation is a section of the
-platform's docs, in the platform's repository, so that docs.smarter.sh is one
-site:
+The docs live in `docs/source/`, built by Sphinx with the Read the Docs theme
+and published to **https://docs.smarter-python.smarter.sh/**. Extensions
+(`docs/source/conf.py`): autodoc, intersphinx (Python's and Pydantic's docs),
+viewcode, copybutton, `notfound.extension` (the 404 page) and `sphinx_sitemap`.
+They follow the platform's conventions (`../smarter/skills/smarter-sphinx-docs`),
+on a much smaller site. The platform's docs (docs.smarter.sh) keep one short
+page about the SDK, `smarter-framework/smarter-python.rst`, that links here.
 
-| Content                                        | Location (in `../smarter/docs/source/`)                                      |
-| ---------------------------------------------- | ---------------------------------------------------------------------------- |
-| The SDK's landing page: what it is, SDK vs CLI | `smarter-framework/smarter-python.rst`, in `smarter-framework.rst`'s toctree |
-| Guides: configuration, manifests, chat, ...    | `smarter-framework/smarter-python/<topic>.rst`                               |
-| The api reference, **generated**               | `smarter-framework/smarter-python/reference/**`                              |
-| The SDK's own architecture decisions           | Not here: `doc/adr/` in this repository                                      |
+## Build to verify
 
-Load the platform's own `smarter-sphinx-docs` skill (`../smarter/skills/`) for
-its general rules: headings (`=`, `-`, `~`, `^`), toctrees, code blocks, and
-writing for a reader new to Smarter.
-
-## The api reference is generated
-
-The platform's Sphinx build autodocs the platform's own `smarter` package, and
-the SDK's import name is `smarter` too, so that build can't import the SDK.
-`scripts/generate_reference.py` imports the SDK here, and writes its docstrings
-as `py:` domain directives (`.. py:class::`, `.. py:method::`, ...), which need no
-import:
+Unlike the platform's 20-minute build, this one takes seconds. Build after
+every docs or docstring change:
 
 ```console
-PYTHONPATH=. venv/bin/python scripts/generate_reference.py      # writes into ../smarter
+make sphinx-build      # rm -rf docs/build, then sphinx-build -W --keep-going: every warning is an error
+open docs/build/html/index.html
+make sphinx-linkcheck  # every external link, when you've added some
 ```
 
-- **Never edit the generated pages.** Fix the docstring (`smarter-docstrings`)
-  and regenerate.
-- A new module must be added to `PAGES` in `scripts/generate_reference.py`.
-- The SDK's module paths must not collide with the platform's, or the two
-  packages' objects collide in the shared Sphinx index. That is why the SDK's
-  internals are `smarter.core`, not `smarter.common` (which the platform has).
-  Check `ls ../smarter/smarter/smarter` before you add a top-level SDK module.
+It must succeed with no warnings. autodoc imports the SDK from the repository
+root (never `./smarter`, see `smarter-python-development`). intersphinx fetches
+Python's and Pydantic's inventories, so the build needs the network. CI builds
+it on every push and pull request.
+
+## Layout
+
+| Content                          | Location                                                                   |
+| -------------------------------- | -------------------------------------------------------------------------- |
+| Landing page, badges, toctrees   | `index.rst`: Getting Started, User Guide, Reference, Project               |
+| Getting started                  | `installation.rst`, `quickstart.rst`                                       |
+| User guide, one topic per page   | `guide/*.rst`: configuration, manifests, chat, resources, models, errors   |
+| API reference                    | `reference.rst`, and one autodoc page per module family in `reference/`    |
+| The SAM models                   | `reference/sam.rst`, and one page per kind in `reference/sam/<module>.rst` |
+| Changelog, contributing, license | `project/*.rst`                                                            |
+| Architectural decision records   | `adr.rst` (the toctree), and `adr/NNN-<slug>.rst`                          |
+| The footer's attribution         | `_templates/footer.html`: The Smarter Project, on every page and the 404   |
+| Files copied as they are         | `_extra/` (`robots.txt`)                                                   |
+
+Headings: `=` for the page title, `-` for sections, then `~` and `^`. Every
+page must be in a toctree, or the build warns.
+
+## The api reference comes from docstrings
+
+A reference page is a title and `.. automodule::` directives. `conf.py` sets
+`members` and `show-inheritance` by default. A new module gets an
+`automodule` in its family's page in `reference/`. **A new SAM kind** (after
+`make sam-models`) gets `reference/sam/<module>.rst`, titled with its model's
+name (e.g. `SAMLLMClient`), and an entry in `reference/sam.rst`'s toctree.
+Fix a wrong reference in the docstring, never the `.rst` (`smarter-docstrings`).
+
+Two things in `conf.py` exist for the generated SAM models, which are never
+edited by hand:
+
+- Their **field** docstrings come from the platform's JSON Schemas, and are
+  plain text, so an `autodoc-process-docstring` hook escapes them (the `*` of
+  `models/*` must not start emphasis). Their class docstrings are reST.
+- Each module defines its own copy of the classes several kinds share (e.g.
+  `SAMPluginCommonMetadata`), so `suppress_warnings = ["ref.python"]` silences
+  Sphinx's "more than one target found" for them.
+
+## Links to the platform's docs
+
+The platform's pages are another site, so link them with absolute urls, never
+`:doc:`, e.g.
+`` `Guardrails <https://docs.smarter.sh/en/latest/smarter-resources/smarter-guardrail.html>`__ ``.
+Sphinx doesn't check these; `make sphinx-linkcheck` does. Link a platform ADR
+as `Smarter ADR-NNN`, so that it isn't mistaken for one of the SDK's.
+
+## ADRs
+
+One decision each, in Michael Nygard's format, in the format of the platform's
+(`../smarter/docs/source/adr/`). Read `adr/000-intro.rst` first.
+
+- **Sections, in order:** Status, Context, Decision, Alternatives Considered,
+  Consequences (**Positive:** and **Negative:** lists), Related ADRs.
+- **Numbers are aligned** with the Node.js and Go SDKs (`../smarter-nodejs/doc/adr`,
+  `../smarter-golang/doc/adr`): a decision every SDK shares takes the same
+  number in each; a new one takes the next number free in all of them.
+- **Title:** `ADR-NNN: <Decision>`, in a file named `NNN-<slug>.rst`, added to
+  `adr.rst`'s toctree.
+- **Related ADRs** link this site's ADRs with `:doc:`, and a platform ADR that
+  this one adapts with its GitHub url:
+
+  ```rst
+  - :doc:`ADR-015: Semantic Versioning and API Versions <015-versioning>`
+  - `Smarter ADR-014: CI CD <https://github.com/smarter-sh/smarter/blob/main/docs/source/adr/014-ci-cd.rst>`__
+  ```
+
+- **Never rewrite a decision.** Add an ADR that supersedes it, and set the old
+  one's Status to `Superseded by ADR-NNN` (e.g. ADR-010 by ADR-024).
 
 ## Writing rules
 
 - **Evergreen prose**, as in the platform: no "New in 0.2" sections. Weave a
-  feature into the page where its topic belongs.
-- Every example must run. Check the field paths of SAM models against the
+  feature into the page where its topic belongs. The changelog carries the
+  history.
+- **Every example must run.** Check the field paths of SAM models against the
   generated code (e.g. an LLMClient's provider is
   `spec.config.prompt.provider`), and run the example against fixtures or the
   local platform.
-- Link the platform's resource pages with `:doc:`, e.g.
-  `:doc:`Guardrails <../../smarter-resources/smarter-guardrail>``.
 - Say when an operation is **billable** (prompts) or creates **real
   infrastructure** (deploy).
+- `double backticks` for literals, settings and commands. Console examples
+  start with `$ ` (copybutton strips it).
+- The README, `index.rst`, `quickstart.rst` and the guide overlap. When
+  behavior changes, update all of them in the same change.
 
-## Verify (never the full build)
+## Publishing
 
-1. Links, with the platform's checker, from `../smarter`:
+```console
+make sphinx-publish   # sphinx-build, aws s3 sync --delete, CloudFront invalidation of /*
+```
 
-   ```console
-   cd ../smarter && skills/smarter-sphinx-docs/scripts/check-docs.sh \
-     docs/source/smarter-framework/smarter-python.rst docs/source/smarter-framework/smarter-python/*.rst \
-     docs/source/smarter-framework/smarter-python/reference/*.rst docs/source/smarter-framework/smarter-python/reference/sam/*.rst
-   ```
+It reads the bucket and distribution from the Terraform outputs, so it needs
+`make terraform-init` once, and AWS credentials for the account. The user
+publishes; publish yourself only when asked.
 
-2. The reST itself, with a build of **only the SDK's pages**, which takes
-   seconds: [scripts/check-sdk-pages.sh](scripts/check-sdk-pages.sh). It reports
-   every warning except links to pages outside the SDK's section. It must report
-   none.
+## The site's AWS resources (`terraform/docs/`)
 
-The user builds the full docs.
+Everything is in Terraform; never change these resources by hand or with the
+aws cli:
+
+- an ACM certificate (us-east-1), validated by a Route53 record;
+- a **private** S3 bucket named after the domain (us-east-2): all public
+  access blocked, ACLs disabled, readable only by the distribution (OAC and
+  the bucket policy);
+- a CloudFront distribution: HTTPS only, the managed CachingOptimized policy,
+  `404.html` for missing pages (S3 answers 403 for them), HTTP/2 and 3, IPv6;
+- A and AAAA alias records in the `smarter.sh` zone.
+
+```console
+make terraform-init    # once: the S3 backend (state key smarter-python/docs/terraform.tfstate)
+make terraform-plan    # writes terraform/docs/tfplan: read it before applying
+make terraform-apply   # applies exactly that plan
+```
+
+The state bucket's name and `allowed_account_ids` contain the AWS account id,
+so the Makefile reads it from the caller's credentials at run time. Never write
+an account id, or a distribution id, into this public repository. Run
+`terraform -chdir=terraform/docs fmt` and `validate` after editing (CI runs
+both), and apply only a plan the user has seen: these are live, billable
+resources in a shared account and DNS zone.

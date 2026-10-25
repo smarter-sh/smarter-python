@@ -1,3 +1,11 @@
+## [0.5.2](https://github.com/smarter-sh/smarter-python/compare/v0.5.1...v0.5.2) (2026-10-22)
+
+
+### Bug Fixes
+
+* **contracts:** sync with smarter v0.36.6 ([0aeb863](https://github.com/smarter-sh/smarter-python/commit/0aeb863976ee86ee658165fe42860d9e142f86b7))
+* **llmclients:** add verbose option to config() ([55a93ff](https://github.com/smarter-sh/smarter-python/commit/55a93ffb3c4a306fda3102aacd00b903b1de7514))
+
 ## [0.5.1](https://github.com/smarter-sh/smarter-python/compare/v0.5.0...v0.5.1) (2026-10-15)
 
 

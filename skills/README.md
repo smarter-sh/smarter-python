@@ -29,19 +29,18 @@ kind of task.
 | `smarter-python-development` | You're making any change. Start here.                                               |
 | `smarter-python-testing`     | You're writing or running the unit or live tests, or raising coverage.              |
 | `smarter-api-testing`        | You're probing the platform's api by hand, e.g. to build a fixture.                 |
-| `smarter-docstrings`         | You're writing docstrings, which become the api reference on docs.smarter.sh.       |
+| `smarter-docstrings`         | You're writing docstrings, which become the api reference on the SDK's docs site.   |
 | `smarter-python-typing`      | You're writing type annotations, especially with `Any`.                             |
-| `smarter-sphinx-docs`        | You're editing the SDK's pages in the platform's `docs/source`.                     |
+| `smarter-sphinx-docs`        | You're editing the docs in `docs/source`, or their site's hosting (`terraform/`).   |
 | `smarter-code-quality`       | You're about to finish a change and need to run the pre-commit hooks.               |
 | `smarter-git-commits`        | You've been asked to write a commit message.                                        |
+| `smarter-python-release`     | You're changing CI, requirements or packaging, or cutting a release.                |
 | `monthly-maintenance`        | It's time to sync the SDK with the platform, and update its requirements.           |
 | `smarter-contract-sync`      | The platform's api contract changed, and this repository's copy must follow it now. |
 
 The bundled scripts are ordinary shell scripts that you can run yourself from
 the repository root:
 
-- `smarter-sphinx-docs/scripts/check-sdk-pages.sh` builds only the SDK's pages
-  of the platform's docs, in seconds, and reports their warnings.
 - `monthly-maintenance/scripts/smarter-delta.sh` lists the platform's commits
   since the SDK's last release, grouped by what they mean for the SDK.
 - `monthly-maintenance/scripts/test-minimum-versions.sh` runs the unit tests

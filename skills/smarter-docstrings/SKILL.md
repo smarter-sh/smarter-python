@@ -1,13 +1,13 @@
 ---
 name: smarter-docstrings
-description: Use when writing or editing Python docstrings in the smarter-python SDK. Docstrings become the SDK's api reference on docs.smarter.sh, so they follow the project's reStructuredText field-list style (:param:, :returns:, :raises:), cross-reference syntax, and the layout that pydocstringformatter enforces.
+description: Use when writing or editing Python docstrings in the smarter-python SDK. Docstrings become the SDK's api reference on docs.smarter-python.smarter.sh, so they follow the project's reStructuredText field-list style (:param:, :returns:, :raises:), cross-reference syntax, and the layout that pydocstringformatter enforces.
 ---
 
 # Smarter Python SDK Docstrings
 
 Docstrings do two jobs: they explain the code to developers, and they become
-the SDK's api reference on docs.smarter.sh (`scripts/generate_reference.py`
-writes them into the platform's Sphinx docs: see `smarter-sphinx-docs`). Write
+the SDK's api reference on docs.smarter-python.smarter.sh (Sphinx autodoc: see
+`smarter-sphinx-docs`). Write
 for a Python programmer who is new to Smarter. The style is exactly the
 platform's, so that the two read as one set of docs.
 
@@ -94,5 +94,6 @@ docstring stating the behavior it proves:
 
 - Run the pre-commit hooks on the file (`smarter-code-quality`): pydocstringformatter
   rewrites docstrings. Review its diff.
-- Regenerate the api reference (`python scripts/generate_reference.py`) and
-  check its pages as `smarter-sphinx-docs` describes. Don't build the docs.
+- Build the docs with `make sphinx-build`, which takes seconds and treats every
+  warning as an error, and read the page of the module you changed
+  (`smarter-sphinx-docs`).
