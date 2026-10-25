@@ -12,7 +12,7 @@ import os
 import unittest
 from collections.abc import Callable
 from pathlib import Path
-from typing import Optional, Union
+from typing import Any
 from unittest import mock
 
 import httpx
@@ -38,7 +38,7 @@ class SmarterTestBase(unittest.TestCase):
 
     client: Smarter
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         environment = {key: value for key, value in os.environ.items() if not key.startswith("SMARTER_")}
         environment["SMARTER_CONFIG_FILE"] = str(DATA / "no-such-config.yaml")
@@ -50,18 +50,19 @@ class SmarterTestBase(unittest.TestCase):
         self.client = self.make_client()
         self.addCleanup(self.client.close)
 
-    def make_client(self, **kwargs) -> Smarter:
+    def make_client(self, **kwargs: Any) -> Smarter:
         """
         A client whose requests are answered by :meth:`handle`.
 
         :param kwargs: Arguments of :class:`smarter.Smarter`, which override the test's defaults.
         :returns: The client.
         """
-        options = {"api_key": API_KEY, "base_url": BASE_URL, "max_retries": 0}
-        options.update(kwargs)
+        kwargs.setdefault("api_key", API_KEY)
+        kwargs.setdefault("base_url", BASE_URL)
+        kwargs.setdefault("max_retries", 0)
         http_client = httpx.Client(transport=httpx.MockTransport(self.handle))
         self.addCleanup(http_client.close)
-        return Smarter(http_client=http_client, **options)
+        return Smarter(http_client=http_client, **kwargs)
 
     def handle(self, request: httpx.Request) -> httpx.Response:
         """Answer a request from its route, or with a 404 if it has none."""
@@ -77,11 +78,11 @@ class SmarterTestBase(unittest.TestCase):
         path: str,
         *,
         json_body: SmarterJsonType = None,
-        fixture: Optional[str] = None,
+        fixture: str | None = None,
         status: int = 200,
-        text: Optional[str] = None,
-        headers: Optional[dict[str, str]] = None,
-        handler: Optional[Handler] = None,
+        text: str | None = None,
+        headers: dict[str, str] | None = None,
+        handler: Handler | None = None,
     ) -> None:
         """
         Answer requests to a path.
@@ -98,10 +99,12 @@ class SmarterTestBase(unittest.TestCase):
         if handler is None:
             body = self.load_json(fixture) if fixture else json_body
 
-            def handler(_request: httpx.Request) -> httpx.Response:
+            def fixed_response(_request: httpx.Request) -> httpx.Response:
                 if text is not None:
                     return httpx.Response(status, text=text, headers=headers)
                 return httpx.Response(status, json=body, headers=headers)
+
+            handler = fixed_response
 
         self.routes[(method, f"/api/v1/{path.lstrip('/')}")] = handler
 
@@ -130,7 +133,7 @@ class SmarterTestBase(unittest.TestCase):
         """The last request that the client sent."""
         return self.requests[-1]
 
-    def request_json(self, index: int = -1) -> Union[SmarterJsonType, None]:
+    def request_json(self, index: int = -1) -> SmarterJsonType | None:
         """
         The JSON body of a request that the client sent.
 

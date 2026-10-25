@@ -1,5 +1,7 @@
 """
-Models of the Smarter Chat api contract, version 2: an LLMClient's configuration, its prompt api's request and response, and the prompt's progress events.
+Models of the Smarter Chat api contract, version 2.
+
+An LLMClient's configuration, its prompt api's request and response, and the prompt's progress events.
 
 These mirror ``smarter.apps.prompt.contract.models`` in the Smarter platform, whose JSON Schema is
 ``chat-contract.schema.json``. The SDK always asks for version 2 of the contract (with the
@@ -19,7 +21,7 @@ models. See ``scripts/sync-contracts.sh``.
 """
 
 from datetime import datetime
-from typing import Annotated, Literal, Optional, Union
+from typing import Annotated, Literal, Union
 
 from pydantic import Field
 
@@ -56,7 +58,7 @@ class PromptChatApiImageUrl(SmarterModel):
     """An image, by its url or as a data url."""
 
     url: str
-    detail: Optional[Literal["auto", "low", "high"]] = None
+    detail: Literal["auto", "low", "high"] | None = None
 
 
 class PromptChatApiImagePart(SmarterModel):
@@ -83,9 +85,9 @@ class PromptChatApiAudioPart(SmarterModel):
 class PromptChatApiFileRef(SmarterModel):
     """A file, base64 encoded, or by the provider's file id."""
 
-    file_data: Optional[str] = None
-    file_id: Optional[str] = None
-    filename: Optional[str] = None
+    file_data: str | None = None
+    file_id: str | None = None
+    filename: str | None = None
 
 
 class PromptChatApiFilePart(SmarterModel):
@@ -140,12 +142,12 @@ class PromptChatApiMessage(SmarterModel):
     """
 
     role: str = Field(..., description="system, assistant, user, tool, smarter or smarter_error.")
-    content: Optional[Union[str, list[PromptChatApiContentPart]]] = Field(
+    content: str | list[PromptChatApiContentPart] | None = Field(
         None, description="The message's text, or a list of content parts."
     )
-    tool_calls: Optional[list[PromptChatApiToolCall]] = Field(None, description="An assistant message's tool calls.")
-    tool_call_id: Optional[str] = Field(None, description="The tool call that a tool message answers.")
-    name: Optional[str] = Field(None, description="The name of a tool message's function.")
+    tool_calls: list[PromptChatApiToolCall] | None = Field(None, description="An assistant message's tool calls.")
+    tool_call_id: str | None = Field(None, description="The tool call that a tool message answers.")
+    name: str | None = Field(None, description="The name of a tool message's function.")
 
     @property
     def text(self) -> str:
@@ -160,9 +162,9 @@ class PromptChatApiMessage(SmarterModel):
 class PromptChatApiJournalMetadata(SmarterModel):
     """The ``metadata`` of a chat response."""
 
-    command: Optional[str] = Field(None, description="The journal's command, e.g. prompt.")
-    thing: Optional[str] = Field(None, description="The journal's thing, e.g. LLMClient.")
-    key: Optional[str] = None
+    command: str | None = Field(None, description="The journal's command, e.g. prompt.")
+    thing: str | None = Field(None, description="The journal's thing, e.g. LLMClient.")
+    key: str | None = None
 
 
 class PromptChatApiErrorBody(SmarterModel):
@@ -177,8 +179,8 @@ class PromptChatApiErrorResponse(SmarterModel):
     """A chat error response."""
 
     error: PromptChatApiErrorBody
-    api: Optional[str] = None
-    metadata: Optional[PromptChatApiJournalMetadata] = None
+    api: str | None = None
+    metadata: PromptChatApiJournalMetadata | None = None
 
 
 class PromptChatApiEnvelope(SmarterModel):
@@ -196,35 +198,35 @@ class PromptChatApiEnvelope(SmarterModel):
 class PromptChatApiStyleSection(SmarterModel):
     """The colors of one section of the chat ui."""
 
-    background_color: Optional[str] = None
-    color: Optional[str] = None
-    border_color: Optional[str] = None
-    info_color: Optional[str] = None
-    link_color: Optional[str] = None
-    editor_background_color: Optional[str] = None
-    placeholder_color: Optional[str] = None
+    background_color: str | None = None
+    color: str | None = None
+    border_color: str | None = None
+    info_color: str | None = None
+    link_color: str | None = None
+    editor_background_color: str | None = None
+    placeholder_color: str | None = None
 
 
 class PromptChatApiStyles(SmarterModel):
     """The LLMClient's chat ui styles."""
 
-    app_logo_url: Optional[str] = None
-    app_background_image_url: Optional[str] = None
-    app_background_image_size: Optional[str] = None
-    assistant_avatar_url: Optional[str] = None
-    user_avatar_url: Optional[str] = None
-    font_family: Optional[str] = None
-    google_font: Optional[str] = None
-    font_size: Optional[str] = None
-    border_radius: Optional[str] = None
-    main_container: Optional[PromptChatApiStyleSection] = None
-    conversation_header: Optional[PromptChatApiStyleSection] = None
-    message_list: Optional[PromptChatApiStyleSection] = None
-    incoming_message: Optional[PromptChatApiStyleSection] = None
-    outgoing_message: Optional[PromptChatApiStyleSection] = None
-    message_input: Optional[PromptChatApiStyleSection] = None
-    buttons: Optional[PromptChatApiStyleSection] = None
-    typing_indicator: Optional[PromptChatApiStyleSection] = None
+    app_logo_url: str | None = None
+    app_background_image_url: str | None = None
+    app_background_image_size: str | None = None
+    assistant_avatar_url: str | None = None
+    user_avatar_url: str | None = None
+    font_family: str | None = None
+    google_font: str | None = None
+    font_size: str | None = None
+    border_radius: str | None = None
+    main_container: PromptChatApiStyleSection | None = None
+    conversation_header: PromptChatApiStyleSection | None = None
+    message_list: PromptChatApiStyleSection | None = None
+    incoming_message: PromptChatApiStyleSection | None = None
+    outgoing_message: PromptChatApiStyleSection | None = None
+    message_input: PromptChatApiStyleSection | None = None
+    buttons: PromptChatApiStyleSection | None = None
+    typing_indicator: PromptChatApiStyleSection | None = None
 
 
 class PromptChatApiLLMClient(SmarterModel):
@@ -232,21 +234,21 @@ class PromptChatApiLLMClient(SmarterModel):
 
     id: int
     name: str
-    url_llmclient: Optional[str] = Field(None, description="The url of the LLMClient's prompt api.")
-    version: Optional[str] = None
-    deployed: Optional[bool] = None
-    provider: Optional[str] = None
-    default_model: Optional[str] = None
-    default_system_role: Optional[str] = Field(None, description="The system prompt of a new chat session.")
-    app_name: Optional[str] = None
-    app_assistant: Optional[str] = None
-    app_welcome_message: Optional[str] = None
-    app_example_prompts: Optional[list[str]] = None
-    app_placeholder: Optional[str] = None
-    app_info_url: Optional[str] = None
-    app_file_attachment: Optional[bool] = None
-    styles: Optional[PromptChatApiStyles] = None
-    total_tools: Optional[int] = Field(
+    url_llmclient: str | None = Field(None, description="The url of the LLMClient's prompt api.")
+    version: str | None = None
+    deployed: bool | None = None
+    provider: str | None = None
+    default_model: str | None = None
+    default_system_role: str | None = Field(None, description="The system prompt of a new chat session.")
+    app_name: str | None = None
+    app_assistant: str | None = None
+    app_welcome_message: str | None = None
+    app_example_prompts: list[str] | None = None
+    app_placeholder: str | None = None
+    app_info_url: str | None = None
+    app_file_attachment: bool | None = None
+    styles: PromptChatApiStyles | None = None
+    total_tools: int | None = Field(
         None, description="The number of the LLMClient's extensions, plugins and MCPClients."
     )
 
@@ -255,18 +257,18 @@ class PromptChatApiOrmModel(SmarterModel):
     """The fields of a Django row that the contract returns."""
 
     id: int
-    created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
 
 
 class PromptChatApiPluginMeta(PromptChatApiOrmModel):
     """A plugin's metadata."""
 
     name: str
-    description: Optional[str] = None
-    version: Optional[str] = None
+    description: str | None = None
+    version: str | None = None
     tags: list[str] = []
-    annotations: Optional[Union[list[SmarterJsonObjectType], SmarterJsonObjectType]] = None
+    annotations: list[SmarterJsonObjectType] | SmarterJsonObjectType | None = None
     plugin_class: str = Field(..., description="api, skill, sql, static, websearch or imagesearch.")
 
 
@@ -283,14 +285,14 @@ class PromptChatApiLLMClientExtension(PromptChatApiOrmModel):
     llmclient: int
     extension: int = Field(..., description="The Extension's id.")
     name: str = Field(..., description="The Extension's slug, e.g. weather.")
-    version: Optional[str] = Field(None, description="The Extension's installed version, e.g. 1.0.0.")
+    version: str | None = Field(None, description="The Extension's installed version, e.g. 1.0.0.")
     enabled: bool = Field(..., description="Whether the Extension is enabled, so that its tools are offered.")
 
 
 class PromptChatApiPromptRequest(SmarterModel):
     """The prompt api's request body."""
 
-    session_key: Optional[str] = None
+    session_key: str | None = None
     messages: list[PromptChatApiMessage]
 
 
@@ -298,18 +300,18 @@ class PromptChatApiLLMClientRequest(PromptChatApiOrmModel):
     """A request that Smarter sent to the LLM."""
 
     llmclient: int
-    request: Optional[PromptChatApiPromptRequest] = None
-    session_key: Optional[str] = None
-    is_aggregation: Optional[bool] = None
+    request: PromptChatApiPromptRequest | None = None
+    session_key: str | None = None
+    is_aggregation: bool | None = None
 
 
 class PromptChatApiPromptToolCall(PromptChatApiOrmModel):
     """A tool call of the chat session."""
 
     prompt: int
-    plugin: Optional[int] = None
-    function_name: Optional[str] = None
-    function_args: Optional[str] = None
+    plugin: int | None = None
+    function_name: str | None = None
+    function_args: str | None = None
     request: SmarterJsonType = None
     response: SmarterJsonType = None
 
@@ -319,16 +321,16 @@ class PromptChatApiPromptPluginUsage(PromptChatApiOrmModel):
 
     prompt: int
     plugin: int
-    input_text: Optional[str] = None
+    input_text: str | None = None
 
 
 class PromptChatApiPluginSelection(PromptChatApiOrmModel):
     """A plugin selector's decision in the chat session."""
 
     plugin_selector: int
-    search_term: Optional[str] = None
-    messages: Optional[list[PromptChatApiMessage]] = None
-    session_key: Optional[str] = None
+    search_term: str | None = None
+    messages: list[PromptChatApiMessage] | None = None
+    session_key: str | None = None
 
 
 class PromptChatApiHistory(SmarterModel):
@@ -341,10 +343,10 @@ class PromptChatApiHistory(SmarterModel):
     chat_history: list[PromptChatApiMessage] = Field(
         default_factory=list, description="The session's messages, which restore the chat thread."
     )
-    prompt_tool_call_history: Optional[list[PromptChatApiPromptToolCall]] = None
-    prompt_plugin_usage_history: Optional[list[PromptChatApiPromptPluginUsage]] = None
-    plugin_selector_history: Optional[list[PromptChatApiPluginSelection]] = None
-    llmclient_request_history: Optional[list[PromptChatApiLLMClientRequest]] = None
+    prompt_tool_call_history: list[PromptChatApiPromptToolCall] | None = None
+    prompt_plugin_usage_history: list[PromptChatApiPromptPluginUsage] | None = None
+    plugin_selector_history: list[PromptChatApiPluginSelection] | None = None
+    llmclient_request_history: list[PromptChatApiLLMClientRequest] | None = None
 
 
 class PromptChatApiMetaData(SmarterModel):
@@ -355,22 +357,22 @@ class PromptChatApiMetaData(SmarterModel):
     ``verbose=True``, adds the platform's other details of the LLMClient, which this model accepts as extra fields.
     """
 
-    ready: Optional[bool] = None
-    is_valid: Optional[bool] = None
-    is_deployed: Optional[bool] = None
-    is_authentication_required: Optional[bool] = Field(
+    ready: bool | None = None
+    is_valid: bool | None = None
+    is_deployed: bool | None = None
+    is_authentication_required: bool | None = Field(
         None, description="True if the LLMClient requires a Smarter api key, or a logged-in user."
     )
-    is_custom_domain: Optional[bool] = Field(None, description="True if the request's host is a custom domain.")
+    is_custom_domain: bool | None = Field(None, description="True if the request's host is a custom domain.")
 
 
 class PromptChatApiListMetaData(SmarterModel):
     """The counts of a list of the LLMClient's plugins or extensions."""
 
-    total_plugins: Optional[int] = None
-    plugins_returned: Optional[int] = None
-    total_extensions: Optional[int] = None
-    extensions_returned: Optional[int] = None
+    total_plugins: int | None = None
+    plugins_returned: int | None = None
+    total_extensions: int | None = None
+    extensions_returned: int | None = None
 
 
 class PromptChatApiPluginList(SmarterModel):
@@ -399,7 +401,9 @@ class PromptChatApiExtensionList(SmarterModel):
 
 class PromptChatApiConfig(SmarterModel):
     """
-    An LLMClient's chat configuration: the LLMClient, the chat session's key and history, and its plugins and extensions.
+    An LLMClient's chat configuration.
+
+    The LLMClient, the chat session's key and history, and its plugins and extensions.
 
     A new session's configuration has an empty history. Pass its ``session_key`` to the prompt api
     to continue the session.
@@ -413,13 +417,13 @@ class PromptChatApiConfig(SmarterModel):
     llmclient: PromptChatApiLLMClient
     history: PromptChatApiHistory
     plugins: PromptChatApiPluginList
-    extensions: Optional[PromptChatApiExtensionList] = None
+    extensions: PromptChatApiExtensionList | None = None
 
 
 class PromptChatApiConfigRequest(SmarterModel):
     """The configuration api's request body."""
 
-    session_key: Optional[str] = Field(None, description="The chat session's key, or None for a new session.")
+    session_key: str | None = Field(None, description="The chat session's key, or None for a new session.")
 
 
 class PromptChatApiConfigResponse(PromptChatApiEnvelope):
@@ -437,39 +441,39 @@ class PromptChatApiChoice(SmarterModel):
     """A choice of a chat completion."""
 
     index: int = 0
-    finish_reason: Optional[str] = Field(None, description="e.g. stop, length or tool_calls.")
-    message: Optional[PromptChatApiMessage] = None
+    finish_reason: str | None = Field(None, description="e.g. stop, length or tool_calls.")
+    message: PromptChatApiMessage | None = None
 
 
 class PromptChatApiTokenDetails(SmarterModel):
     """The breakdown of a completion's tokens."""
 
-    reasoning_tokens: Optional[int] = None
-    cached_tokens: Optional[int] = None
-    audio_tokens: Optional[int] = None
+    reasoning_tokens: int | None = None
+    cached_tokens: int | None = None
+    audio_tokens: int | None = None
 
 
 class PromptChatApiUsage(SmarterModel):
     """A chat completion's token usage."""
 
-    prompt_tokens: Optional[int] = None
-    completion_tokens: Optional[int] = None
-    total_tokens: Optional[int] = None
-    prompt_tokens_details: Optional[PromptChatApiTokenDetails] = None
-    completion_tokens_details: Optional[PromptChatApiTokenDetails] = None
+    prompt_tokens: int | None = None
+    completion_tokens: int | None = None
+    total_tokens: int | None = None
+    prompt_tokens_details: PromptChatApiTokenDetails | None = None
+    completion_tokens_details: PromptChatApiTokenDetails | None = None
 
 
 class PromptChatApiCompletion(SmarterModel):
     """The LLM's chat completion, in the format of the OpenAI api."""
 
-    id: Optional[str] = None
-    object: Optional[str] = None
-    created: Optional[int] = None
-    model: Optional[str] = None
+    id: str | None = None
+    object: str | None = None
+    created: int | None = None
+    model: str | None = None
     choices: list[PromptChatApiChoice] = Field(default_factory=list)
-    usage: Optional[PromptChatApiUsage] = None
-    system_fingerprint: Optional[str] = None
-    service_tier: Optional[str] = None
+    usage: PromptChatApiUsage | None = None
+    system_fingerprint: str | None = None
+    service_tier: str | None = None
 
 
 class PromptChatApiPromptResult(SmarterModel):
@@ -480,7 +484,7 @@ class PromptChatApiPromptResult(SmarterModel):
     messages: list[PromptChatApiMessage] = Field(
         default_factory=list, description="The messages that the prompt added to the chat thread, in order."
     )
-    completion: Optional[PromptChatApiCompletion] = Field(None, description="The LLM's chat completion.")
+    completion: PromptChatApiCompletion | None = Field(None, description="The LLM's chat completion.")
     plugins: list[str] = Field(default_factory=list, description="The plugins that Smarter selected.")
     tools: list[str] = Field(default_factory=list, description="The functions that the LLM could call.")
 
@@ -506,7 +510,7 @@ class PromptChatApiPromptResponse(PromptChatApiEnvelope):
     """
 
     data: PromptChatApiPromptResult
-    error: Optional[PromptChatApiErrorBody] = None
+    error: PromptChatApiErrorBody | None = None
 
     @property
     def text(self) -> str:
@@ -543,7 +547,7 @@ class PromptChatApiProgressResult(SmarterModel):
     """The data of the final ``result`` event."""
 
     status: int = Field(..., description="The prompt's http status.")
-    response: Union[PromptChatApiPromptResponse, PromptChatApiErrorResponse] = Field(
+    response: PromptChatApiPromptResponse | PromptChatApiErrorResponse = Field(
         ..., description="Exactly the JSON of a non-streaming response."
     )
 

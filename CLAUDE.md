@@ -35,18 +35,18 @@ This file holds only what applies to nearly every task.
 
 ## Repository map
 
-| Path                 | Contents                                                                                                 |
-| -------------------- | -------------------------------------------------------------------------------------------------------- |
-| `smarter/client.py`  | `Smarter`, the client                                                                                    |
-| `smarter/core/`      | Configuration, http transport, exceptions, logging, SSE, type aliases                                    |
-| `smarter/resources/` | One module per resource family                                                                           |
-| `smarter/models/`    | Pydantic models; `sam/` is generated, `chat.py`/`journal.py`/`react.py` mirror the platform's contracts  |
-| `scripts/`           | SAM model generation, contract sync                                                                      |
-| `tests/`             | Unit tests, fixtures in `tests/data/`, live tests in `tests/live/`                                       |
-| `docs/source/`       | The Sphinx site, https://docs.smarter-python.smarter.sh/; `adr/` holds the architecture decision records |
-| `terraform/docs/`    | The docs site's AWS resources                                                                            |
-| `.github/workflows/` | `ci.yml` (every push and pull request) and `release.yml` (by hand: CI, release, TestPyPI, PyPI)          |
-| `skills/`            | Agent Skills                                                                                             |
+| Path                 | Contents                                                                                                  |
+| -------------------- | --------------------------------------------------------------------------------------------------------- |
+| `smarter/client.py`  | `Smarter`, the client                                                                                     |
+| `smarter/core/`      | Configuration, http transport, exceptions, logging, SSE, type aliases                                     |
+| `smarter/resources/` | One module per resource family                                                                            |
+| `smarter/models/`    | Pydantic models; `sam/` is generated, `chat.py`/`journal.py`/`react.py` mirror the platform's contracts   |
+| `scripts/`           | SAM model generation, contract sync                                                                       |
+| `tests/`             | Unit tests, fixtures in `tests/data/`, live tests in `tests/live/`                                        |
+| `docs/source/`       | The Sphinx site, https://docs.smarter-python.smarter.sh/; `adr/` holds the architecture decision records  |
+| `terraform/docs/`    | The docs site's AWS resources                                                                             |
+| `.github/workflows/` | `ci.yml` (pull requests) and `release.yml` (every push to main, alpha, beta: CI, release, TestPyPI, PyPI) |
+| `skills/`            | Agent Skills                                                                                              |
 
 The SDK's documentation is its own site, built from `docs/source/` and
 published to https://docs.smarter-python.smarter.sh/. CI, Codecov and releases

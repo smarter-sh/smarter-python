@@ -10,8 +10,6 @@ LLMHosts: open-weight models that the platform serves on its own Kubernetes clus
 
 from __future__ import annotations
 
-from typing import Optional
-
 from smarter.core.typing import SmarterIdType
 from smarter.models.llmhost import (
     DiscoveredManifest,

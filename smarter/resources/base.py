@@ -11,7 +11,7 @@ api has no verb for, such as evaluating a Guardrail or calling an MCP tool.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, ClassVar, Generic, Optional, TypeVar, Union
+from typing import TYPE_CHECKING, ClassVar, Generic, TypeVar, Union
 
 from smarter.core.exceptions import ResourceNotFoundError, SmarterValueError
 from smarter.core.http import SmarterHttpClient

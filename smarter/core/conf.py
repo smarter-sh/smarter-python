@@ -22,7 +22,7 @@ model is the only place that reads the environment.
 
 import logging
 from pathlib import Path
-from typing import Literal, Optional
+from typing import Literal
 from urllib.parse import urlsplit, urlunsplit
 
 import yaml
@@ -59,22 +59,22 @@ class SmarterSettings(BaseSettings):
 
     model_config = SettingsConfigDict(env_prefix="SMARTER_", extra="ignore")
 
-    api_key: Optional[SecretStr] = Field(None, description="A Smarter api key: 64 characters.")
-    base_url: Optional[str] = Field(None, description="e.g. https://platform.example.com or http://localhost:9357.")
-    environment: Optional[SmarterEnvironment] = None
-    root_domain: Optional[str] = Field(None, description="The platform's root domain, e.g. platform.smarter.sh.")
+    api_key: SecretStr | None = Field(None, description="A Smarter api key: 64 characters.")
+    base_url: str | None = Field(None, description="e.g. https://platform.example.com or http://localhost:9357.")
+    environment: SmarterEnvironment | None = None
+    root_domain: str | None = Field(None, description="The platform's root domain, e.g. platform.smarter.sh.")
     timeout: float = Field(DEFAULT_TIMEOUT, gt=0)
     max_retries: int = Field(DEFAULT_MAX_RETRIES, ge=0)
     config_file: Path = DEFAULT_CONFIG_FILE
-    log: Optional[Literal["debug", "info"]] = Field(None, description="Log the SDK's requests to stderr.")
+    log: Literal["debug", "info"] | None = Field(None, description="Log the SDK's requests to stderr.")
 
 
 class CliConfig(BaseModel):
     """The parts of the smarter cli's ``~/.smarter/config.yaml`` that the SDK reads."""
 
-    environment: Optional[SmarterEnvironment] = None
-    root_domain: Optional[str] = None
-    api_key: Optional[SecretStr] = Field(None, description="The top-level api_key, used by any environment.")
+    environment: SmarterEnvironment | None = None
+    root_domain: str | None = None
+    api_key: SecretStr | None = Field(None, description="The top-level api_key, used by any environment.")
     api_keys: dict[str, SecretStr] = Field(default_factory=dict, description="The api key of each environment.")
 
     @classmethod
@@ -160,12 +160,12 @@ def api_base_url(url: str) -> str:
 
 def resolve_client_config(
     *,
-    api_key: Optional[str] = None,
-    base_url: Optional[str] = None,
-    environment: Optional[SmarterEnvironment] = None,
-    timeout: Optional[float] = None,
-    max_retries: Optional[int] = None,
-    settings: Optional[SmarterSettings] = None,
+    api_key: str | None = None,
+    base_url: str | None = None,
+    environment: SmarterEnvironment | None = None,
+    timeout: float | None = None,
+    max_retries: int | None = None,
+    settings: SmarterSettings | None = None,
 ) -> ClientConfig:
     """
     Resolve a client's configuration from its arguments, the environment, and the cli's configuration file.
@@ -185,7 +185,7 @@ def resolve_client_config(
         environment or settings.environment or cli.environment or DEFAULT_ENVIRONMENT
     )
 
-    key: Optional[str] = api_key
+    key: str | None = api_key
     if not key and settings.api_key:
         key = settings.api_key.get_secret_value()
     if not key and resolved_environment in cli.api_keys:

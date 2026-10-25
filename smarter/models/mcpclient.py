@@ -1,7 +1,6 @@
 """Models of MCPClients: connections to Model Context Protocol servers, whose tools an LLMClient's LLM can call."""
 
 from datetime import datetime
-from typing import Optional
 
 from pydantic import Field
 
@@ -13,54 +12,54 @@ from .base import SmarterCamelModel, SmarterResource
 class MCPClient(SmarterResource):
     """An MCPClient: an MCP server, how to reach it, and which of its tools the LLM may call."""
 
-    transport: Optional[str] = Field(None, description="http, sse or stdio.")
-    endpoint_url: Optional[str] = None
-    command: Optional[str] = None
-    timeout: Optional[int] = None
-    auth_type: Optional[str] = None
+    transport: str | None = Field(None, description="http, sse or stdio.")
+    endpoint_url: str | None = None
+    command: str | None = None
+    timeout: int | None = None
+    auth_type: str | None = None
     allowed_tools: list[str] = []
     allowed_resources: list[str] = []
-    include_instructions: Optional[bool] = None
-    cache_ttl: Optional[int] = None
-    is_active: Optional[bool] = None
-    status: Optional[str] = Field(None, description="e.g. connected or error.")
-    priority: Optional[int] = None
-    protocol_version: Optional[str] = None
-    server_name: Optional[str] = None
-    server_version: Optional[str] = None
+    include_instructions: bool | None = None
+    cache_ttl: int | None = None
+    is_active: bool | None = None
+    status: str | None = Field(None, description="e.g. connected or error.")
+    priority: int | None = None
+    protocol_version: str | None = None
+    server_name: str | None = None
+    server_version: str | None = None
     tools: list[str] = Field(default_factory=list, description="The names of every tool that the server offers.")
-    last_connected_at: Optional[datetime] = None
-    last_error: Optional[str] = None
+    last_connected_at: datetime | None = None
+    last_error: str | None = None
 
 
 class MCPClientStatus(SmarterCamelModel):
     """The connection state of an MCPClient."""
 
     name: str
-    status: Optional[str] = None
-    protocol_version: Optional[str] = None
-    server_name: Optional[str] = None
-    server_version: Optional[str] = None
-    last_connected: Optional[datetime] = None
-    last_error: Optional[str] = None
-    error: Optional[str] = Field(None, description="The error of a failed refresh.")
+    status: str | None = None
+    protocol_version: str | None = None
+    server_name: str | None = None
+    server_version: str | None = None
+    last_connected: datetime | None = None
+    last_error: str | None = None
+    error: str | None = Field(None, description="The error of a failed refresh.")
 
 
 class MCPTool(SmarterCamelModel):
     """A tool of an MCP server, which the MCPClient allows the LLM to call."""
 
     name: str
-    title: Optional[str] = None
-    description: Optional[str] = None
-    input_schema: Optional[SmarterJsonObjectType] = Field(None, description="The tool's arguments, as a JSON Schema.")
-    read_only: Optional[bool] = None
-    destructive: Optional[bool] = None
+    title: str | None = None
+    description: str | None = None
+    input_schema: SmarterJsonObjectType | None = Field(None, description="The tool's arguments, as a JSON Schema.")
+    read_only: bool | None = None
+    destructive: bool | None = None
 
 
 class MCPClientTools(MCPClientStatus):
     """An MCPClient's allowed tools, and the server's instructions."""
 
-    instructions: Optional[str] = None
+    instructions: str | None = None
     tools: list[MCPTool] = []
 
 
@@ -70,7 +69,7 @@ class MCPToolResult(SmarterCamelModel):
     name: str = Field(..., description="The MCPClient's name.")
     tool: str
     is_error: bool = False
-    content: Optional[str] = Field(None, description="The tool's result, as text.")
+    content: str | None = Field(None, description="The tool's result, as text.")
 
 
 __all__ = ["MCPClient", "MCPClientStatus", "MCPClientTools", "MCPTool", "MCPToolResult"]

@@ -52,7 +52,11 @@ class SmarterValueError(SmarterError, ValueError):
 
 
 class ResourceNotFoundError(SmarterError, LookupError):
-    """A resource was not found: the api answered 404 (:class:`NotFoundError`), or ``find()`` found no resource of that name."""
+    """
+    A resource was not found.
+
+    The api answered 404 (:class:`NotFoundError`), or ``find()`` found no resource of that name.
+    """
 
 
 class APIError(SmarterError):
@@ -126,7 +130,7 @@ class APIStatusError(APIError):
         self.error = error
 
     @property
-    def error_class(self) -> Optional[str]:
+    def error_class(self) -> str | None:
         """The name of the server-side exception class, e.g. ``SAMBrokerErrorNotFound``, when the platform sent it."""
         return self.error.errorClass if self.error else None
 

@@ -1,7 +1,6 @@
 """Models of LLMHosts: open-weight models that Smarter serves on its own Kubernetes cluster."""
 
 from datetime import datetime
-from typing import Optional
 
 from pydantic import Field
 
@@ -13,26 +12,26 @@ from .base import SmarterCamelModel, SmarterModel, SmarterResource
 class LLMHost(SmarterResource):
     """An LLMHost: a model, the inference engine that serves it, and the compute it runs on."""
 
-    spec: Optional[SmarterJsonObjectType] = None
-    model_source: Optional[str] = None
-    model_repository: Optional[str] = None
-    model_revision: Optional[str] = None
-    model_task: Optional[str] = Field(None, description="e.g. chat, completion or embedding.")
-    inference_engine: Optional[str] = Field(None, description="e.g. vllm, tgi, tei, ollama or llama_cpp.")
-    api_format: Optional[str] = None
-    compute: Optional[int] = Field(None, description="The id of the LLMHostCompute that the LLMHost runs on.")
-    gpu_count: Optional[int] = None
-    gpu_type: Optional[str] = None
-    replicas: Optional[int] = None
-    ready_replicas: Optional[int] = None
-    status: Optional[str] = None
-    status_message: Optional[str] = None
-    endpoint_url: Optional[str] = None
-    public_url: Optional[str] = None
-    served_model_name: Optional[str] = None
-    is_active: Optional[bool] = None
-    deployed_at: Optional[datetime] = None
-    cost_per_hour: Optional[str] = None
+    spec: SmarterJsonObjectType | None = None
+    model_source: str | None = None
+    model_repository: str | None = None
+    model_revision: str | None = None
+    model_task: str | None = Field(None, description="e.g. chat, completion or embedding.")
+    inference_engine: str | None = Field(None, description="e.g. vllm, tgi, tei, ollama or llama_cpp.")
+    api_format: str | None = None
+    compute: int | None = Field(None, description="The id of the LLMHostCompute that the LLMHost runs on.")
+    gpu_count: int | None = None
+    gpu_type: str | None = None
+    replicas: int | None = None
+    ready_replicas: int | None = None
+    status: str | None = None
+    status_message: str | None = None
+    endpoint_url: str | None = None
+    public_url: str | None = None
+    served_model_name: str | None = None
+    is_active: bool | None = None
+    deployed_at: datetime | None = None
+    cost_per_hour: str | None = None
 
 
 class LLMHostStatus(SmarterCamelModel):
@@ -40,14 +39,14 @@ class LLMHostStatus(SmarterCamelModel):
 
     llmhost: str
     status: str
-    message: Optional[str] = None
-    replicas: Optional[int] = None
-    ready_replicas: Optional[int] = None
-    healthy: Optional[bool] = None
-    endpoint: Optional[str] = None
-    public_url: Optional[str] = None
+    message: str | None = None
+    replicas: int | None = None
+    ready_replicas: int | None = None
+    healthy: bool | None = None
+    endpoint: str | None = None
+    public_url: str | None = None
     pods: list[SmarterJsonObjectType] = []
-    checked_at: Optional[datetime] = None
+    checked_at: datetime | None = None
 
 
 class LLMHostLogs(SmarterCamelModel):
@@ -76,17 +75,17 @@ class LLMHostReport(SmarterCamelModel):
 class DiscoveredModel(SmarterModel):
     """A model found in a public catalog, e.g. Hugging Face, with the LLMHost manifest that would serve it."""
 
-    catalog: Optional[str] = None
-    source: Optional[str] = None
+    catalog: str | None = None
+    source: str | None = None
     repository: str
-    task: Optional[str] = None
-    description: Optional[str] = None
-    license: Optional[str] = None
-    gated: Optional[bool] = None
-    downloads: Optional[int] = None
-    likes: Optional[int] = None
+    task: str | None = None
+    description: str | None = None
+    license: str | None = None
+    gated: bool | None = None
+    downloads: int | None = None
+    likes: int | None = None
     tags: list[str] = []
-    manifest: Optional[SmarterJsonObjectType] = None
+    manifest: SmarterJsonObjectType | None = None
 
 
 class DiscoveredManifest(SmarterModel):

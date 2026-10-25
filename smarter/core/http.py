@@ -13,7 +13,7 @@ import time
 from collections.abc import Iterator, Mapping
 from contextlib import contextmanager
 from functools import lru_cache
-from typing import Any, Optional, TypeVar, Union
+from typing import Any, TypeVar, Union
 
 import httpx
 from pydantic import TypeAdapter, ValidationError
@@ -98,7 +98,7 @@ def parse_body(response: httpx.Response) -> object:
         return response.text
 
 
-def journal_error(body: object) -> Optional[SAMJournalApiErrorBody]:
+def journal_error(body: object) -> SAMJournalApiErrorBody | None:
     """
     The Smarter Journal error of a response body, if it is a journaled error response.
 
@@ -113,7 +113,7 @@ def journal_error(body: object) -> Optional[SAMJournalApiErrorBody]:
         return None
 
 
-def error_message(response: httpx.Response, body: object, error: Optional[SAMJournalApiErrorBody]) -> str:
+def error_message(response: httpx.Response, body: object, error: SAMJournalApiErrorBody | None) -> str:
     """
     A human-readable message for an error response.
 
@@ -172,7 +172,7 @@ def is_retryable(response: httpx.Response) -> bool:
     return False
 
 
-def retry_delay(attempt: int, response: Optional[httpx.Response] = None) -> float:
+def retry_delay(attempt: int, response: httpx.Response | None = None) -> float:
     """
     Seconds to wait before a retry: the response's ``Retry-After``, or exponential backoff with jitter.
 
@@ -191,7 +191,7 @@ def retry_delay(attempt: int, response: Optional[httpx.Response] = None) -> floa
     return min(0.5 * 2**attempt, 8.0) * (1 - 0.25 * random.random())  # nosec B311 - jitter, not security
 
 
-def query_params(params: Optional[Mapping[str, QueryParamValue]]) -> dict[str, str]:
+def query_params(params: Mapping[str, QueryParamValue] | None) -> dict[str, str]:
     """
     Query parameters as strings: booleans as ``true`` or ``false``, and None values left out.
 
@@ -222,8 +222,8 @@ class SmarterHttpClient:
         self,
         config: ClientConfig,
         *,
-        default_headers: Optional[Mapping[str, str]] = None,
-        http_client: Optional[httpx.Client] = None,
+        default_headers: Mapping[str, str] | None = None,
+        http_client: httpx.Client | None = None,
     ) -> None:
         self.config = config
         self._owns_http_client = http_client is None
@@ -251,7 +251,7 @@ class SmarterHttpClient:
             return path
         return self.base_url + path.lstrip("/")
 
-    def headers(self, extra: Optional[Mapping[str, str]] = None) -> dict[str, str]:
+    def headers(self, extra: Mapping[str, str] | None = None) -> dict[str, str]:
         """
         The headers of a request.
 
@@ -274,13 +274,13 @@ class SmarterHttpClient:
         method: str,
         path: str,
         *,
-        params: Optional[Mapping[str, QueryParamValue]] = None,
+        params: Mapping[str, QueryParamValue] | None = None,
         json: object = None,
-        content: Union[str, bytes, None] = None,
-        files: Optional[Mapping[str, Any]] = None,
-        data: Optional[Mapping[str, Any]] = None,
-        headers: Optional[Mapping[str, str]] = None,
-        timeout: Optional[float] = None,
+        content: str | bytes | None = None,
+        files: Mapping[str, Any] | None = None,
+        data: Mapping[str, Any] | None = None,
+        headers: Mapping[str, str] | None = None,
+        timeout: float | None = None,
     ) -> httpx.Request:
         """
         Build a request.
@@ -349,7 +349,7 @@ class SmarterHttpClient:
             raise make_status_error(response)
 
     def _wait(
-        self, attempt: int, request: httpx.Request, *, reason: str, response: Optional[httpx.Response] = None
+        self, attempt: int, request: httpx.Request, *, reason: str, response: httpx.Response | None = None
     ) -> None:
         delay = retry_delay(attempt, response)
         logger.info("retrying %s %s in %.2fs after %s", request.method, request.url, delay, reason)
@@ -361,13 +361,13 @@ class SmarterHttpClient:
         path: str,
         *,
         cast_to: Any,
-        params: Optional[Mapping[str, QueryParamValue]] = None,
+        params: Mapping[str, QueryParamValue] | None = None,
         json: object = None,
-        content: Union[str, bytes, None] = None,
-        files: Optional[Mapping[str, Any]] = None,
-        data: Optional[Mapping[str, Any]] = None,
-        headers: Optional[Mapping[str, str]] = None,
-        timeout: Optional[float] = None,
+        content: str | bytes | None = None,
+        files: Mapping[str, Any] | None = None,
+        data: Mapping[str, Any] | None = None,
+        headers: Mapping[str, str] | None = None,
+        timeout: float | None = None,
     ) -> Any:
         """
         Send a request, and validate its JSON response.
@@ -424,8 +424,8 @@ class SmarterHttpClient:
         path: str,
         *,
         json: object = None,
-        headers: Optional[Mapping[str, str]] = None,
-        timeout: Optional[float] = None,
+        headers: Mapping[str, str] | None = None,
+        timeout: float | None = None,
     ) -> Iterator[Iterator[ServerSentEvent]]:
         """
         Send a request that asks for Server-Sent Events, and iterate its events.

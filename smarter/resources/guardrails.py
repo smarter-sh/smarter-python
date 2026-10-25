@@ -10,7 +10,7 @@ Guardrails: checks that the platform runs on prompts and on the LLM's replies.
 
 from __future__ import annotations
 
-from typing import Literal, Optional
+from typing import Literal
 
 from smarter.core.typing import SmarterIdType
 from smarter.models.guardrail import Guardrail, GuardrailEvaluation, GuardrailEvents

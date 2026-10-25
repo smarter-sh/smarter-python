@@ -1,5 +1,2 @@
-# Jinja templates of the Sphinx theme, which prettier reflows as html
-docs/source/_templates/
-
 # written by semantic-release (release.config.js), in its own format
 CHANGELOG.md

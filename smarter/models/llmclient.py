@@ -1,7 +1,6 @@
 """Models of LLMClients and their plugins, MCPClients, guardrails, extensions, api keys and custom domains."""
 
 from datetime import datetime
-from typing import Optional
 
 from pydantic import Field
 
@@ -13,21 +12,21 @@ class LLMClientPluginRef(SmarterCamelModel):
     """A plugin of an LLMClient, by its id and name."""
 
     id: int
-    name: Optional[str] = None
+    name: str | None = None
 
 
 class LLMClientMCPClientRef(SmarterCamelModel):
     """An MCPClient of an LLMClient, by the link's id and the MCPClient's name."""
 
     id: int
-    name: Optional[str] = None
+    name: str | None = None
 
 
 class LLMClientGuardrailRef(SmarterCamelModel):
     """A guardrail of an LLMClient, by the link's id and the guardrail's name."""
 
     id: int
-    name: Optional[str] = None
+    name: str | None = None
 
 
 class LLMClientTool(SmarterCamelModel):
@@ -46,11 +45,11 @@ class LLMClientExtension(SmarterCamelModel):
     """An extension of an LLMClient, whose tools the LLMClient offers the LLM, e.g. ``calculator``."""
 
     id: int
-    name: Optional[str] = Field(None, description="The extension's slug, e.g. weather.")
-    extension: Optional[int] = Field(None, description="The Extension's id.")
-    llmclient: Optional[int] = None
-    created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
+    name: str | None = Field(None, description="The extension's slug, e.g. weather.")
+    extension: int | None = Field(None, description="The Extension's id.")
+    llmclient: int | None = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
 
 
 class LLMClientPlugin(SmarterCamelModel):
@@ -58,33 +57,33 @@ class LLMClientPlugin(SmarterCamelModel):
 
     id: int
     plugin_meta: Plugin
-    llmclient: Optional[int] = None
+    llmclient: int | None = None
 
 
 class LLMClientApiKey(SmarterCamelModel):
     """An api key that may call an LLMClient that requires authentication."""
 
     id: int
-    llmclient: Optional[int] = None
-    api_key: Optional[str] = Field(None, description="The api key's public key_id, a UUID. Never the key itself.")
-    created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
+    llmclient: int | None = None
+    api_key: str | None = Field(None, description="The api key's public key_id, a UUID. Never the key itself.")
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
 
 
 class LLMClientCustomDomain(SmarterCamelModel):
     """A custom domain on which an LLMClient is deployed: the domain itself, and its verification."""
 
     id: int
-    name: Optional[str] = None
-    description: Optional[str] = None
-    version: Optional[str] = None
-    domain_name: Optional[str] = Field(None, description="The domain, e.g. example.com.")
-    verification_status: Optional[str] = Field(None, description="Not Verified, Verifying, Verified or Failed.")
-    verified_at: Optional[datetime] = None
-    verification_message: Optional[str] = None
-    user_profile: Optional[int] = Field(None, description="The owner's user profile id.")
-    created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
+    name: str | None = None
+    description: str | None = None
+    version: str | None = None
+    domain_name: str | None = Field(None, description="The domain, e.g. example.com.")
+    verification_status: str | None = Field(None, description="Not Verified, Verifying, Verified or Failed.")
+    verified_at: datetime | None = None
+    verification_message: str | None = None
+    user_profile: int | None = Field(None, description="The owner's user profile id.")
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
 
 
 class LLMClient(SmarterResource):
@@ -95,24 +94,24 @@ class LLMClient(SmarterResource):
     :meth:`smarter.resources.llmclients.LLMClients.chat`.
     """
 
-    rfc1034_compliant_name: Optional[str] = None
-    provider: Optional[str] = None
-    default_model: Optional[str] = None
-    default_system_role: Optional[str] = Field(None, description="The system prompt of a new chat session.")
-    deployed: Optional[bool] = None
-    default_host: Optional[str] = None
-    default_url: Optional[str] = None
-    custom_host: Optional[str] = None
-    custom_url: Optional[str] = None
-    sandbox_host: Optional[str] = None
-    sandbox_url: Optional[str] = None
-    url_llmclient: Optional[str] = Field(None, description="Where to send prompts: the chat api's prompt url.")
-    url_chat_config: Optional[str] = Field(None, description="The chat api's configuration url.")
-    ready: Optional[bool] = Field(None, description="Whether the LLMClient can be prompted.")
-    is_authentication_required: Optional[bool] = Field(
+    rfc1034_compliant_name: str | None = None
+    provider: str | None = None
+    default_model: str | None = None
+    default_system_role: str | None = Field(None, description="The system prompt of a new chat session.")
+    deployed: bool | None = None
+    default_host: str | None = None
+    default_url: str | None = None
+    custom_host: str | None = None
+    custom_url: str | None = None
+    sandbox_host: str | None = None
+    sandbox_url: str | None = None
+    url_llmclient: str | None = Field(None, description="Where to send prompts: the chat api's prompt url.")
+    url_chat_config: str | None = Field(None, description="The chat api's configuration url.")
+    ready: bool | None = Field(None, description="Whether the LLMClient can be prompted.")
+    is_authentication_required: bool | None = Field(
         None, description="Whether prompting the LLMClient requires an api key."
     )
-    can_delete: Optional[bool] = Field(None, description="Whether the api key's user may delete the LLMClient now.")
+    can_delete: bool | None = Field(None, description="Whether the api key's user may delete the LLMClient now.")
     extensions: list[LLMClientExtension] = []
     plugins: list[LLMClientPluginRef] = []
     mcpclients: list[LLMClientMCPClientRef] = []

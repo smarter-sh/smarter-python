@@ -5,9 +5,9 @@ Smarter Python SDK
    :target: https://smarter.sh
    :alt: A project of The Smarter Project
 
-.. image:: https://github.com/smarter-sh/smarter-python/actions/workflows/ci.yml/badge.svg?branch=main
-   :target: https://github.com/smarter-sh/smarter-python/actions/workflows/ci.yml
-   :alt: CI
+.. image:: https://github.com/smarter-sh/smarter-python/actions/workflows/release.yml/badge.svg?branch=main
+   :target: https://github.com/smarter-sh/smarter-python/actions/workflows/release.yml
+   :alt: Release
 
 .. image:: https://codecov.io/gh/smarter-sh/smarter-python/graph/badge.svg
    :target: https://codecov.io/gh/smarter-sh/smarter-python

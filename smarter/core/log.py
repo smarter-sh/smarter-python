@@ -13,13 +13,12 @@ Api keys are never logged: see :func:`mask_secret`.
 """
 
 import logging
-from typing import Optional
 
 ROOT_LOGGER_NAME = "smarter"
 _configured = False
 
 
-def mask_secret(secret: Optional[str]) -> str:
+def mask_secret(secret: str | None) -> str:
     """
     A secret, masked for logging: its last four characters.
 
@@ -31,7 +30,7 @@ def mask_secret(secret: Optional[str]) -> str:
     return "****" + secret[-4:] if len(secret) > 8 else "****"
 
 
-def setup_logging(level: Optional[str]) -> None:
+def setup_logging(level: str | None) -> None:
     """
     Log the SDK's messages to stderr, at the given level, once per process.
 

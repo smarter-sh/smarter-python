@@ -229,7 +229,8 @@ class TestChatSession(SmarterTestBase):
         response = chat.send("What is 17 times 23?")
         body = self.request_json()
         self.assertEqual(body["session_key"], chat.session_key)  # type: ignore[index]
-        self.assertEqual(body["messages"][-1], {"role": "user", "content": "What is 17 times 23?"})  # type: ignore[index]
+        expected = {"role": "user", "content": "What is 17 times 23?"}
+        self.assertEqual(body["messages"][-1], expected)  # type: ignore[index]
         self.assertEqual(len(chat.messages), before + 1 + len(response.data.messages))
         chat.send({"role": "user", "content": "again"})
         self.assertEqual(self.request_json()["messages"][-1]["content"], "again")  # type: ignore[index]

@@ -1,7 +1,5 @@
 """The base class of the generated SAM models."""
 
-from typing import Optional
-
 import yaml
 from pydantic import ConfigDict
 
@@ -32,7 +30,7 @@ class SAMModel(SmarterModel):
         """
         return self.model_dump(mode="json", by_alias=True, exclude_none=True, exclude={"status"})
 
-    def to_yaml(self, status: Optional[bool] = False) -> str:
+    def to_yaml(self, status: bool | None = False) -> str:
         """
         The manifest as YAML text.
 

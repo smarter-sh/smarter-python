@@ -11,7 +11,6 @@ MCPClients: the platform's connections to Model Context Protocol servers.
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Optional
 
 from smarter.core.typing import SmarterIdType, SmarterJsonType
 from smarter.models.mcpclient import (

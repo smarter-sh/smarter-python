@@ -31,3 +31,4 @@ context, the alternatives considered, and its consequences.
    adr/023-documentation-site
    adr/024-release-workflow
    adr/025-packaging
+   adr/026-release-on-push

@@ -1,5 +1,7 @@
 """
-Models of the Smarter Journal api contract: the envelope of every journaled response, its error body, and a journal entry.
+Models of the Smarter Journal api contract.
+
+The envelope of every journaled response, its error body, and a journal entry.
 
 The Smarter platform journals its api responses. Each one carries ``api`` (the api version, e.g.
 ``smarter.sh/v1``) and ``metadata`` (the command and the resource kind, which the platform calls
@@ -11,7 +13,7 @@ them. See ``scripts/sync-contracts.sh``.
 """
 
 from datetime import datetime
-from typing import Generic, Optional, TypeVar
+from typing import Generic, TypeVar
 
 from pydantic import Field
 
@@ -27,9 +29,7 @@ class SAMJournalApiMetadata(SmarterModel):
 
     command: str = Field(..., description="The journal's command, e.g. apply.")
     thing: str = Field(..., description="The journal's thing, e.g. Guardrail. The string 'None' when there is none.")
-    key: Optional[str] = Field(
-        None, description="The key of the response's journal entry, when the journal is enabled."
-    )
+    key: str | None = Field(None, description="The key of the response's journal entry, when the journal is enabled.")
 
 
 class SAMJournalApiErrorBody(SmarterModel):
@@ -39,21 +39,21 @@ class SAMJournalApiErrorBody(SmarterModel):
     """
 
     errorClass: str = Field(..., description="The name of the exception's class, e.g. SAMBrokerErrorNotFound.")
-    stacktrace: Optional[str] = Field(None, description="The server's stack trace, when the platform includes it.")
-    description: Optional[str] = Field(None, description="A human-readable description of the error.")
+    stacktrace: str | None = Field(None, description="The server's stack trace, when the platform includes it.")
+    description: str | None = Field(None, description="A human-readable description of the error.")
     status: int = Field(..., description="The http status.")
     args: SmarterJsonType = Field(None, description="The exception's arguments, or the request's url.")
-    cause: Optional[str] = Field(None, description="The exception's cause.")
-    context: Optional[str] = Field(None, description="The exception's context, or the response's thing and command.")
-    thing: Optional[str] = Field(None, description="The journal's thing, e.g. Guardrail.")
-    command: Optional[str] = Field(None, description="The journal's command, e.g. describe.")
+    cause: str | None = Field(None, description="The exception's cause.")
+    context: str | None = Field(None, description="The exception's context, or the response's thing and command.")
+    thing: str | None = Field(None, description="The journal's thing, e.g. Guardrail.")
+    command: str | None = Field(None, description="The journal's command, e.g. describe.")
 
 
 class SAMJournalApiEnvelope(SmarterModel):
     """The fields that every journaled response adds beside its own data."""
 
     api: str = Field("smarter.sh/v1", description='The api version, e.g. "smarter.sh/v1".')
-    metadata: Optional[SAMJournalApiMetadata] = None
+    metadata: SAMJournalApiMetadata | None = None
 
 
 class SAMJournalApiErrorResponse(SAMJournalApiEnvelope):
@@ -69,14 +69,14 @@ class SmarterJournaledResponse(SAMJournalApiEnvelope, Generic[DataT]):
     ``data`` is typed by the endpoint, e.g. ``SmarterJournaledResponse[WhoAmI]``.
     """
 
-    data: Optional[DataT] = None
-    message: Optional[str] = Field(None, description="A human-readable message, e.g. 'LLMClient calculator applied'.")
+    data: DataT | None = None
+    message: str | None = Field(None, description="A human-readable message, e.g. 'LLMClient calculator applied'.")
 
 
 class SmarterJournalMessage(SAMJournalApiEnvelope):
     """A journaled response that carries only a ``message``, e.g. the response of delete or deploy."""
 
-    message: Optional[str] = None
+    message: str | None = None
 
 
 class JournalEntry(SmarterCamelModel):
@@ -89,8 +89,8 @@ class JournalEntry(SmarterCamelModel):
     """
 
     key: str
-    created_at: Optional[datetime] = None
-    user: Optional[str] = Field(None, description="The username of the caller, or None for an anonymous request.")
+    created_at: datetime | None = None
+    user: str | None = Field(None, description="The username of the caller, or None for an anonymous request.")
     thing: str
     command: str
     status_code: int

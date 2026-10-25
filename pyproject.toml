@@ -75,7 +75,3 @@ line_length = 120
 [tool.black]
 line-length = 120
 target-version = ["py310"]
-
-[tool.codespell]
-skip = '*.svg,models/prompt_templates.py'
-ignore-words = 'codespell.txt'

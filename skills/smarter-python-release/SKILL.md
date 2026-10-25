@@ -11,7 +11,8 @@ PyPI project. When you change one, consider whether the other should follow.
 
 ## CI (`.github/workflows/ci.yml`)
 
-Runs on every push to `main`, `alpha` and `beta`, and on every pull request:
+Runs on every pull request, and as the first job of every Release run, which
+starts on every push to `main`, `alpha` and `beta`:
 
 | Job         | What it does                                                                               |
 | ----------- | ------------------------------------------------------------------------------------------ |
@@ -72,11 +73,16 @@ commits since the last tag (`smarter-git-commits`):
 
 ## The Release workflow (`.github/workflows/release.yml`)
 
-Run by hand, never on push:
+Runs on **every push to `main`, `alpha` and `beta`**: a push to `main` makes a
+release, and a push to `alpha` or `beta` a prerelease. A push whose commits
+since the last tag release nothing (`docs`, `ci`, `build`, `chore`, ...) runs CI
+and stops. semantic-release's own commit ends in `[skip ci]`, so it starts no
+run. Runs are one at a time per branch: a push during a release waits, then
+releases everything since the last tag. It can also be started by hand:
 
 ```console
-make release-dry-run     # gh workflow run release.yml -f dry_run=true: shows the next version
-make release             # the real thing
+make release-dry-run     # gh workflow run release.yml -f dry_run=true: CI, then the next version
+make release             # the same as a push, e.g. to re-run a release
 make release RELEASE_BRANCH=alpha   # a prerelease, to TestPyPI only
 gh run watch
 ```
@@ -107,6 +113,9 @@ gh run watch
   `smarter-api` project, for the `testpypi` and `pypi` environments.
 - Uploads `skip-existing`, so a run that failed after an upload can be run
   again.
+
+- The README's and docs' status badge is the Release workflow's, on `main`:
+  `ci.yml` runs on pushes only inside it.
 
 Secrets: `CODECOV_TOKEN` (coverage), and `PAT` only when `main` is protected
 against `GITHUB_TOKEN`'s pushes. Variables: `PUBLISH_TO_TESTPYPI` and

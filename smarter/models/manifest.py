@@ -8,7 +8,7 @@ complete JSON Schema of each kind: see :meth:`smarter.resources.manifests.Manife
 """
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING
 
 import yaml
 from pydantic import Field
@@ -30,8 +30,8 @@ class ManifestMetadata(SmarterModel):
     """A manifest's ``metadata``: the resource's name, and descriptive information about it."""
 
     name: str = Field(..., description="The resource's name, unique per account and kind, in snake_case.")
-    description: Optional[str] = None
-    version: Optional[str] = Field(None, description="The resource's semantic version, e.g. 1.0.0.")
+    description: str | None = None
+    version: str | None = Field(None, description="The resource's semantic version, e.g. 1.0.0.")
     tags: list[str] = []
     annotations: list[SmarterJsonObjectType] = Field(
         default_factory=list, description="Key-value pairs, as a list of single-key objects."
@@ -53,7 +53,7 @@ class Manifest(SmarterModel):
     kind: str = Field(..., description="The resource kind, e.g. LLMClient. See Smarter.kinds().")
     metadata: ManifestMetadata
     spec: SmarterJsonObjectType = Field(default_factory=dict, description="The resource's specification.")
-    status: Optional[SmarterJsonObjectType] = Field(None, description="Read-only state, returned by describe.")
+    status: SmarterJsonObjectType | None = Field(None, description="Read-only state, returned by describe.")
 
     @classmethod
     def from_yaml(cls, text: str) -> "Manifest":
@@ -73,7 +73,7 @@ class Manifest(SmarterModel):
         return cls.model_validate(document)
 
     @classmethod
-    def from_file(cls, path: Union[str, Path]) -> "Manifest":
+    def from_file(cls, path: str | Path) -> "Manifest":
         """
         Read a manifest from a YAML or JSON file.
 
@@ -141,7 +141,7 @@ class ManifestList(SmarterModel):
 
     apiVersion: str = SMARTER_API_VERSION
     kind: str
-    name: Optional[str] = None
+    name: str | None = None
     metadata: ManifestListMetadata = Field(default_factory=ManifestListMetadata)
     data: ManifestListData = Field(default_factory=ManifestListData)
 
@@ -167,8 +167,8 @@ class KindInfo(SmarterCamelModel):
     singular: str = Field(..., alias="Singular")
     plural: str = Field(..., alias="Plural")
     api_kind: str = Field(..., alias="APIKind", description="The kind, as it appears in a manifest.")
-    display: Optional[str] = Field(None, alias="Display")
-    display_plural: Optional[str] = Field(None, alias="DisplayPlural")
+    display: str | None = Field(None, alias="Display")
+    display_plural: str | None = Field(None, alias="DisplayPlural")
     deployable: bool = Field(False, alias="Deployable", description="True if the kind can be deployed.")
 
 

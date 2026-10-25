@@ -1,6 +1,7 @@
 ---
 #------------------------------------------------------------------------------
-# Continuous integration: on every push and pull request,
+# Continuous integration: on every pull request, and as the first job of the
+# Release workflow, which runs on every push to main, alpha and beta,
 #
 # - lint: run the pre-commit hooks on every file.
 # - test: run the unit tests with coverage on every supported Python version.
@@ -18,8 +19,6 @@ name: CI
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main, alpha, beta]
   pull_request:
   # release.yml runs the whole of CI before it releases anything.
   workflow_call:

@@ -1,5 +1,7 @@
 """
-Pydantic models of the Smarter platform's Django-React integration: a React app's Vite manifest, and the assets that a template includes.
+Pydantic models of the Smarter platform's Django-React integration.
+
+A React app's Vite manifest, and the assets that a template includes.
 
 The platform's web console pages are React apps that Django hosts.
 ``SmarterReactTemplateTagManager`` (in ``smarter.lib.django.templatetags``) reads each app's
@@ -24,7 +26,7 @@ Smarter's own addition, the ``_custom`` entry that every package's
 """
 
 from datetime import datetime
-from typing import Literal, Optional
+from typing import Literal
 
 from pydantic import (
     BaseModel,
@@ -66,9 +68,9 @@ class ViteManifestChunk(BaseModel):
     model_config = ConfigDict(extra="allow", populate_by_name=True)
 
     file: str = Field(description="The output file of this chunk, relative to the app's static directory.")
-    name: Optional[str] = Field(default=None, description="The chunk's name.")
+    name: str | None = Field(default=None, description="The chunk's name.")
     names: list[str] = Field(default_factory=list, description="The names of a static asset.")
-    src: Optional[str] = Field(default=None, description="The chunk's source path.")
+    src: str | None = Field(default=None, description="The chunk's source path.")
     is_entry: bool = Field(default=False, alias="isEntry", description="Whether this chunk is an entry point.")
     is_dynamic_entry: bool = Field(
         default=False, alias="isDynamicEntry", description="Whether this chunk is a dynamic entry point."
@@ -116,7 +118,7 @@ class ViteManifest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     chunks: dict[str, ViteManifestChunk] = Field(description="The manifest's chunks, keyed by source path.")
-    build_info: Optional[ReactAppBuildInfo] = Field(
+    build_info: ReactAppBuildInfo | None = Field(
         default=None, description="The ``_custom`` build information, if the package's vite.config.ts adds it."
     )
 
@@ -161,7 +163,7 @@ class ViteManifest(BaseModel):
         """
         return bool(self.chunks)
 
-    def entry_key(self) -> Optional[str]:
+    def entry_key(self) -> str | None:
         """
         Find the key of the manifest's entry point, the first chunk with ``"isEntry": true``.
 
@@ -170,7 +172,7 @@ class ViteManifest(BaseModel):
         """
         return next((key for key, chunk in self.chunks.items() if chunk.is_entry), None)
 
-    def collect_assets(self, key: str, asset_type: ReactAssetType, seen: Optional[set[str]] = None) -> list[str]:
+    def collect_assets(self, key: str, asset_type: ReactAssetType, seen: set[str] | None = None) -> list[str]:
         """
         Recursively collect the JS or CSS files of a chunk and of its static imports.
 

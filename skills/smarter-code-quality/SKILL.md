@@ -5,27 +5,28 @@ description: Use before finishing any change to the smarter-python SDK, to lint 
 
 # Smarter Python SDK Code Quality
 
-`.pre-commit-config.yaml` at the repository root is the authoritative standard,
-and it matches the platform's (`../smarter/.pre-commit-config.yaml`), minus the
-React hooks. If a hook passes, the code meets the standard. If it fails, fix the
+`.pre-commit-config.yaml` at the repository root is the authoritative standard.
+It is cache-results' (`../cache-results/.pre-commit-config.yaml`), the model for
+every Smarter PyPI package, plus one exclusion: prettier skips `tests/data/`.
+Keep the two the same. If a hook passes, the code meets the standard. If it fails, fix the
 code. Never bypass a hook (`--no-verify`, `SKIP=`, blanket `# noqa`).
 
 ## What the hooks enforce
 
-| Hook                 | Configuration                       | Notes                                                                          |
-| -------------------- | ----------------------------------- | ------------------------------------------------------------------------------ |
-| black                | `pyproject.toml`, line length 120   | Formatter. Let it reformat.                                                    |
-| isort                | `pyproject.toml`, `profile = black` | Import order. Don't add `lines_after_imports`: it fights black forever.        |
-| autoflake            | `--remove-all-unused-imports`       | Deletes unused imports. Re-check that nothing you need was removed.            |
-| flake8               | `.flake8`                           | Selects **only C101** (coding magic comment). It is not a general style check. |
-| bandit               | `-ll`                               | Medium or high severity security findings fail.                                |
-| pyupgrade            |                                     | Modern syntax. The SDK supports Python 3.10 and later.                         |
-| pydocstringformatter |                                     | Normalizes docstring layout. See `smarter-docstrings`.                         |
-| codespell            | `codespell.txt` ignore list         | Skips `tests/data/`. Add real project words to `codespell.txt`.                |
-| prettier             |                                     | Markdown, YAML and JSON. Skips `tests/data/`.                                  |
+| Hook                 | Configuration                            | Notes                                                                                                            |
+| -------------------- | ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| black                | `pyproject.toml`, line length 120        | Formatter. Let it reformat.                                                                                      |
+| isort                | `pyproject.toml`, `profile = black`      | Import order. Don't add `lines_after_imports`: it fights black forever.                                          |
+| autoflake            | `--in-place --remove-all-unused-imports` | Deletes unused imports. Without `--in-place` it only prints a diff.                                              |
+| flake8               | `.flake8`, line length 120               | pyflakes and pycodestyle. Skips the generated `smarter/models/sam/*`.                                            |
+| bandit               | `-ll`                                    | Medium or high severity security findings fail.                                                                  |
+| pyupgrade            | `--py310-plus`                           | Modern syntax, e.g. `X \| None` rather than `Optional[X]` (Python 3.10+).                                        |
+| pydocstringformatter |                                          | Normalizes docstring layout. See `smarter-docstrings`.                                                           |
+| codespell            |                                          | No ignore list. Reword, or fix the spelling.                                                                     |
+| prettier             | `.prettierignore`                        | Markdown, YAML and JSON. Skips `tests/data/` (copied from the platform) and `CHANGELOG.md` (semantic-release's). |
 
 Also: trailing whitespace, end-of-file newline, YAML/JSON/TOML syntax, merge
-conflict markers, private keys, AWS credentials, debug statements, and
+conflict markers, private keys, debug statements, and
 commitlint on commit messages.
 
 **ruff is not configured.** Don't report ruff output as lint debt.

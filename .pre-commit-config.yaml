@@ -1,5 +1,4 @@
 default_language_version:
-  # any Python 3: CI runs the hooks on its newest supported Python.
   python: python3
 # Install the commit-msg hook too, so that commitlint checks each commit message.
 # semantic-release versions the package from the conventional commit messages.
@@ -13,17 +12,18 @@ repos:
     rev: v3.22.0
     hooks:
       - id: pyupgrade
+        args: [--py310-plus]
   - repo: https://github.com/codespell-project/codespell
     rev: v2.4.3
     hooks:
       - id: codespell
-        args: ["--ignore-words=codespell.txt"]
-        exclude: '\.svg$|^tests/data/|package-lock\.json$'
   - repo: https://github.com/pre-commit/mirrors-prettier
     rev: v4.0.0-alpha.8
     hooks:
       - id: prettier
         args: [--no-error-on-unmatched-pattern]
+        types_or: [markdown, yaml, json]
+        # the platform's contracts and recorded responses, which make contracts copies as they are.
         exclude: "^tests/data/"
   - repo: https://github.com/psf/black
     rev: 26.10.1
@@ -33,9 +33,8 @@ repos:
     rev: 7.4.1
     hooks:
       - id: flake8
-        args: ["--config=.flake8"]
   - repo: https://github.com/PyCQA/isort
-    rev: 9.0.2
+    rev: 10.0.0b1
     hooks:
       - id: isort
         args: ["--settings-path=pyproject.toml"]
@@ -43,7 +42,7 @@ repos:
     rev: v2.4.0
     hooks:
       - id: autoflake
-        args: [--remove-all-unused-imports]
+        args: [--in-place, --remove-all-unused-imports]
   - repo: https://github.com/PyCQA/bandit
     rev: 1.9.4
     hooks:
@@ -52,26 +51,18 @@ repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
-      # See https://pre-commit.com/hooks.html for more hooks
-      #- id: check-added-large-files
       - id: fix-byte-order-marker
       - id: check-case-conflict
       - id: check-json
-        exclude: ".*/reactapp/.*"
       - id: check-merge-conflict
       - id: check-symlinks
       - id: check-toml
-      - id: check-xml
       - id: check-yaml
       - id: destroyed-symlinks
-      - id: detect-aws-credentials
-        args: ["--allow-missing-credentials"]
       - id: detect-private-key
       - id: end-of-file-fixer
       - id: forbid-new-submodules
       - id: trailing-whitespace
-      - id: check-case-conflict
-      - id: check-merge-conflict
       - id: debug-statements
   - repo: https://github.com/alessandrojcm/commitlint-pre-commit-hook
     rev: v9.27.0
@@ -80,13 +71,3 @@ repos:
         stages: [commit-msg]
         additional_dependencies:
           ["@commitlint/config-conventional", "@commitlint/config-angular"]
-ci:
-  # for more information, see https://pre-commit.ci
-  autofix_commit_msg: |
-    [pre-commit.ci] auto fixes from pre-commit.com hooks
-  autofix_prs: true
-  autoupdate_branch: ""
-  autoupdate_commit_msg: "[pre-commit.ci] pre-commit autoupdate"
-  autoupdate_schedule: weekly
-  skip: [shellcheck, markdown-link-check, commitlint]
-  submodules: false
