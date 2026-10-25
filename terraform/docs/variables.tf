@@ -25,6 +25,18 @@ variable "hosted_zone_name" {
   default     = "smarter.sh"
 }
 
+variable "github_repository" {
+  description = "The GitHub repository whose Release workflow publishes the site, as owner/name."
+  type        = string
+  default     = "smarter-sh/smarter-python"
+}
+
+variable "github_environment" {
+  description = "The GitHub environment of the Release workflow's publish-docs job: the only job that can assume the publisher role."
+  type        = string
+  default     = "docs"
+}
+
 locals {
   bucket_name = var.domain_name
 
