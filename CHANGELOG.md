@@ -1,3 +1,11 @@
+## [0.5.3-alpha.1](https://github.com/smarter-sh/smarter-python/compare/v0.5.2...v0.5.3-alpha.1) (2026-10-25)
+
+
+### Bug Fixes
+
+* **release:** release, publish and document the sdk like cache-results ([1696896](https://github.com/smarter-sh/smarter-python/commit/1696896b0bdda90da855db5bdc40a63e849767e7))
+* **release:** start the release workflow on every push ([e4c9d36](https://github.com/smarter-sh/smarter-python/commit/e4c9d3614e3374a9cb8680cf33284a8744ce40be))
+
 ## [0.5.2](https://github.com/smarter-sh/smarter-python/compare/v0.5.1...v0.5.2) (2026-10-22)
 
 
