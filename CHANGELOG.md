@@ -1,3 +1,10 @@
+## [0.5.4](https://github.com/smarter-sh/smarter-python/compare/v0.5.3...v0.5.4) (2026-10-25)
+
+
+### Bug Fixes
+
+* **release:** publish the release's own build, not ci's ([03b2911](https://github.com/smarter-sh/smarter-python/commit/03b2911bb3e303616a000e3337094fbb27324f31))
+
 ## [0.5.4-alpha.1](https://github.com/smarter-sh/smarter-python/compare/v0.5.3...v0.5.4-alpha.1) (2026-10-25)
 
 
