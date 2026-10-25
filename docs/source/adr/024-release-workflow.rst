@@ -4,7 +4,7 @@ ADR-024: CI and the Release Workflow
 Status
 ------
 
-Accepted
+Accepted. Superseded in part by :doc:`ADR-026 <026-release-on-push>`: releases start on every push.
 
 Supersedes :doc:`ADR-010 <010-ci-cd>`.
 

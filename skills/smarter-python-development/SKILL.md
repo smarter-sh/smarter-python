@@ -35,7 +35,7 @@ to customize or fork the backend to integrate with it.
 | `docs/source/adr/`                                 | The SDK's architecture decision records, which adapt the platform's                  |
 | `terraform/docs/`                                  | The docs site's AWS resources (S3, CloudFront, ACM, Route53)                         |
 | `requirements/in/`                                 | The `.in` files that pip-compile pins into `requirements/*.txt`                      |
-| `.github/workflows/`                               | `ci.yml` (every push and pull request) and `release.yml` (by hand)                   |
+| `.github/workflows/`                               | `ci.yml` (pull requests) and `release.yml` (every push: CI, then release)            |
 | `skills/`                                          | These skills                                                                         |
 
 The SDK has its own documentation site, built from `docs/source/` and
@@ -78,9 +78,10 @@ it. See `smarter-sphinx-docs`.
 11. **Type annotations are required** for every public function and method,
     and for every attribute of a Pydantic model. See `smarter-python-typing`.
 12. **CI and releases follow cache-results**, the model for every Smarter
-    PyPI project: `ci.yml` on every push and pull request, and one manual
-    `release.yml` that runs CI, versions with semantic-release, and publishes
-    to TestPyPI and PyPI by trusted publishing. Every `make` target has a CI
+    PyPI project: `ci.yml` on every pull request, and `release.yml` on every
+    push to `main`, `alpha` and `beta`, which runs CI, versions with
+    semantic-release, and publishes to TestPyPI and PyPI by trusted
+    publishing. Every `make` target has a CI
     counterpart. See `smarter-python-release`.
 13. **The docs site is this repository's own** (`docs/source/`), built with
     warnings as errors. See `smarter-sphinx-docs`.

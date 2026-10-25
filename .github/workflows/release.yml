@@ -1,7 +1,13 @@
 ---
 #------------------------------------------------------------------------------
-# Release: run by hand from the Actions tab, or with make release-dry-run and
-# make release, on main (a release) or alpha or beta (a prerelease).
+# Release: on every push to main (a release) or alpha or beta (a prerelease).
+# It can also be started by hand from the Actions tab, or with make
+# release-dry-run (CI, then the next version, without releasing) and make
+# release.
+#
+# A push whose commits since the last tag are all docs, ci, build, chore,
+# style, refactor or test runs CI and releases nothing. semantic-release's own
+# commit ends in [skip ci], so it doesn't start another run.
 #
 #   ci                 the whole CI workflow (lint, tests, docs, terraform, build)
 #   release            semantic-release: version, CHANGELOG.md, tag, GitHub release
@@ -24,6 +30,8 @@
 name: Release
 
 on:
+  push:
+    branches: [main, alpha, beta]
   workflow_dispatch:
     inputs:
       dry_run:
@@ -34,8 +42,10 @@ on:
 permissions:
   contents: read
 
+# one release at a time per branch. A push while a release runs waits for it, and the next run
+# releases everything since the last tag.
 concurrency:
-  group: release
+  group: release-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -66,7 +76,8 @@ jobs:
         id: semantic
         uses: cycjimmy/semantic-release-action@v8
         with:
-          dry_run: ${{ inputs.dry_run }}
+          # inputs.dry_run is empty on a push, which is a real release.
+          dry_run: ${{ inputs.dry_run == true }}
           extra_plugins: |
             @semantic-release/changelog
             @semantic-release/exec
@@ -82,7 +93,8 @@ jobs:
           {
             echo "### Release"
             echo "- Branch: ${{ github.ref_name }}"
-            echo "- Dry run: ${{ inputs.dry_run }}"
+            echo "- Trigger: ${{ github.event_name }}"
+            echo "- Dry run: ${{ inputs.dry_run == true }}"
             echo "- Last release: ${{ steps.semantic.outputs.last_release_version || 'none' }}"
             echo "- Next release: ${{ steps.semantic.outputs.new_release_version || 'none' }}"
           } >> "$GITHUB_STEP_SUMMARY"
@@ -90,7 +102,7 @@ jobs:
   dist:
     name: Build distributions
     needs: release
-    if: needs.release.outputs.published == 'true' && !inputs.dry_run
+    if: needs.release.outputs.published == 'true' && inputs.dry_run != true
     runs-on: ubuntu-latest
     outputs:
       # the version as Python's packaging writes it, e.g. 0.2.0-alpha.1 becomes 0.2.0a1.

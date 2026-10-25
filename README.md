@@ -1,7 +1,7 @@
 # The Smarter Python SDK
 
 [![A project of The Smarter Project](https://img.shields.io/badge/a%20project%20of-The%20Smarter%20Project-2F6FEB)](https://smarter.sh)
-[![CI](https://github.com/smarter-sh/smarter-python/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/smarter-sh/smarter-python/actions/workflows/ci.yml)
+[![Release](https://github.com/smarter-sh/smarter-python/actions/workflows/release.yml/badge.svg?branch=main)](https://github.com/smarter-sh/smarter-python/actions/workflows/release.yml)
 [![codecov](https://codecov.io/gh/smarter-sh/smarter-python/graph/badge.svg)](https://codecov.io/gh/smarter-sh/smarter-python)
 [![Latest Release](https://img.shields.io/github/v/release/smarter-sh/smarter-python?label=release)](https://github.com/smarter-sh/smarter-python/releases)
 [![PyPI](https://img.shields.io/pypi/v/smarter-api?logo=pypi&label=PyPI)](https://pypi.org/project/smarter-api/)
@@ -159,11 +159,12 @@ make python-requirements  # recompile the pinned requirements/*.txt
 ```
 
 CI runs the hooks, the unit tests on every supported Python version, the docs
-build and a package build, on every push and pull request. Coverage is reported
-to [Codecov](https://codecov.io/gh/smarter-sh/smarter-python). Releases are
-made by the Release workflow with semantic-release, from the conventional
-commit messages (`make release-dry-run` shows the next version), and published
-to PyPI in the same run.
+build and a package build, on every pull request, and on every push to `main`,
+`alpha` and `beta` as the first step of the Release workflow. Coverage is
+reported to [Codecov](https://codecov.io/gh/smarter-sh/smarter-python). When CI
+passes, the Release workflow releases with semantic-release, from the
+conventional commit messages, and publishes to PyPI from `main` (or to TestPyPI
+from `alpha` and `beta`). `make release-dry-run` shows the next version.
 
 The agent skills in [skills/](./skills/) describe how this repository is
 developed, tested and documented, for people and for AI coding agents.
