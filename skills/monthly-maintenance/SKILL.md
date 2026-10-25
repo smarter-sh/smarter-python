@@ -202,7 +202,7 @@ Only when every test passes, write the commit command (never run it), following
 `smarter-git-commits`:
 
 ```console
-git commit --author="Claude <noreply@anthropic.com>" \
+git commit --author="Lawrence McDaniel <lpm0073@gmail.com>" \
   -m "fix(deps): update the python requirements" \
   -m "Monthly maintenance: make python-requirements recompiled requirements/base.txt and local.txt with every package at its newest version, and pyproject.toml's ranges admit the latest runtime versions." \
   -m "requirements/local.txt:" \
@@ -211,7 +211,7 @@ git commit --author="Claude <noreply@anthropic.com>" \
   -m "pyproject.toml:" \
   -m "- no change: every runtime dependency's newest version is within its range" \
   -m "Tests: make test (125 passed, 9 skipped), test-minimum-versions.sh on Python 3.10 (125 passed, 9 skipped), make test-live (9 passed, n subtests skipped for platform bugs), pre-commit, and the sdist and wheel built and checked by twine." \
-  -m "Co-authored-by: Lawrence McDaniel <lpm0073@gmail.com>"
+  -m "Co-authored-by: Claude <noreply@anthropic.com>"
 ```
 
 `fix` makes semantic-release publish a patch release, which ships the
