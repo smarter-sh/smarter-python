@@ -103,7 +103,7 @@ jobs:
           persist-credentials: false
 
       - name: Cache NPM dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
@@ -111,7 +111,7 @@ jobs:
             ${{ runner.os }}-node
 
       - name: Cache Python dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('./smarter/requirements/**/*.txt') }}
