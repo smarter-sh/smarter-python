@@ -7,7 +7,7 @@ Do not edit: run ``scripts/generate_sam_models.py``. See :mod:`smarter.models.sa
 from __future__ import annotations
 
 from datetime import date, datetime
-from typing import Any, Optional, Union
+from typing import Any
 from uuid import UUID
 
 from pydantic import Field, conint

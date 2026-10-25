@@ -8,7 +8,6 @@ are kept, and are available as attributes and in :meth:`SmarterModel.to_dict`.
 
 import json
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel, ConfigDict
 from pydantic.alias_generators import to_camel
@@ -34,7 +33,7 @@ class SmarterModel(BaseModel):
         """
         return self.model_dump(mode="json", by_alias=True, exclude_unset=True)
 
-    def to_json(self, indent: Optional[int] = 2) -> str:
+    def to_json(self, indent: int | None = 2) -> str:
         """
         The model as JSON text, with the api's own field names.
 
@@ -58,7 +57,7 @@ class SmarterUserRef(SmarterCamelModel):
     """The user of a resource's owner."""
 
     username: str
-    email: Optional[str] = None
+    email: str | None = None
 
 
 class SmarterAccountRef(SmarterCamelModel):
@@ -70,8 +69,8 @@ class SmarterAccountRef(SmarterCamelModel):
 class SmarterOwner(SmarterCamelModel):
     """The owner of a resource: its user profile, as the user and the account."""
 
-    user: Optional[SmarterUserRef] = None
-    account: Optional[SmarterAccountRef] = None
+    user: SmarterUserRef | None = None
+    account: SmarterAccountRef | None = None
 
 
 class SmarterResource(SmarterCamelModel):
@@ -83,18 +82,18 @@ class SmarterResource(SmarterCamelModel):
     """
 
     id: int
-    hashed_id: Optional[str] = None
+    hashed_id: str | None = None
     name: str
-    description: Optional[str] = None
-    version: Optional[str] = None
+    description: str | None = None
+    version: str | None = None
     tags: list[str] = []
     annotations: list[SmarterJsonObjectType] = []
-    created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
-    user_profile: Optional[SmarterOwner] = None
-    can_delete: Optional[bool] = None
-    manifest_url: Optional[str] = None
-    ready: Optional[bool] = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+    user_profile: SmarterOwner | None = None
+    can_delete: bool | None = None
+    manifest_url: str | None = None
+    ready: bool | None = None
 
 
 __all__ = [

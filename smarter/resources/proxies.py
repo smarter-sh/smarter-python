@@ -16,7 +16,6 @@ easiest way to call a proxy is with the provider's own SDK:
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Optional
 
 from smarter.core.http import QueryParamValue
 from smarter.core.typing import SmarterJsonType
@@ -65,7 +64,8 @@ class Proxies(SmarterAPIResource):
         Send a request to a provider's api, through its proxy.
 
         :param name: The proxy's name, e.g. ``openai``.
-        :param path: The provider api's path, e.g. ``v1/chat/completions``. It must be one of the proxy's ``allowed_paths``.
+        :param path: The provider api's path, e.g. ``v1/chat/completions``. It must be one of the proxy's
+            ``allowed_paths``.
         :param method: The http method.
         :param json: The JSON body, as the provider's api expects it.
         :param params: Query parameters.

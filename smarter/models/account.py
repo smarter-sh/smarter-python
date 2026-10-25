@@ -1,7 +1,6 @@
 """Models of accounts, users, user profiles and account contacts, as ``/api/v1/accounts/`` returns them."""
 
 from datetime import datetime
-from typing import Optional
 
 from pydantic import Field
 
@@ -12,19 +11,19 @@ class Account(SmarterResource):
     """A Smarter account: the tenant that owns users and resources."""
 
     account_number: str
-    is_default_account: Optional[bool] = None
-    company_name: Optional[str] = None
-    phone_number: Optional[str] = None
-    address1: Optional[str] = None
-    address2: Optional[str] = None
-    city: Optional[str] = None
-    state: Optional[str] = None
-    postal_code: Optional[str] = None
-    country: Optional[str] = None
-    language: Optional[str] = None
-    timezone: Optional[str] = None
-    currency: Optional[str] = None
-    is_active: Optional[bool] = None
+    is_default_account: bool | None = None
+    company_name: str | None = None
+    phone_number: str | None = None
+    address1: str | None = None
+    address2: str | None = None
+    city: str | None = None
+    state: str | None = None
+    postal_code: str | None = None
+    country: str | None = None
+    language: str | None = None
+    timezone: str | None = None
+    currency: str | None = None
+    is_active: bool | None = None
 
 
 class User(SmarterCamelModel):
@@ -32,11 +31,11 @@ class User(SmarterCamelModel):
 
     id: int
     username: str
-    first_name: Optional[str] = None
-    last_name: Optional[str] = None
-    email: Optional[str] = None
-    is_staff: Optional[bool] = None
-    is_superuser: Optional[bool] = None
+    first_name: str | None = None
+    last_name: str | None = None
+    email: str | None = None
+    is_staff: bool | None = None
+    is_superuser: bool | None = None
 
 
 class UserProfile(SmarterResource):
@@ -44,27 +43,27 @@ class UserProfile(SmarterResource):
 
     user: User
     account: SmarterAccountRef
-    profile_image: Optional[str] = Field(
+    profile_image: str | None = Field(
         None, description="The url of the image that the user uploaded, which takes precedence over profile_image_url."
     )
-    profile_image_url: Optional[str] = Field(None, description="The url of the image that the oauth provider supplied.")
-    is_test: Optional[bool] = None
+    profile_image_url: str | None = Field(None, description="The url of the image that the oauth provider supplied.")
+    is_test: bool | None = None
 
 
 class AccountContact(SmarterCamelModel):
     """A contact of an account, who receives its notices."""
 
     id: int
-    account: Optional[SmarterAccountRef] = None
-    created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
-    first_name: Optional[str] = None
-    last_name: Optional[str] = None
-    email: Optional[str] = None
-    phone: Optional[str] = None
-    is_primary: Optional[bool] = None
-    is_test: Optional[bool] = None
-    welcomed: Optional[bool] = None
+    account: SmarterAccountRef | None = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+    first_name: str | None = None
+    last_name: str | None = None
+    email: str | None = None
+    phone: str | None = None
+    is_primary: bool | None = None
+    is_test: bool | None = None
+    welcomed: bool | None = None
 
 
 __all__ = ["Account", "AccountContact", "User", "UserProfile"]

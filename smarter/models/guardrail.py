@@ -1,7 +1,6 @@
 """Models of guardrails, their evaluations, and their events."""
 
 from datetime import datetime
-from typing import Optional
 
 from pydantic import Field
 
@@ -13,20 +12,20 @@ from .base import SmarterCamelModel, SmarterModel, SmarterResource
 class Guardrail(SmarterResource):
     """A guardrail: a check that the platform runs on prompts (``input``) or on the LLM's replies (``output``)."""
 
-    stage: Optional[str] = Field(None, description="input or output.")
-    category: Optional[str] = None
-    strategy: Optional[str] = Field(None, description="e.g. regex, detector, classifier or llm.")
-    pattern: Optional[str] = None
-    config: Optional[SmarterJsonObjectType] = None
-    threshold: Optional[float] = None
-    action: Optional[str] = Field(None, description="e.g. block, redact or flag.")
-    replacement: Optional[str] = None
-    message: Optional[str] = None
-    severity: Optional[int] = None
-    mode: Optional[str] = Field(None, description="enforce or monitor.")
-    fail_closed: Optional[bool] = None
-    priority: Optional[int] = None
-    is_active: Optional[bool] = None
+    stage: str | None = Field(None, description="input or output.")
+    category: str | None = None
+    strategy: str | None = Field(None, description="e.g. regex, detector, classifier or llm.")
+    pattern: str | None = None
+    config: SmarterJsonObjectType | None = None
+    threshold: float | None = None
+    action: str | None = Field(None, description="e.g. block, redact or flag.")
+    replacement: str | None = None
+    message: str | None = None
+    severity: int | None = None
+    mode: str | None = Field(None, description="enforce or monitor.")
+    fail_closed: bool | None = None
+    priority: int | None = None
+    is_active: bool | None = None
 
 
 class GuardrailMatch(SmarterModel):
@@ -35,14 +34,14 @@ class GuardrailMatch(SmarterModel):
     start: int
     end: int
     text: str
-    label: Optional[str] = None
+    label: str | None = None
 
 
 class GuardrailFinding(SmarterModel):
     """One finding of a guardrail evaluation."""
 
-    confidence: Optional[float] = None
-    rationale: Optional[str] = None
+    confidence: float | None = None
+    rationale: str | None = None
     matches: list[GuardrailMatch] = []
 
 
@@ -56,11 +55,11 @@ class GuardrailEvaluation(SmarterCamelModel):
     guardrail: str
     stage: str
     triggered: bool
-    disposition: Optional[str] = Field(None, description="e.g. passed, blocked, redacted or flagged.")
-    text: Optional[str] = Field(None, description="The text after the guardrail's action, e.g. redacted.")
-    message: Optional[str] = None
-    error: Optional[str] = None
-    duration_ms: Optional[float] = None
+    disposition: str | None = Field(None, description="e.g. passed, blocked, redacted or flagged.")
+    text: str | None = Field(None, description="The text after the guardrail's action, e.g. redacted.")
+    message: str | None = None
+    error: str | None = None
+    duration_ms: float | None = None
     findings: list[GuardrailFinding] = []
 
 
@@ -68,11 +67,11 @@ class GuardrailEvent(SmarterCamelModel):
     """A guardrail's finding in a real prompt, saved for review."""
 
     id: int
-    created_at: Optional[datetime] = None
-    llmclient: Optional[str] = Field(None, description="The name of the LLMClient whose prompt triggered it.")
-    stage: Optional[str] = None
-    disposition: Optional[str] = None
-    reviewed: Optional[bool] = None
+    created_at: datetime | None = None
+    llmclient: str | None = Field(None, description="The name of the LLMClient whose prompt triggered it.")
+    stage: str | None = None
+    disposition: str | None = None
+    reviewed: bool | None = None
 
 
 class GuardrailEvents(SmarterModel):

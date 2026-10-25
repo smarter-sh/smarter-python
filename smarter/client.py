@@ -15,7 +15,7 @@ The Smarter client.
 from collections.abc import Mapping
 from functools import cached_property
 from types import TracebackType
-from typing import Any, Optional
+from typing import Any
 
 import httpx
 
@@ -82,13 +82,13 @@ class Smarter:
     def __init__(
         self,
         *,
-        api_key: Optional[str] = None,
-        base_url: Optional[str] = None,
-        environment: Optional[SmarterEnvironment] = None,
-        timeout: Optional[float] = None,
-        max_retries: Optional[int] = None,
-        default_headers: Optional[Mapping[str, str]] = None,
-        http_client: Optional[httpx.Client] = None,
+        api_key: str | None = None,
+        base_url: str | None = None,
+        environment: SmarterEnvironment | None = None,
+        timeout: float | None = None,
+        max_retries: int | None = None,
+        default_headers: Mapping[str, str] | None = None,
+        http_client: httpx.Client | None = None,
     ) -> None:
         settings = SmarterSettings()
         setup_logging(settings.log)
@@ -243,9 +243,9 @@ class Smarter:
 
     def __exit__(
         self,
-        exc_type: Optional[type[BaseException]],
-        exc: Optional[BaseException],
-        traceback: Optional[TracebackType],
+        exc_type: type[BaseException] | None,
+        exc: BaseException | None,
+        traceback: TracebackType | None,
     ) -> None:
         self.close()
 

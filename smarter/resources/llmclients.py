@@ -29,7 +29,7 @@ from __future__ import annotations
 from collections.abc import Iterator, Mapping, Sequence
 from contextlib import AbstractContextManager
 from types import TracebackType
-from typing import Optional, Union
+from typing import Union
 
 from smarter.core.exceptions import SmarterError
 from smarter.core.streaming import ServerSentEvent

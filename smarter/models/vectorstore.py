@@ -1,7 +1,6 @@
 """Models of vectorstores, their documents and snapshots, and search results."""
 
 from datetime import datetime
-from typing import Optional
 
 from pydantic import Field
 
@@ -13,22 +12,22 @@ from .base import SmarterCamelModel, SmarterResource
 class Vectorstore(SmarterResource):
     """A vectorstore: a vector database, hosted by Smarter or by a provider, for retrieval-augmented generation."""
 
-    backend: Optional[str] = Field(None, description="e.g. qdrant or pinecone.")
-    hosting: Optional[str] = Field(None, description="self_hosted or managed.")
-    is_active: Optional[bool] = None
-    dimension: Optional[int] = None
-    metric: Optional[str] = None
-    embeddings_provider: Optional[str] = None
-    embeddings_model: Optional[str] = None
-    status: Optional[str] = Field(None, description="e.g. pending, ready or error.")
-    status_message: Optional[str] = None
-    index_name: Optional[str] = None
-    endpoint_url: Optional[str] = None
-    vector_count: Optional[int] = None
-    document_count: Optional[int] = None
-    snapshot_count: Optional[int] = None
-    spec: Optional[SmarterJsonObjectType] = None
-    deployed_at: Optional[datetime] = None
+    backend: str | None = Field(None, description="e.g. qdrant or pinecone.")
+    hosting: str | None = Field(None, description="self_hosted or managed.")
+    is_active: bool | None = None
+    dimension: int | None = None
+    metric: str | None = None
+    embeddings_provider: str | None = None
+    embeddings_model: str | None = None
+    status: str | None = Field(None, description="e.g. pending, ready or error.")
+    status_message: str | None = None
+    index_name: str | None = None
+    endpoint_url: str | None = None
+    vector_count: int | None = None
+    document_count: int | None = None
+    snapshot_count: int | None = None
+    spec: SmarterJsonObjectType | None = None
+    deployed_at: datetime | None = None
 
 
 class VectorstoreStatus(SmarterCamelModel):
@@ -36,8 +35,8 @@ class VectorstoreStatus(SmarterCamelModel):
 
     vectorstore: str
     status: str
-    message: Optional[str] = None
-    vector_count: Optional[int] = None
+    message: str | None = None
+    vector_count: int | None = None
     stats: SmarterJsonObjectType = {}
 
 
@@ -46,13 +45,13 @@ class VectorstoreDocument(SmarterCamelModel):
 
     id: int
     name: str
-    created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
-    source: Optional[str] = Field(None, description="upload, text or url.")
-    content_type: Optional[str] = None
-    status: Optional[str] = Field(None, description="e.g. pending, loaded, error or deleting.")
-    chunk_count: Optional[int] = None
-    metadata: Optional[SmarterJsonObjectType] = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+    source: str | None = Field(None, description="upload, text or url.")
+    content_type: str | None = None
+    status: str | None = Field(None, description="e.g. pending, loaded, error or deleting.")
+    chunk_count: int | None = None
+    metadata: SmarterJsonObjectType | None = None
 
 
 class VectorstoreDocuments(SmarterCamelModel):
@@ -71,7 +70,7 @@ class VectorstoreDocumentsAdded(SmarterCamelModel):
     documents: list[VectorstoreDocument] = []
     duplicates: list[VectorstoreDocument] = Field(default_factory=list, description="Documents that already existed.")
     queued: bool = False
-    message: Optional[str] = None
+    message: str | None = None
 
 
 class VectorstoreDocumentDeleted(SmarterCamelModel):
@@ -84,10 +83,10 @@ class VectorstoreDocumentDeleted(SmarterCamelModel):
 class VectorstoreSearchResult(SmarterCamelModel):
     """A chunk that matched a search."""
 
-    id: Optional[SmarterJsonType] = None
+    id: SmarterJsonType | None = None
     text: str
-    metadata: Optional[SmarterJsonObjectType] = None
-    score: Optional[float] = None
+    metadata: SmarterJsonObjectType | None = None
+    score: float | None = None
 
 
 class VectorstoreSearchResults(SmarterCamelModel):
@@ -101,11 +100,11 @@ class VectorstoreSnapshot(SmarterCamelModel):
     """A snapshot of a vectorstore's data."""
 
     id: int
-    name: Optional[str] = None
-    created_at: Optional[datetime] = None
-    status: Optional[str] = None
-    scheduled: Optional[bool] = None
-    size_bytes: Optional[int] = None
+    name: str | None = None
+    created_at: datetime | None = None
+    status: str | None = None
+    scheduled: bool | None = None
+    size_bytes: int | None = None
 
 
 class VectorstoreSnapshots(SmarterCamelModel):
@@ -119,7 +118,7 @@ class VectorstoreRestored(SmarterCamelModel):
 
     vectorstore: str
     restored: str
-    vector_count: Optional[int] = None
+    vector_count: int | None = None
 
 
 __all__ = [

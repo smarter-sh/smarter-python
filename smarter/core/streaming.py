@@ -9,7 +9,6 @@ The Smarter prompt api streams a prompt's progress as Server-Sent Events when th
 import json
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
-from typing import Optional
 
 from smarter.core.typing import SmarterJsonType
 
@@ -27,10 +26,10 @@ class ServerSentEvent:
     :param retry: The reconnection time that the server asked for, in milliseconds, if any.
     """
 
-    event: Optional[str]
+    event: str | None
     data: str
-    id: Optional[str] = None
-    retry: Optional[int] = None
+    id: str | None = None
+    retry: int | None = None
 
     def json(self) -> SmarterJsonType:
         """
@@ -52,10 +51,10 @@ def iter_sse(lines: Iterable[str]) -> Iterator[ServerSentEvent]:
     :param lines: The stream's lines, without their line endings.
     :returns: The events, in order.
     """
-    event: Optional[str] = None
+    event: str | None = None
     data: list[str] = []
-    event_id: Optional[str] = None
-    retry: Optional[int] = None
+    event_id: str | None = None
+    retry: int | None = None
     for line in lines:
         if line == "":
             if data or event:

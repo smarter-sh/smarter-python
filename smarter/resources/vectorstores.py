@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 from pathlib import Path
-from typing import Literal, Optional, Union
+from typing import Literal
 
 from smarter.core.typing import SmarterIdType, SmarterJsonObjectType, SmarterJsonType
 from smarter.models.vectorstore import (

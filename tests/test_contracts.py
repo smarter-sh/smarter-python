@@ -238,7 +238,9 @@ class TestOpenApiContract(SmarterTestBase):
 
 class TestRecordedResponses(unittest.TestCase):
     """
-    Test that the responses that the SDK's tests replay, recorded from a real platform, are valid under the platform's OpenAPI document.
+    Test that the responses that the SDK's tests replay are valid under the platform's OpenAPI document.
+
+    The responses were recorded from a real platform.
 
     A fixture that drifts from what the platform publishes would let the SDK's tests pass against a
     response that the platform never sends.

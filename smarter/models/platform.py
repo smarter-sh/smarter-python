@@ -1,7 +1,5 @@
 """Models of the platform's own endpoints: ``whoami``, ``version`` and ``status``."""
 
-from typing import Optional
-
 from pydantic import Field
 
 from smarter.core.typing import SmarterJsonObjectType
@@ -15,27 +13,27 @@ class WhoAmI(SmarterModel):
 
     user: User
     account: Account
-    environment: Optional[str] = Field(None, description="The platform's environment, e.g. local or prod.")
+    environment: str | None = Field(None, description="The platform's environment, e.g. local or prod.")
 
 
 class ApiVersion(SmarterModel):
     """The platform's version, and the versions of its main Python packages."""
 
     version: str = Field(..., description="The Smarter platform's semantic version.")
-    python: dict[str, Optional[str]] = Field(default_factory=dict, description="Python package versions, by package.")
+    python: dict[str, str | None] = Field(default_factory=dict, description="Python package versions, by package.")
 
 
 class CliVersion(SmarterModel):
     """The version of the smarter cli that the platform recommends."""
 
-    version: Optional[str] = None
+    version: str | None = None
 
 
 class PlatformVersion(SmarterModel):
     """The response of ``version``."""
 
     api: ApiVersion
-    cli: Optional[CliVersion] = None
+    cli: CliVersion | None = None
 
 
 class PlatformStatus(SmarterCamelModel):

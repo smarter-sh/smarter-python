@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Optional
-
 from smarter.core.typing import SmarterIdType
 from smarter.models.journal import JournalEntry, JournalPage
 from smarter.models.misc import PromptPluginUsage, PromptSession, PromptToolCall

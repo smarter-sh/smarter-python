@@ -157,7 +157,8 @@ class TestLive(unittest.TestCase):
         guardrail = self.client.guardrails.find(name)
         self.assertEqual(self.client.guardrails.retrieve(guardrail.id).name, name)
         stage = guardrail.stage or "input"
-        evaluation = self.client.guardrails.evaluate(guardrail.id, "My SSN is 078-05-1120.", stage=stage)  # type: ignore[arg-type]
+        text = "My SSN is 078-05-1120."
+        evaluation = self.client.guardrails.evaluate(guardrail.id, text, stage=stage)  # type: ignore[arg-type]
         self.assertEqual(evaluation.guardrail, name)
         self.client.guardrails.events(guardrail.id)
 

@@ -18,8 +18,6 @@ only way that the SDK writes resources.
 
 from __future__ import annotations
 
-from typing import Optional
-
 from smarter.core.exceptions import SmarterValueError
 from smarter.core.typing import SmarterJsonObjectType, SmarterJsonType
 from smarter.models.base import SmarterModel

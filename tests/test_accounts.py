@@ -22,7 +22,8 @@ class TestAccounts(SmarterTestBase):
         self.assertTrue(self.client.accounts.users.list()[0].is_superuser)
         self.assertEqual(self.client.accounts.users.retrieve(1).username, "admin")
         self.assertTrue(self.client.accounts.contacts.list()[0].is_primary)
-        self.assertEqual(self.client.accounts.contacts.retrieve(1).account.account_number, "1234-5678-9012")  # type: ignore[union-attr]
+        account = self.client.accounts.contacts.retrieve(1).account
+        self.assertEqual(account.account_number, "1234-5678-9012")  # type: ignore[union-attr]
 
     def test_user_profiles(self):
         """The user profiles are listed and retrieved, with their users and accounts."""
