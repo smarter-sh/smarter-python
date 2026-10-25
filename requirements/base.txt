@@ -9,4 +9,4 @@ httpx>=0.27,<1                          # HTTP client, and Server-Sent Events st
 pydantic>=2.14.0,<3                        # response and manifest models
 pydantic-settings>=2.3,<3               # SMARTER_* environment variables
 PyYAML>=6.0,<7                          # YAML manifests, and the smarter cli's config.yaml
-email-validator>=2.0,<3                 # the SAM models' EmailStr fields (pydantic[email])
+email-validator>=2.3.0,<3                 # the SAM models' EmailStr fields (pydantic[email])
