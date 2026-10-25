@@ -133,9 +133,11 @@ jobs:
             || { echo "::error::dist/ doesn't hold version $PY_VERSION"; ls dist; exit 1; }
           [ "$(find dist -type f | wc -l)" -eq 2 ] || { echo "::error::dist/ holds other files"; ls dist; exit 1; }
           echo "python-version=$PY_VERSION" >> "$GITHUB_OUTPUT"
+      # not "dist": the CI job of this same run uploads a "dist" artifact too, built from the
+      # pushed commit with the previous version, and a download by name could get that one.
       - uses: actions/upload-artifact@v7
         with:
-          name: dist
+          name: release-dist
           path: dist/
           if-no-files-found: error
 
@@ -148,8 +150,15 @@ jobs:
     steps:
       - uses: actions/download-artifact@v8
         with:
-          name: dist
+          name: release-dist
           path: dist/
+      - name: Check that dist/ holds exactly the release
+        env:
+          VERSION: ${{ needs.dist.outputs.python-version }}
+        run: |
+          ls dist/*-"$VERSION"-py3-none-any.whl dist/*-"$VERSION".tar.gz \
+            || { echo "::error::dist/ doesn't hold version $VERSION"; ls dist; exit 1; }
+          [ "$(find dist -type f | wc -l)" -eq 2 ] || { echo "::error::dist/ holds other files"; ls dist; exit 1; }
       - name: Upload the distributions to the release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -169,8 +178,15 @@ jobs:
     steps:
       - uses: actions/download-artifact@v8
         with:
-          name: dist
+          name: release-dist
           path: dist/
+      - name: Check that dist/ holds exactly the release
+        env:
+          VERSION: ${{ needs.dist.outputs.python-version }}
+        run: |
+          ls dist/*-"$VERSION"-py3-none-any.whl dist/*-"$VERSION".tar.gz \
+            || { echo "::error::dist/ doesn't hold version $VERSION"; ls dist; exit 1; }
+          [ "$(find dist -type f | wc -l)" -eq 2 ] || { echo "::error::dist/ holds other files"; ls dist; exit 1; }
       - uses: pypa/gh-action-pypi-publish@release/v1
         with:
           repository-url: https://test.pypi.org/legacy/
@@ -220,8 +236,15 @@ jobs:
     steps:
       - uses: actions/download-artifact@v8
         with:
-          name: dist
+          name: release-dist
           path: dist/
+      - name: Check that dist/ holds exactly the release
+        env:
+          VERSION: ${{ needs.dist.outputs.python-version }}
+        run: |
+          ls dist/*-"$VERSION"-py3-none-any.whl dist/*-"$VERSION".tar.gz \
+            || { echo "::error::dist/ doesn't hold version $VERSION"; ls dist; exit 1; }
+          [ "$(find dist -type f | wc -l)" -eq 2 ] || { echo "::error::dist/ holds other files"; ls dist; exit 1; }
       - uses: pypa/gh-action-pypi-publish@release/v1
         with:
           skip-existing: true
