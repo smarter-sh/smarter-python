@@ -25,7 +25,7 @@ This file holds only what applies to nearly every task.
 3. **Never deploy from a test or a probe.** Deploy creates real, billable
    infrastructure. The local platform's containers hold live credentials.
 4. **The pre-commit hooks are the lint standard.** See `smarter-code-quality`.
-5. **Coverage:** at least 90%, 95% where it takes moderate effort.
+5. **Coverage:** at least 95%, with branch coverage. CI fails below it.
 6. **This repository is public.** No api keys, tokens, account numbers,
    private hostnames, names or customer data in code, fixtures, docs or skills.
 7. **`PYTHONPATH` is the repository root, never `./smarter`**, which would
@@ -35,19 +35,23 @@ This file holds only what applies to nearly every task.
 
 ## Repository map
 
-| Path                 | Contents                                                                                                |
-| -------------------- | ------------------------------------------------------------------------------------------------------- |
-| `smarter/client.py`  | `Smarter`, the client                                                                                   |
-| `smarter/core/`      | Configuration, http transport, exceptions, logging, SSE, type aliases                                   |
-| `smarter/resources/` | One module per resource family                                                                          |
-| `smarter/models/`    | Pydantic models; `sam/` is generated, `chat.py`/`journal.py`/`react.py` mirror the platform's contracts |
-| `scripts/`           | SAM model generation, contract sync, api reference generation                                           |
-| `tests/`             | Unit tests, fixtures in `tests/data/`, live tests in `tests/live/`                                      |
-| `doc/adr/`           | The SDK's architecture decision records                                                                 |
-| `skills/`            | Agent Skills                                                                                            |
+| Path                 | Contents                                                                                                 |
+| -------------------- | -------------------------------------------------------------------------------------------------------- |
+| `smarter/client.py`  | `Smarter`, the client                                                                                    |
+| `smarter/core/`      | Configuration, http transport, exceptions, logging, SSE, type aliases                                    |
+| `smarter/resources/` | One module per resource family                                                                           |
+| `smarter/models/`    | Pydantic models; `sam/` is generated, `chat.py`/`journal.py`/`react.py` mirror the platform's contracts  |
+| `scripts/`           | SAM model generation, contract sync                                                                      |
+| `tests/`             | Unit tests, fixtures in `tests/data/`, live tests in `tests/live/`                                       |
+| `docs/source/`       | The Sphinx site, https://docs.smarter-python.smarter.sh/; `adr/` holds the architecture decision records |
+| `terraform/docs/`    | The docs site's AWS resources                                                                            |
+| `.github/workflows/` | `ci.yml` (every push and pull request) and `release.yml` (by hand: CI, release, TestPyPI, PyPI)          |
+| `skills/`            | Agent Skills                                                                                             |
 
-The SDK's user documentation lives in the platform's repository:
-`../smarter/docs/source/smarter-framework/smarter-python*`.
+The SDK's documentation is its own site, built from `docs/source/` and
+published to https://docs.smarter-python.smarter.sh/. CI, Codecov and releases
+follow cache-results (`../cache-results`), the model for every Smarter PyPI
+project.
 
 ## Common commands
 
@@ -57,7 +61,8 @@ make coverage                               # unit tests with coverage
 SMARTER_BASE_URL=http://localhost:9357 SMARTER_API_KEY=... make test-live
 make sam-models                             # make contracts, then regenerate smarter/models/sam
 make contracts                              # copy the platform's contracts, SAM schemas and openapi.json from ../smarter
-PYTHONPATH=. venv/bin/python scripts/generate_reference.py   # api reference into ../smarter
+make sphinx-build                           # the docs site, warnings as errors (seconds)
+make release-dry-run                        # CI, then the next version, without releasing
 git diff --name-only | xargs venv/bin/pre-commit run --files
 ```
 
@@ -66,8 +71,8 @@ Monthly, sync the SDK with the platform and update its requirements: load the
 
 ## Definition of done
 
-- The change follows an existing pattern, and the ADRs in `doc/adr/`.
+- The change follows an existing pattern, and the ADRs in `docs/source/adr/`.
 - Tests cover it, you ran them, and the live tests pass or skip only for named platform bugs.
 - Pre-commit hooks pass on the changed files.
-- Public objects have reST docstrings; user-facing features are documented in `../smarter/docs/source/`.
+- Public objects have reST docstrings; user-facing features are documented in `docs/source/`.
 - Your summary says what changed, what you verified, what you skipped, and any platform bugs found.

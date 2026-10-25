@@ -1,29 +1,80 @@
 [build-system]
-requires = ["setuptools", "wheel"]
-#build-backend = "setuptools.build_meta"
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "smarter-api"
+dynamic = ["version"]
+description = "The official Python SDK of the Smarter platform's api."
+readme = "README.md"
+license = "AGPL-3.0-or-later"
+license-files = ["LICENSE.txt"]
+requires-python = ">=3.10"
+authors = [{ name = "The Smarter Project" }]
+maintainers = [{ name = "Lawrence McDaniel", email = "lpm0073@gmail.com" }]
+keywords = ["smarter", "sdk", "api", "llm", "ai", "agents", "manifests"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Typing :: Typed",
+]
+# a library's compatible ranges, not pins: an application that installs the SDK pins its own.
+# Keep the lower bounds the same as requirements/in/constraints.in.
+dependencies = [
+  "httpx>=0.27,<1",
+  "pydantic>=2.14.0,<3",
+  "pydantic-settings>=2.3,<3",
+  "PyYAML>=6.0,<7",
+  "email-validator>=2.0,<3",
+]
+
+[project.optional-dependencies]
+test = ["coverage[toml]>=7", "jsonschema>=4.26"]
+docs = ["sphinx>=8", "sphinx-rtd-theme>=3", "sphinx-copybutton>=0.5", "sphinx-notfound-page>=1", "sphinx-sitemap>=2.6"]
+
+[project.urls]
+Homepage = "https://github.com/smarter-sh/smarter-python"
+Documentation = "https://docs.smarter-python.smarter.sh/"
+Source = "https://github.com/smarter-sh/smarter-python"
+Issues = "https://github.com/smarter-sh/smarter-python/issues"
+Changelog = "https://github.com/smarter-sh/smarter-python/blob/main/CHANGELOG.md"
+"Code of Conduct" = "https://github.com/smarter-sh/smarter-python/blob/main/CODE_OF_CONDUCT.md"
+
+[tool.hatch.version]
+path = "smarter/__version__.py"
+
+[tool.hatch.build.targets.sdist]
+include = ["/smarter", "/tests", "/README.md", "/LICENSE.txt", "/CHANGELOG.md"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["smarter"]
+
+[tool.coverage.run]
+source = ["smarter"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 95
+exclude_lines = ["pragma: no cover", "if TYPE_CHECKING:"]
 
 [tool.isort]
 profile = "black"
+line_length = 120
 
 [tool.black]
 line-length = 120
-target-version = ['py311']
-include = '\.pyi?$'
-exclude = '''
-/(
-    \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | venv
-  | node_modules
-  | build
-  | buck-out
-  | build
-  | dist
-)/
-'''
+target-version = ["py310"]
 
 [tool.codespell]
 skip = '*.svg,models/prompt_templates.py'

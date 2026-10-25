@@ -1,6 +1,6 @@
 default_language_version:
-  # default language version for each language
-  python: python3.12
+  # any Python 3: CI runs the hooks on its newest supported Python.
+  python: python3
 # Install the commit-msg hook too, so that commitlint checks each commit message.
 # semantic-release versions the package from the conventional commit messages.
 default_install_hook_types: [pre-commit, commit-msg]

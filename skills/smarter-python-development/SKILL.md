@@ -29,14 +29,20 @@ to customize or fork the backend to integrate with it.
 | `smarter/models/`                                  | Pydantic models of the api's responses, one module per family                        |
 | `smarter/models/chat.py`, `journal.py`, `react.py` | Mirrors of the platform's api contracts                                              |
 | `smarter/models/sam/`                              | **Generated** SAM models of every manifest kind. Never edit by hand                  |
-| `scripts/`                                         | `generate_sam_models.py`, `sync-contracts.sh`, `generate_reference.py`               |
+| `scripts/`                                         | `generate_sam_models.py`, `sync-contracts.sh`                                        |
 | `tests/`                                           | Unit tests (`tests/test_*.py`), fixtures (`tests/data/`), live tests (`tests/live/`) |
-| `doc/adr/`                                         | The SDK's architecture decision records, which adapt the platform's                  |
+| `docs/source/`                                     | The Sphinx site, https://docs.smarter-python.smarter.sh/, and its api reference      |
+| `docs/source/adr/`                                 | The SDK's architecture decision records, which adapt the platform's                  |
+| `terraform/docs/`                                  | The docs site's AWS resources (S3, CloudFront, ACM, Route53)                         |
+| `requirements/in/`                                 | The `.in` files that pip-compile pins into `requirements/*.txt`                      |
+| `.github/workflows/`                               | `ci.yml` (every push and pull request) and `release.yml` (by hand)                   |
 | `skills/`                                          | These skills                                                                         |
 
-The SDK's documentation lives in the **platform's** repository:
-`../smarter/docs/source/smarter-framework/smarter-python*`. See
-`smarter-sphinx-docs`.
+The SDK has its own documentation site, built from `docs/source/` and
+published to https://docs.smarter-python.smarter.sh/. Every page's footer says
+it is part of The Smarter Project. The platform's docs keep one short page,
+`../smarter/docs/source/smarter-framework/smarter-python.rst`, that links to
+it. See `smarter-sphinx-docs`.
 
 ## Non-negotiable rules
 
@@ -54,8 +60,8 @@ The SDK's documentation lives in the **platform's** repository:
    tests never call it. The local platform's containers hold live credentials:
    see `smarter-infrastructure-safety` in `../smarter/skills/`.
 5. **The pre-commit hooks are the lint standard.** See `smarter-code-quality`.
-6. **Coverage:** at least 90% overall, 95% where it takes moderate effort.
-   CI fails below 90%.
+6. **Coverage:** at least 95%, with branch coverage. `make coverage` and CI
+   fail below it, and Codecov checks each pull request's patch.
 7. **This repository is public.** No api keys, tokens, account numbers,
    private hostnames, names, addresses or customer data in code, fixtures,
    docs or skills. Sanitize every fixture taken from a real response, and
@@ -71,12 +77,17 @@ The SDK's documentation lives in the **platform's** repository:
     exactly as in the platform. See `smarter-docstrings`.
 11. **Type annotations are required** for every public function and method,
     and for every attribute of a Pydantic model. See `smarter-python-typing`.
-12. **GitHub Actions** should host a build, tests (with coverage), and publish to PyPI. See `smarter-python-testing`. The workflows should be logically/instructionally consistent with Makefile targets, and with the platform's own CI.
-13. **smarter Sphinx docs** should build the SDK's pages in the smarter/docs/source/smarter-framework/. See `smarter-sphinx-docs`.
+12. **CI and releases follow cache-results**, the model for every Smarter
+    PyPI project: `ci.yml` on every push and pull request, and one manual
+    `release.yml` that runs CI, versions with semantic-release, and publishes
+    to TestPyPI and PyPI by trusted publishing. Every `make` target has a CI
+    counterpart. See `smarter-python-release`.
+13. **The docs site is this repository's own** (`docs/source/`), built with
+    warnings as errors. See `smarter-sphinx-docs`.
 
 ## Architecture, and why
 
-Each decision below is recorded in `doc/adr/`, with the platform ADR that it
+Each decision below is recorded in `docs/source/adr/`, with the platform ADR that it
 follows or adapts. Read the relevant ADR before you change one of them, and
 add an ADR when you make a new decision of that size.
 
@@ -131,8 +142,8 @@ add an ADR when you make a new decision of that size.
    `tests/test_<family>.py`, and a call in `tests/live/test_live.py` if it is
    safe (no deploy, no destructive change to existing data).
 6. Run `make test`, `make test-live`, and the hooks.
-7. Update the docs page in `../smarter/docs/source/smarter-framework/smarter-python/`
-   and regenerate the api reference (`smarter-sphinx-docs`).
+7. Update the user guide in `docs/source/`, add the module to the api
+   reference if it is new, and run `make sphinx-build` (`smarter-sphinx-docs`).
 
 A **new resource kind** on the platform usually needs: `make sam-models`, a
 resource class (subclass `SmarterKindResource`, set `kind`, `path`, `model`),
@@ -148,17 +159,18 @@ message rather than fail, and report the bug to the user.
 
 ## Which skill to load
 
-| Task                                                           | Skill                    |
-| -------------------------------------------------------------- | ------------------------ |
-| Unit tests, live tests, fixtures, coverage                     | `smarter-python-testing` |
-| Probing the platform's api by hand                             | `smarter-api-testing`    |
-| Python docstrings                                              | `smarter-docstrings`     |
-| Type annotations, `Any`, the `smarter.core.typing` aliases     | `smarter-python-typing`  |
-| The SDK's pages in the platform's Sphinx docs                  | `smarter-sphinx-docs`    |
-| Lint, format, pre-commit                                       | `smarter-code-quality`   |
-| Writing a commit message                                       | `smarter-git-commits`    |
-| Monthly sync with the platform, and requirements updates       | `monthly-maintenance`    |
-| A platform contract change to follow now, between maintenances | `smarter-contract-sync`  |
+| Task                                                              | Skill                    |
+| ----------------------------------------------------------------- | ------------------------ |
+| Unit tests, live tests, fixtures, coverage                        | `smarter-python-testing` |
+| Probing the platform's api by hand                                | `smarter-api-testing`    |
+| Python docstrings                                                 | `smarter-docstrings`     |
+| Type annotations, `Any`, the `smarter.core.typing` aliases        | `smarter-python-typing`  |
+| The SDK's Sphinx docs site, its ADRs and its Terraform            | `smarter-sphinx-docs`    |
+| CI, Codecov, requirements, semantic-release, publishing a release | `smarter-python-release` |
+| Lint, format, pre-commit                                          | `smarter-code-quality`   |
+| Writing a commit message                                          | `smarter-git-commits`    |
+| Monthly sync with the platform, and requirements updates          | `monthly-maintenance`    |
+| A platform contract change to follow now, between maintenances    | `smarter-contract-sync`  |
 
 The platform's own skills (`../smarter/skills/`) apply whenever you change the
 platform itself, e.g. to fix a bug that the SDK found.
@@ -166,10 +178,10 @@ platform itself, e.g. to fix a bug that the SDK found.
 ## Definition of done
 
 - The change follows an existing pattern in this repository, and its ADRs.
-- Unit tests cover it, `make test` passes, and coverage stays at 90% or more.
+- Unit tests cover it, `make test` passes, and coverage stays at 95% or more.
 - The live tests pass against the local platform, or their skips name platform bugs.
 - The pre-commit hooks pass on the changed files.
-- Public objects have reST docstrings, and the docs in `../smarter/docs/source/`
-  describe the feature.
+- Public objects have reST docstrings, the docs in `docs/source/` describe the
+  feature, and `make sphinx-build` passes.
 - Your summary says what changed, what you verified, what you skipped, and any
   platform bugs you found.

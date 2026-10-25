@@ -89,8 +89,10 @@ Create and delete the throwaway api key as `smarter-api-testing` describes.
 
 ## Coverage
 
-At least 90% overall (CI enforces it with `--fail-under=90`), and 95% where
-that takes moderate effort. `if TYPE_CHECKING:` blocks are excluded. Test
+At least 95%, with branch coverage: `[tool.coverage]` in `pyproject.toml` sets
+`fail_under = 95`, so `make coverage` and every CI test job fail below it, and
+Codecov checks 95% of the project and of each pull request's patch
+(`codecov.yml`). `if TYPE_CHECKING:` blocks are excluded. Test
 behavior through the public interface (the client's methods), not private
 helpers.
 

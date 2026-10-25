@@ -1,14 +1,13 @@
 # The Smarter Python SDK
 
-![Build Status](https://github.com/smarter-sh/smarter-python/actions/workflows/build.yml/badge.svg?branch=main)
-![Test Status](https://github.com/smarter-sh/smarter-python/actions/workflows/test.yml/badge.svg?branch=main)
-[![Python coverage](https://img.shields.io/codecov/c/github/smarter-sh/smarter-python/main?flag=python&label=Python%20coverage&logo=codecov)](https://codecov.io/gh/smarter-sh/smarter-python?flags%5B0%5D=python)
+[![A project of The Smarter Project](https://img.shields.io/badge/a%20project%20of-The%20Smarter%20Project-2F6FEB)](https://smarter.sh)
+[![CI](https://github.com/smarter-sh/smarter-python/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/smarter-sh/smarter-python/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/smarter-sh/smarter-python/graph/badge.svg)](https://codecov.io/gh/smarter-sh/smarter-python)
 [![Latest Release](https://img.shields.io/github/v/release/smarter-sh/smarter-python?label=release)](https://github.com/smarter-sh/smarter-python/releases)
 [![PyPI](https://img.shields.io/pypi/v/smarter-api?logo=pypi&label=PyPI)](https://pypi.org/project/smarter-api/)
-[![Python versions](https://img.shields.io/pypi/pyversions/smarter-api?logo=python)](https://pypi.org/project/smarter-api/)
-[![Docs](https://img.shields.io/badge/Read%20the%20Docs-smarter.sh-blue?logo=readthedocs)](https://docs.smarter.sh/en/latest/smarter-framework/smarter-python.html)
-[![Website](https://img.shields.io/badge/official%20web%20site-smarter.sh-blue?logo=google-chrome)](https://smarter.sh)
-[![License: GNU AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)<br>
+[![Python](https://img.shields.io/badge/python-3.10%2B-blue?logo=python&logoColor=white)](https://www.python.org/)
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](LICENSE.txt)
+[![Docs](https://img.shields.io/badge/docs-docs.smarter--python.smarter.sh-blue?logo=readthedocs)](https://docs.smarter-python.smarter.sh/)
 
 `smarter-api` is the official Python SDK of the
 [Smarter platform](https://github.com/smarter-sh/smarter). It is to Smarter what
@@ -31,6 +30,10 @@ llmclient = client.llm_clients.find("customer_support")
 response = client.llm_clients.prompt(llmclient.id, "Where is my order #1234?")
 print(response.text)
 ```
+
+**Documentation: <https://docs.smarter-python.smarter.sh/>**
+
+smarter-python is part of [The Smarter Project](https://smarter.sh).
 
 ## Smarter Python SDK or Smarter CLI?
 
@@ -129,8 +132,10 @@ except SmarterError as e:
 
 ## Documentation
 
-Read the Docs: [The Smarter Python SDK](https://docs.smarter.sh/en/latest/smarter-framework/smarter-python.html)
-on [docs.smarter.sh](https://docs.smarter.sh/).
+The SDK's documentation is at <https://docs.smarter-python.smarter.sh/>: the
+user guide, the api reference generated from its docstrings, and its
+architecture decision records. The platform's own documentation is at
+[docs.smarter.sh](https://docs.smarter.sh/).
 
 ## Requirements
 
@@ -141,11 +146,24 @@ to run one on your laptop.
 ## Development
 
 ```console
-make init        # a virtual environment, with the development requirements and pre-commit
-make test        # the unit tests, which never reach a platform
-make coverage    # the unit tests, with a coverage report
+make                # list every command
+make init           # create venv/ from requirements/local.txt, install the package and the git hooks
+make test           # the unit tests, which never reach a platform
+make coverage       # the unit tests, with a coverage report
 SMARTER_BASE_URL=http://localhost:9357 SMARTER_API_KEY=... make test-live
+make lint           # run the pre-commit hooks on every file
+make sphinx-build   # build the Sphinx docs into docs/build/html
+make sphinx-publish # publish them to docs.smarter-python.smarter.sh
+make build          # build the sdist and wheel, and check them
+make python-requirements  # recompile the pinned requirements/*.txt
 ```
+
+CI runs the hooks, the unit tests on every supported Python version, the docs
+build and a package build, on every push and pull request. Coverage is reported
+to [Codecov](https://codecov.io/gh/smarter-sh/smarter-python). Releases are
+made by the Release workflow with semantic-release, from the conventional
+commit messages (`make release-dry-run` shows the next version), and published
+to PyPI in the same run.
 
 The agent skills in [skills/](./skills/) describe how this repository is
 developed, tested and documented, for people and for AI coding agents.

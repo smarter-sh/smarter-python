@@ -1,0 +1,16 @@
+# -----------------------------------------------------------------------------
+# written by: Lawrence McDaniel
+#             https://lawrencemcdaniel.com
+#
+# usage:      The SDK's runtime requirements, as pyproject.toml publishes them.
+#
+#             pip-compile --upgrade requirements/in/base.in -o requirements/base.txt
+# -----------------------------------------------------------------------------
+
+-c constraints.in
+
+httpx                               # HTTP client, and Server-Sent Events streaming
+pydantic                            # response and manifest models
+pydantic-settings                   # SMARTER_* environment variables
+PyYAML                              # YAML manifests, and the smarter cli's config.yaml
+email-validator                     # the SAM models' EmailStr fields (pydantic[email])

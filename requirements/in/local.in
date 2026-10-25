@@ -1,0 +1,54 @@
+# -----------------------------------------------------------------------------
+# written by: Lawrence McDaniel
+#             https://lawrencemcdaniel.com
+#
+# usage: developer support packages for testing, type checking, formatting,
+#        security, quality, documentation, code generation, build & packaging
+#
+#       pip-compile --upgrade requirements/in/local.in -o requirements/local.txt
+#
+#       make init installs local.txt into ./venv, then the package itself,
+#       editable (pip install -e . --no-deps).
+# -----------------------------------------------------------------------------
+
+-c constraints.in
+-r base.in
+
+pip-tools                           # pip-compile (make python-requirements)
+
+# tests
+# ------------
+coverage[toml]                      # test coverage, configured in pyproject.toml
+jsonschema                          # tests/test_contracts.py: the recorded responses against openapi.json
+
+# code generation
+# ------------
+datamodel-code-generator            # smarter/models/sam/ from the platform's JSON Schemas (make sam-models)
+
+# type annotations for packages that don't include them
+# ------------
+mypy                                # static type checker
+types-PyYAML                        # Type annotations for PyYAML
+
+# Code linters, formatters, and security scanners
+# ------------
+bandit                              # security linter
+black                               # code formatter
+codespell                           # typo checker
+flake8                              # code linter
+isort                               # import sorter
+pre-commit                          # git hook manager
+pydocstringformatter                # docstring formatter
+
+# Documentation
+# ------------
+sphinx                              # the documentation builder (make sphinx-build)
+sphinx-rtd-theme                    # Sphinx theme for Readthedocs
+sphinx-copybutton                   # Sphinx code copy button extension
+sphinx-notfound-page                # the site's 404.html, which CloudFront serves for missing pages
+sphinx-sitemap                      # sitemap.xml, for search engines
+
+# build & packaging
+# ------------
+build                               # builds the sdist and wheel (make build)
+twine                               # checks the distributions (make build)
