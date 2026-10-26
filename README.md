@@ -4,7 +4,7 @@
 [![Release](https://github.com/smarter-sh/smarter-python/actions/workflows/release.yml/badge.svg?branch=main)](https://github.com/smarter-sh/smarter-python/actions/workflows/release.yml)
 [![codecov](https://codecov.io/gh/smarter-sh/smarter-python/graph/badge.svg)](https://codecov.io/gh/smarter-sh/smarter-python)
 [![Latest Release](https://img.shields.io/github/v/release/smarter-sh/smarter-python?label=release)](https://github.com/smarter-sh/smarter-python/releases)
-[![PyPI](https://img.shields.io/pypi/v/smarter-api?logo=pypi&label=PyPI)](https://pypi.org/project/smarter-api/)
+[![PyPI](https://img.shields.io/pypi/v/smarter-api?logo=pypi&logoColor=white&label=PyPI)](https://pypi.org/project/smarter-api/)
 [![PyPI Downloads](https://img.shields.io/pypi/dm/smarter-api?label=downloads&logo=pypi&logoColor=white)](https://pypi.org/project/smarter-api/)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue?logo=python&logoColor=white)](https://www.python.org/)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](LICENSE.txt)
