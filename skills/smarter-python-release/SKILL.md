@@ -100,8 +100,11 @@ gh run watch
    the variable `PUBLISH_TO_TESTPYPI` is `"true"`. The verify job installs the
    upload back, its dependencies from PyPI and only smarter-api from TestPyPI
    (anyone can upload a look-alike of a dependency there), and checks the
-   installed `smarter.__version__`. Keep its list of dependencies the same as
-   `pyproject.toml`'s.
+   installed `smarter.__version__`. It reads
+   those dependencies from the uploaded package's own metadata
+   (`importlib.metadata.requires`), so there is no list to keep in step with
+   `pyproject.toml`: a hand-written one once missed smarter-types, and the job
+   failed with `ModuleNotFoundError`.
 6. `publish-pypi`, then `verify-pypi`: PyPI, **from `main` only**, when
    `PUBLISH_TO_PYPI` is `"true"`, and only if the rehearsal passed or is off.
    Prereleases from `alpha` and `beta` stop at TestPyPI.
@@ -189,7 +192,8 @@ make init                  # rebuild venv/ from local.txt, install the package e
 - A new development tool goes into `in/local.in`, with a comment saying what
   it is for, then `make python-requirements`. A new runtime dependency is a
   decision: it goes into `pyproject.toml` **and** `in/base.in`, with the same
-  range in `constraints.in`, and into the `verify-testpypi` job's install.
+  range in `constraints.in`. The `verify-testpypi` job reads it from the
+  package's metadata, so the workflow needs no change.
 - `datamodel-code-generator` is pinned in `constraints.in`: it generated
   `smarter/models/sam/`, and a new version can change every generated file.
   Upgrade it together with `make sam-models`.

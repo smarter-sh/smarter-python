@@ -212,15 +212,18 @@ jobs:
         env:
           VERSION: ${{ needs.dist.outputs.python-version }}
         run: |
-          # dependencies from PyPI, and only smarter-api itself from TestPyPI, where anyone
-          # can upload a package named like one of them.
-          pip install "httpx>=0.27,<1" "pydantic>=2.14.0,<3" "pydantic-settings>=2.3,<3" "PyYAML>=6.0,<7" "email-validator>=2.0,<3" packaging
-          # the index can take a minute to show a new upload.
+          # only smarter-api itself from TestPyPI, where anyone can upload a package named like one
+          # of its dependencies. The index can take a minute to show a new upload.
           for attempt in 1 2 3 4 5 6 7 8 9 10; do
             pip install --no-cache-dir --no-deps --index-url https://test.pypi.org/simple/ "smarter-api==$VERSION" && break
             [ "$attempt" = 10 ] && exit 1
             sleep 30
           done
+          # then its dependencies from PyPI, read from the uploaded package's own metadata, so that
+          # they can't drift from pyproject.toml (extras are left out).
+          python -I -c "from importlib.metadata import requires; print('\n'.join(r for r in requires('smarter-api') or [] if 'extra ==' not in r))" > requirements.txt
+          cat requirements.txt
+          pip install -r requirements.txt packaging
           # the installed package's own __version__ must be the release, compared as PEP 440 versions.
           python -I -c "import sys, smarter; from packaging.version import Version; installed = Version(smarter.__version__); assert installed == Version(sys.argv[1]), installed; print('smarter-api', installed)" "$VERSION"
 
