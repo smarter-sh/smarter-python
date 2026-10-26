@@ -1,14 +1,9 @@
-# [0.6.0-alpha.1](https://github.com/smarter-sh/smarter-python/compare/v0.5.4-alpha.1...v0.6.0-alpha.1) (2026-10-26)
+## [0.5.4](https://github.com/smarter-sh/smarter-python/compare/v0.5.3...v0.5.4) (2026-10-25)
 
 
 ### Bug Fixes
 
-* **models:** accept manifests with unquoted yaml dates ([5935456](https://github.com/smarter-sh/smarter-python/commit/593545628cd674f857b8723c1cb5a21d9fa0e665))
-
-
-### Features
-
-* re-export SAMKinds from smarter-types ([389ca4a](https://github.com/smarter-sh/smarter-python/commit/389ca4a5cb00374fa22bb20c1e1ce3a05419608b))
+* **release:** publish the release's own build, not ci's ([03b2911](https://github.com/smarter-sh/smarter-python/commit/03b2911bb3e303616a000e3337094fbb27324f31))
 
 ## [0.5.4-alpha.1](https://github.com/smarter-sh/smarter-python/compare/v0.5.3...v0.5.4-alpha.1) (2026-10-25)
 
