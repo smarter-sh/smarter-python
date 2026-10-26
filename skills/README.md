@@ -24,19 +24,21 @@ Start with `smarter-python-development`. It sets out the rules that apply to
 every change, the SDK's architecture, and which narrower skill to load for each
 kind of task.
 
-| Skill                        | Use it when                                                                         |
-| ---------------------------- | ----------------------------------------------------------------------------------- |
-| `smarter-python-development` | You're making any change. Start here.                                               |
-| `smarter-python-testing`     | You're writing or running the unit or live tests, or raising coverage.              |
-| `smarter-api-testing`        | You're probing the platform's api by hand, e.g. to build a fixture.                 |
-| `smarter-docstrings`         | You're writing docstrings, which become the api reference on the SDK's docs site.   |
-| `smarter-python-typing`      | You're writing type annotations, especially with `Any`.                             |
-| `smarter-sphinx-docs`        | You're editing the docs in `docs/source`, or their site's hosting (`terraform/`).   |
-| `smarter-code-quality`       | You're about to finish a change and need to run the pre-commit hooks.               |
-| `smarter-git-commits`        | You've been asked to write a commit message.                                        |
-| `smarter-python-release`     | You're changing CI, requirements or packaging, or cutting a release.                |
-| `monthly-maintenance`        | It's time to sync the SDK with the platform, and update its requirements.           |
-| `smarter-contract-sync`      | The platform's api contract changed, and this repository's copy must follow it now. |
+| Skill                                  | Use it when                                                                         |
+| -------------------------------------- | ----------------------------------------------------------------------------------- |
+| `smarter-python-development`           | You're making any change. Start here.                                               |
+| `smarter-python-testing`               | You're writing or running the unit or live tests, or raising coverage.              |
+| `smarter-api-testing`                  | You're probing the platform's api by hand, e.g. to build a fixture.                 |
+| `smarter-docstrings`                   | You're writing docstrings, which become the api reference on the SDK's docs site.   |
+| `smarter-python-typing`                | You're writing type annotations, especially with `Any`.                             |
+| `smarter-sphinx-docs`                  | You're editing the docs in `docs/source`, or their site's hosting (`terraform/`).   |
+| `smarter-code-quality`                 | You're about to finish a change and need to run the pre-commit hooks.               |
+| `smarter-git-commits`                  | You've been asked to write a commit message.                                        |
+| `smarter-python-release`               | You're changing CI, requirements or packaging, or cutting a release.                |
+| `monthly-maintenance`                  | It's time to sync the SDK with the platform, and update its requirements.           |
+| `smarter-contract-sync`                | The platform's api contract changed, and this repository's copy must follow it now. |
+| `blog.smarter.sh-release-announcement` | You're announcing a release on blog.smarter.sh.                                     |
+| `blog.smarter.sh-publish`              | You're publishing or updating a post on blog.smarter.sh yourself.                   |
 
 The bundled scripts are ordinary shell scripts that you can run yourself from
 the repository root:
@@ -87,5 +89,9 @@ A skill is a set of instructions that an agent follows, often without asking.
 - **Skills can carry prompt injection.** Look for instructions unrelated to a
   skill's purpose, new scripts with network calls, and text that tells an agent
   to skip confirmations, hooks or safety rules.
+- **`blog.smarter.sh-publish` signs in to the blog as an administrator.** Its
+  `wp.py` makes network calls to blog.smarter.sh with the credentials in
+  `../smarter/.env`, and publishing is public. The skill publishes only when
+  asked, and uploads a draft otherwise.
 - **Keep secrets out.** This repository is public: no api keys, tokens, account
   numbers, private hostnames or customer data in a skill, an example or a script.
