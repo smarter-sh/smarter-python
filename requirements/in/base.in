@@ -14,3 +14,4 @@ pydantic                            # response and manifest models
 pydantic-settings                   # SMARTER_* environment variables
 PyYAML                              # YAML manifests, and the smarter cli's config.yaml
 email-validator                     # the SAM models' EmailStr fields (pydantic[email])
+smarter-types                       # SAMKinds and the journal enumerations, shared with the platform

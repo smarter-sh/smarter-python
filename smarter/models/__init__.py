@@ -27,6 +27,7 @@ from .journal import (
     SAMJournalApiErrorBody,
     SmarterJournaledResponse,
 )
+from .kinds import SAMKinds
 from .llmclient import (
     LLMClient,
     LLMClientApiKey,
@@ -127,6 +128,7 @@ __all__ = [
     "ProviderModel",
     "Proxy",
     "SAMJournalApiErrorBody",
+    "SAMKinds",
     "Secret",
     "SmarterJournaledResponse",
     "SmarterModel",
