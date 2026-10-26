@@ -17,6 +17,17 @@ people at a terminal.
 The SDK's goal is to cover **all** of the platform's api, so that nobody needs
 to customize or fork the backend to integrate with it.
 
+The **minimum** is everything needed to work with Smarter manifests the way the
+platform does: every broker verb, and the enumerations that the brokers are
+built on. Those enumerations are never copied from the platform. They live in
+[smarter-types](https://github.com/smarter-sh/smarter-types) (`../smarter-types`,
+import `smarter_types`), which the platform and the SDK both depend on, and the
+SDK re-exports them (e.g. `SAMKinds` in `smarter/models/kinds.py`). When
+platform code that handles manifests relies on a plain-Python enum or helper
+that the SDK lacks, move it into smarter-types and re-export it from both. Beyond that, the SDK should let a program do the administrative
+tasks that are otherwise done in Django Admin or with `manage.py`, as the
+platform exposes them through its api.
+
 ## Repository map
 
 | Path                                               | What lives there                                                                     |
@@ -85,6 +96,52 @@ it. See `smarter-sphinx-docs`.
     counterpart. See `smarter-python-release`.
 13. **The docs site is this repository's own** (`docs/source/`), built with
     warnings as errors. See `smarter-sphinx-docs`.
+
+## When the user reports that something didn't happen
+
+If the user says that something didn't happen, e.g. "it did not create a
+release", "PyPI still has the old version" or "the SDK still rejects that
+field", that is a problem to fix, not a claim to debate. Don't answer with
+evidence that it did happen somewhere else, e.g. a prerelease on `alpha` or
+TestPyPI when they mean `main` and PyPI, or a platform change on `../smarter`'s
+`alpha` that their installation doesn't run. Find out what is missing from
+their point of view, why, and fix it, or hand them the one command or click
+that fixes it.
+
+## Pattern-first workflow
+
+The SDK is consistent, and almost every change has a precedent.
+
+1. Identify what kind of change it is: a new endpoint, a new resource kind, a
+   model field, a contract change, a transport behavior, a doc page.
+2. Find two or three existing implementations of the same kind, newest first,
+   and read them in full: the resource module, its model, its tests and
+   fixture, its docs page.
+3. Copy their structure, naming, docstrings, logging and error handling.
+   Don't introduce a new pattern when one exists. For an endpoint, follow
+   [Covering a platform endpoint](#covering-a-platform-endpoint-the-pattern).
+4. Make the change, then its tests, docstrings and docs.
+5. Run the hooks and the tests, and fix what they find.
+
+When existing code disagrees with these skills, the code that is newest and
+consistent with most of the SDK wins. Say so in your summary.
+
+## Reading the platform and its siblings
+
+The SDK follows the platform, so most tasks read `../smarter`, and some
+`../smarter-types` or `../cache-results` (the model for CI and releases).
+
+- **Read the local checkouts**, not GitHub: grep them like any local code.
+  First check that they are current:
+  `../smarter/skills/smarter-project-repositories/scripts/repos-status.sh smarter smarter-types cache-results`
+  (read only: each checkout's branch, uncommitted changes, and whether it
+  matches its remote). A checkout that is behind can mislead you, e.g. a
+  platform on `alpha` that has changes `main` lacks. Say so, and give the user
+  the `git -C ../<repository> pull` to run. Don't run it yourself: rule 1
+  applies to every repository.
+- **Each has its own `CLAUDE.md` and skills.** Read them before changing
+  anything there, and follow their rules, not this repository's: e.g. the
+  platform's tests run in its Docker containers, not on the host.
 
 ## Architecture, and why
 
@@ -158,6 +215,31 @@ only when the workaround is harmless (e.g. `Manifests.get()` filters by name
 client-side), say so in a comment, make the live test skip with the platform's
 message rather than fail, and report the bug to the user.
 
+## Logging
+
+The SDK is a library: it logs to the `smarter.*` logger hierarchy and adds no
+handlers unless `SMARTER_LOG` is set (`smarter/core/log.py`). Copy the calls in
+`smarter/core/http.py` and `conf.py`:
+
+```python
+logger = logging.getLogger(__name__)
+logger.warning("smarter cli configuration %s is invalid and was ignored: %s", path, e)
+```
+
+- %-style arguments, never f-strings: a message that isn't emitted is never
+  formatted, and aggregators can group messages by their template. Wrap an
+  expensive argument in `if logger.isEnabledFor(logging.DEBUG):`.
+- The logger's name says where a message came from, so the SDK's messages
+  don't carry the platform's `ClassName.method()` prefix. Say what happened
+  and why, in words a caller can act on.
+- Pick the level deliberately: `debug` for request and response bodies,
+  `info` for one line per request and each retry, `warning` for something
+  unusual that was handled (an ignored configuration file). An error the
+  caller receives as an exception isn't logged as well.
+- **Never log a secret.** Mask an api key with `mask_secret()`; never log a
+  whole headers dict or `SmarterSettings`. A request body can hold a secret,
+  e.g. a `Secret` manifest's value, so only `debug` logs bodies.
+
 ## Which skill to load
 
 | Task                                                              | Skill                    |
@@ -179,7 +261,9 @@ platform itself, e.g. to fix a bug that the SDK found.
 ## Definition of done
 
 - The change follows an existing pattern in this repository, and its ADRs.
-- Unit tests cover it, `make test` passes, and coverage stays at 95% or more.
+- Unit tests cover it, you ran `make test` yourself and it passes, and
+  coverage stays at 95% or more. Report failures honestly, including
+  pre-existing ones.
 - The live tests pass against the local platform, or their skips name platform bugs.
 - The pre-commit hooks pass on the changed files.
 - Public objects have reST docstrings, the docs in `docs/source/` describe the

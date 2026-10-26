@@ -29,6 +29,12 @@ root (never `./smarter`, see `smarter-python-development`). intersphinx fetches
 Python's and Pydantic's inventories, so the build needs the network. CI builds
 it on every push and pull request.
 
+`-W` catches malformed reST (a heading underline shorter than its title, a
+directive whose content doesn't follow a blank line, a page in no toctree),
+but not a page that renders wrong. Open each page you changed and read it:
+code-block content indented consistently, lists that render as lists, links
+that land where they should.
+
 ## Layout
 
 | Content                          | Location                                                                   |
@@ -65,12 +71,25 @@ edited by hand:
   `SAMPluginCommonMetadata`), so `suppress_warnings = ["ref.python"]` silences
   Sphinx's "more than one target found" for them.
 
+## Cross-references
+
+- **Another page of this site:** `:doc:`, relative to the referring page
+  (`` :doc:`manifests` `` from `guide/resources.rst`), or absolute from
+  `docs/source/` with a leading `/` (`` :doc:`/reference/client` ``). A missing
+  target warns, so the build checks these.
+- **A Python object:** `:class:`, `:meth:`, `:func:` with its full dotted
+  path, and `~` to show only the last name. Python's and Pydantic's objects
+  resolve through intersphinx. `nitpicky` is off, so a wrong path renders as
+  plain text without a warning: check the link in the built page.
+
 ## Links to the platform's docs
 
 The platform's pages are another site, so link them with absolute urls, never
 `:doc:`, e.g.
-`` `Guardrails <https://docs.smarter.sh/en/latest/smarter-resources/smarter-guardrail.html>`__ ``.
-Sphinx doesn't check these; `make sphinx-linkcheck` does. Link a platform ADR
+`` `Guardrails <https://docs.smarter.sh/smarter-resources/smarter-guardrail.html>`__ ``.
+docs.smarter.sh serves pages from its root; old `/en/latest/` urls redirect
+there, so new links leave it out. Sphinx doesn't check these;
+`make sphinx-linkcheck` does. Link a platform ADR
 as `Smarter ADR-NNN`, so that it isn't mistaken for one of the SDK's.
 
 ## ADRs
@@ -101,14 +120,18 @@ One decision each, in Michael Nygard's format, in the format of the platform's
 - **Evergreen prose**, as in the platform: no "New in 0.2" sections. Weave a
   feature into the page where its topic belongs. The changelog carries the
   history.
+- Write for a Python developer new to Smarter. Define a term on first use
+  (SAM, manifest, kind, LLMClient), and link the page that explains it, here
+  or on docs.smarter.sh.
 - **Every example must run.** Check the field paths of SAM models against the
   generated code (e.g. an LLMClient's provider is
   `spec.config.prompt.provider`), and run the example against fixtures or the
   local platform.
 - Say when an operation is **billable** (prompts) or creates **real
   infrastructure** (deploy).
-- `double backticks` for literals, settings and commands. Console examples
-  start with `$ ` (copybutton strips it).
+- `double backticks` for literals, settings and commands, and
+  `.. code-block:: python` or `console` for examples. Console examples start
+  with `$ ` (copybutton strips it).
 - The README, `index.rst`, `quickstart.rst` and the guide overlap. When
   behavior changes, update all of them in the same change.
 
@@ -139,9 +162,9 @@ aws cli:
 - A and AAAA alias records in the `smarter.sh` zone;
 - the `smarter-python-docs-publisher` role that the Release workflow's `docs`
   environment assumes, allowed only to sync the bucket and invalidate the
-  distribution (`github_actions.tf`). It trusts GitHub's OIDC provider, which
-  is one per account and is created by cache-results' `terraform/docs`, so
-  this stack only reads it: apply cache-results' stack first.
+  distribution (`github_actions.tf`). It trusts GitHub's OIDC provider,
+  which is one per account and shared by every repository's stack, so this
+  stack only reads it (`data "aws_iam_openid_connect_provider"`).
 
 ```console
 make terraform-init    # once: the S3 backend (state key smarter-python/docs/terraform.tfstate)
@@ -149,9 +172,46 @@ make terraform-plan    # writes terraform/docs/tfplan: read it before applying
 make terraform-apply   # applies exactly that plan
 ```
 
-The state bucket's name and `allowed_account_ids` contain the AWS account id,
-so the Makefile reads it from the caller's credentials at run time. Never write
+The state bucket's name contains the AWS account id, so `make terraform-init`
+reads it from the caller's credentials. `make terraform-plan` also passes it as
+the optional `aws_account_id` guard; plain `terraform` uses `AWS_PROFILE`'s
+account without the guard. Never write
 an account id, or a distribution id, into this public repository. Run
 `terraform -chdir=terraform/docs fmt` and `validate` after editing (CI runs
 both), and apply only a plan the user has seen: these are live, billable
 resources in a shared account and DNS zone.
+
+### Rules for these stacks
+
+These are what went wrong before; each one was found the hard way.
+
+- **Plain `terraform` must work.** `cd terraform/docs && terraform plan` with
+  only `AWS_PROFILE` set must not prompt for anything. Terraform signs in as
+  the profile's account; never add a required variable that only `make` can
+  fill (an `aws_account_id` with no default made a bare `terraform apply`
+  stop at a prompt). The account id is needed only for the state bucket's
+  name, at `make terraform-init`. An account guard, if any, is an optional
+  variable (`default = null`, and
+  `allowed_account_ids = var.aws_account_id == null ? null : [var.aws_account_id]`).
+- **Read account-wide singletons, never create them.** GitHub's OIDC
+  provider (`token.actions.githubusercontent.com`, one per account), the
+  `smarter.sh` hosted zone and the state bucket are shared by every
+  repository's stack. A stack reads them with a `data` source. Creating one
+  fails with `EntityAlreadyExists` (409) in an account that has it, and a
+  stack that owns one breaks every other repository when it is destroyed.
+  To hand off one that a stack already owns, switch to the `data` source and
+  add a `removed { from = ... lifecycle { destroy = false } }` block; the plan
+  must say "will no longer be managed by Terraform, but will not be
+  destroyed". Nothing manages the OIDC provider now; it is left in place.
+- **Look in AWS before writing a stack.** Check with read-only `aws` calls
+  whether the bucket, distribution, certificate, records or role already
+  exist. Existing resources are adopted with `import` blocks and a
+  configuration that describes them as they are, until the plan shows imports
+  and no change to anything live, and no destroys. Compute import ids from
+  `data` sources (e.g. a certificate's ARN from `data "aws_acm_certificate"`)
+  so that no account id is written into the repository.
+- **Plan before you hand it over.** After any change, run `terraform plan`
+  yourself with the user's profile (it only reads) and read it: a stack that
+  validates can still fail at apply. Never leave a stale `tfplan` behind.
+- **When the user's apply fails, fix the stack.** Don't explain why it was
+  run "wrong" or offer workarounds; the stack is what must work.

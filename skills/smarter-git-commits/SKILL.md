@@ -8,23 +8,32 @@ description: Use whenever the user asks you to "write a git commit" (or a commit
 ## The rule: write, never execute
 
 "Write a git commit", in any wording or tone, means **output the command as
-text**. It never means run it.
+text**. It never means run it. Frustrated or emphatic phrasing ("THAT IS NOT A
+GIT COMMIT", all caps, profanity) still asks for the command text. Agents have
+broken this rule in exactly that situation.
 
 - Never execute `git commit`, `git add`, `git reset`, `git restore --staged`,
-  `git push`, `git stash`, or any other git command that writes. The user stages
-  and commits themselves.
+  `git push`, `git tag`, `git stash`, or any other git command that writes.
+  The user stages, commits, tags and pushes.
 - Read-only git commands (`git status`, `git diff`, `git log`) are fine for
   working out what changed.
-- Always include a reference to the latest release tag of https://github.com/smarter-sh/smarter/releases/ so that we have a record of the version of the code from the smarter
-  backend that was used to produce the commit.
+- Always include a reference to the latest release tag of
+  https://github.com/smarter-sh/smarter/releases/, so that there is a record
+  of the version of the platform's code that the commit was produced against.
 - Don't volunteer commit messages. Write one only when asked.
 
 ## Authorship
 
-Lawrence McDaniel is the author. You are the co-author, and your email is `noreply@anthropic.com`.
+Lawrence McDaniel is the author. You are the co-author, and your email is
+`noreply@anthropic.com`.
 
 - `--author="Lawrence McDaniel <lpm0073@gmail.com>"`
 - The last `-m` is `Co-authored-by: Claude <noreply@anthropic.com>`.
+
+This is the rule of the repositories published to PyPI. `../smarter` is the
+other way round (you are the author there): for a commit in `../smarter`,
+follow its own `smarter-git-commits` skill. A change to Smarter's authorship
+rule doesn't apply here.
 
 ## Command format
 
@@ -49,6 +58,7 @@ git commit --author="Lawrence McDaniel <lpm0073@gmail.com>" \
 - When the user asks for the `git add` too, write it as a separate code block.
   List the paths explicitly. Leave out files that don't belong to the change
   (for example, untracked work for another task).
+- Escape inner double quotes (`\"data\"`).
 
 ## Subject line
 
@@ -57,9 +67,17 @@ git commit --author="Lawrence McDaniel <lpm0073@gmail.com>" \
 semantic-release (`release.config.js`) to version the release.
 
 - **type:** `feat`, `fix`, `test`, `docs`, `refactor`, `perf`, `style`,
-  `build`, `ci`, or `chore`.
-  - `feat` is a user-visible capability, and `fix` is a bug fix. Both trigger a
-    release.
+  `build`, `ci`, or `chore`. The type decides the release of `smarter-api`
+  (`smarter-python-release`):
+  - `feat` is a user-visible capability, and makes a **minor** release. `fix`
+    is a bug fix, and makes a **patch** release, as does `perf`. The other
+    types make no release.
+  - **A breaking change** (a removed or renamed public name, a changed
+    signature or default, a dropped Python version) gets a footer paragraph
+    `-m "BREAKING CHANGE: <what breaks, and what users must do>"`. It makes a
+    **major** release.
+  - Refactoring is `refactor`, never `feat`, even when it moves code to a new
+    module.
   - Use `chore` for data-only or housekeeping changes, such as example manifests
     or model defaults. Don't use `feat` for them.
   - Work that the user asked for as a list of bugs is `fix`, even when it adds a
