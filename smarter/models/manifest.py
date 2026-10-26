@@ -7,11 +7,12 @@ the kind and the platform's version, so it is a JSON object here. The platform p
 complete JSON Schema of each kind: see :meth:`smarter.resources.manifests.Manifests.json_schema`.
 """
 
+from datetime import date, datetime
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 import yaml
-from pydantic import Field
+from pydantic import Field, model_validator
 
 from smarter.core.exceptions import SmarterValueError
 from smarter.core.typing import SmarterJsonObjectType
@@ -24,6 +25,25 @@ if TYPE_CHECKING:
 
 SMARTER_API_VERSION = "smarter.sh/v1"
 """The ``apiVersion`` of every Smarter manifest."""
+
+
+def json_compatible(value: object) -> object:
+    """
+    A parsed YAML value, with its dates and times as ISO 8601 strings.
+
+    YAML reads an unquoted ``2024-06-15`` as a date, which is not a JSON value. The platform reads
+    manifests as YAML too and accepts them, so the SDK keeps such a value, as the text it was.
+
+    :param value: A value from ``yaml.safe_load``.
+    :returns: The value, with every ``date`` and ``datetime`` in it replaced by its ISO 8601 string.
+    """
+    if isinstance(value, (date, datetime)):
+        return value.isoformat()
+    if isinstance(value, dict):
+        return {key: json_compatible(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [json_compatible(item) for item in value]
+    return value
 
 
 class ManifestMetadata(SmarterModel):
@@ -54,6 +74,17 @@ class Manifest(SmarterModel):
     metadata: ManifestMetadata
     spec: SmarterJsonObjectType = Field(default_factory=dict, description="The resource's specification.")
     status: SmarterJsonObjectType | None = Field(None, description="Read-only state, returned by describe.")
+
+    @model_validator(mode="before")
+    @classmethod
+    def _dates_as_strings(cls, data: object) -> object:
+        """
+        Accept a manifest whose YAML has unquoted dates, e.g. an annotation's ``2024-06-15``.
+
+        :param data: The manifest, before validation.
+        :returns: The manifest, with its dates and times as ISO 8601 strings.
+        """
+        return json_compatible(data)
 
     @classmethod
     def from_yaml(cls, text: str) -> "Manifest":
