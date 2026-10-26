@@ -24,7 +24,12 @@ make coverage
 `PYTHONPATH` must be `.` (the repository root). A developer shell that exports
 `PYTHONPATH=./smarter` breaks every import: see `smarter-python-development`.
 
-Run the tests yourself, after every change, and report the counts.
+Run the tests yourself, after every change, and report the counts. Never ask
+the user to re-run them. Read the `Ran N tests` and `OK`/`FAILED` lines, not
+only the coverage table: a coverage report alone is not a result. For a long
+run, such as the live tests, write the whole output to a file in your
+scratchpad, then grep that file, rather than piping the run into `grep`, which
+loses the summary if the pattern is wrong.
 
 ## Unit tests
 
@@ -42,6 +47,13 @@ status=..., text=..., handler=...)`. `path` is relative to `/api/v1/`. An
   `self.last_request.url.params`.
 - `self.make_client(max_retries=2, ...)` builds another client on the same
   routes. Patch `smarter.core.http.time.sleep` when a test retries.
+- Patch a name where the code under test reads it (`smarter.core.http.time`),
+  not where it is defined.
+- Assert a log message with `assertLogs("<logger name>", level=...)`, e.g.
+  `"smarter.client"` or `"smarter.core.conf"`, and check that a masked api
+  key, not the key, is what was logged.
+- Test names say what's being proven. Test behavior through the client's
+  public methods, not private helpers.
 
 ## Fixtures
 
@@ -99,4 +111,9 @@ helpers.
 ## Reporting
 
 Report pass, fail, error and skip counts honestly, for both suites. Name the
-live tests' skips, and separate platform bugs from SDK failures.
+live tests' skips, and separate platform bugs from SDK failures. Name
+pre-existing failures and separate them from anything your change caused.
+Confirm "pre-existing" by running the test on unchanged code, e.g. a copy of
+the repository in your scratchpad with the changed files replaced by
+`git show HEAD:<path>`: don't assume it. Never `git stash` or `git checkout`
+to do so.

@@ -1,7 +1,7 @@
 # Canonical Git Commit
 
-A real Smarter commit (`fix(passthrough)`, released in 0.17.4), in the required
-format. What makes it a good one:
+A real Smarter platform commit (`fix(passthrough)`, released in 0.17.4), with
+this repository's authorship. What makes it a good one:
 
 - The subject has a type and the Django app as its scope, and it says what the
   commit achieves.
@@ -12,7 +12,8 @@ format. What makes it a good one:
 - The tests are described by what they prove, not just listed.
 - It ends with the current status, so the reader knows what's known to be
   skipped and why.
-- You are the author, and Lawrence McDaniel is the co-author.
+- Lawrence McDaniel is the author, and Claude is the co-author: this
+  repository's rule. The platform's original had them the other way round.
 
 ```console
 git commit --author="Lawrence McDaniel <lpm0073@gmail.com>" \

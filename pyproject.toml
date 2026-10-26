@@ -36,6 +36,7 @@ dependencies = [
   "pydantic-settings>=2.3,<3",
   "PyYAML>=6.0,<7",
   "email-validator>=2.0,<3",
+  "smarter-types>=0.1,<1",
 ]
 
 [project.optional-dependencies]

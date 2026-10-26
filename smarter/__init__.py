@@ -32,6 +32,7 @@ from .core.exceptions import (
     SmarterValueError,
     UnprocessableEntityError,
 )
+from .models.kinds import SAMKinds
 from .models.manifest import Manifest
 from .resources.llmclients import ChatSession, PromptStream, SmarterPromptError
 
@@ -51,6 +52,7 @@ __all__ = [
     "PermissionDeniedError",
     "PromptStream",
     "RateLimitError",
+    "SAMKinds",
     "ResourceNotFoundError",
     "Smarter",
     "SmarterConfigurationError",

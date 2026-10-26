@@ -3,8 +3,9 @@
 #------------------------------------------------------------------------------
 
 variable "aws_account_id" {
-  description = "The AWS account to operate on. make passes it as TF_VAR_aws_account_id, from the caller's credentials."
+  description = "The only AWS account this stack may operate on. make passes it as TF_VAR_aws_account_id; when unset, the AWS profile's account is used without the check."
   type        = string
+  default     = null
 }
 
 variable "aws_region" {

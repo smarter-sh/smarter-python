@@ -31,6 +31,8 @@ idna==3.20
     #   anyio
     #   email-validator
     #   httpx
+inflection==0.5.1
+    # via smarter-types
 pydantic==2.14.1
     # via
     #   -c requirements/in/constraints.in
@@ -45,6 +47,10 @@ pydantic-settings==2.16.1
 python-dotenv==1.2.4
     # via pydantic-settings
 pyyaml==6.0.3
+    # via
+    #   -c requirements/in/constraints.in
+    #   -r requirements/in/base.in
+smarter-types==0.1.0
     # via
     #   -c requirements/in/constraints.in
     #   -r requirements/in/base.in

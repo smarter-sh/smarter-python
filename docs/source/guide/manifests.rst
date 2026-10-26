@@ -79,17 +79,32 @@ Manifests in CI/CD
 ------------------
 
 Because manifests are files, the usual way to manage production resources is to keep them in a
-repository, review changes in pull requests, and apply them from CI/CD:
+repository, review changes in pull requests, and apply them from CI/CD.
+
+Resources refer to one another by name: a SqlPlugin names its SqlConnection, which names the
+Secret that holds its password. The platform resolves each name when it applies the manifest, so
+the resource that is named must already exist. :class:`~smarter.models.kinds.SAMKinds` gives the
+order that always works, each kind after the kinds that it may name. Sort by
+``SAMKinds.apply_rank()``, not by file name:
 
 .. code-block:: python
 
    from pathlib import Path
-   from smarter import Smarter
+
+   from smarter import Manifest, SAMKinds, Smarter
+
+   paths = sorted(Path("manifests").rglob("*.yaml"))
+   manifests = sorted(
+       ((path, Manifest.from_file(path)) for path in paths),
+       key=lambda item: SAMKinds.apply_rank(item[1].kind),
+   )
 
    with Smarter() as client:
-       for path in sorted(Path("manifests").glob("*.yaml")):
-           result = client.manifests.validate(path)
+       for path, manifest in manifests:
+           result = client.manifests.validate(manifest)
            if not result.valid:
                raise SystemExit(f"{path}: {result.errors}")
-       for path in sorted(Path("manifests").glob("*.yaml")):
-           print(client.manifests.apply(path).message)
+       for path, manifest in manifests:
+           print(path, client.manifests.apply(manifest).message)
+
+``SAMKinds.apply_order()`` returns the whole order, and a kind that isn't a SAM kind ranks last.

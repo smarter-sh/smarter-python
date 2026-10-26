@@ -48,6 +48,11 @@ def evaluate(self, id: SmarterIdType, text: str, *, stage: Literal["input", "out
 - A body paragraph starts with a capital letter. A body that starts lower case
   usually means a summary was split.
 - Use one blank line between paragraphs, and between the body and the fields.
+- **pydocstringformatter capitalizes the first word.** A summary that starts
+  with a name, e.g. `list() returns ...`, becomes `List() returns ...`. Put the
+  name in double backticks, which the formatter leaves alone, or rephrase.
+  Start a module docstring with a sentence ("Type aliases of the Smarter
+  SDK."), not its dotted name, which would become `Smarter.core.typing`.
 
 ## Content
 

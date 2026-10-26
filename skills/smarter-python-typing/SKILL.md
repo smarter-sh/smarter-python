@@ -1,6 +1,6 @@
 ---
 name: smarter-python-typing
-description: Use when writing or reviewing Python type annotations in the smarter-python SDK, especially any use of typing.Any, Optional[Any], list[Any], dict[str, Any], or a type construction that repeats. Explains when Any is honest, the Smarter-prefixed aliases in smarter.core.typing (SmarterJsonType, SmarterJsonObjectType, SmarterIdType, SmarterDictType), and the SDK's own typing traps (a method named list, Literal versus str).
+description: Use when writing or reviewing Python type annotations in the smarter-python SDK, especially any use of typing.Any, Optional[Any], list[Any], dict[str, Any], or a type construction that repeats. Explains the Python 3.10 syntax that pyupgrade enforces, when Any is honest (and when object is truer), the rules for aliases, the Smarter-prefixed aliases in smarter.core.typing (SmarterJsonType, SmarterJsonObjectType, SmarterIdType, SmarterDictType), and the SDK's own typing traps (a method named list, Literal versus str).
 ---
 
 # Smarter Python SDK Type Annotations
@@ -12,6 +12,17 @@ weakest possible claim and turns the type checker off for that value, so it's
 only correct when the claim is literally true. This is the platform's rule
 (ADR-027 and `../smarter/skills/smarter-python-typing`), applied to the SDK.
 
+## Syntax
+
+- Python 3.10 and newer: `X | None`, `list[str]`, `type[Model]`.
+  pyupgrade (`--py310-plus`) rewrites the old forms in annotations; write the
+  new ones to begin with.
+- In an **expression**, the `typing` form stays: an alias's assignment
+  (`SmarterIdType = Union[int, str]`), or a `cast()`. pyupgrade leaves it.
+- A **quoted forward reference** stays `Optional["X"]`: `"X" | None` fails at
+  runtime unless the module starts with `from __future__ import annotations`
+  (see `smarter/core/exceptions.py`).
+
 ## When `Any` is acceptable
 
 Only where the value really can be of any type:
@@ -20,6 +31,10 @@ Only where the value really can be of any type:
 - A **type form**, e.g. the `cast_to` of `SmarterHttpClient.request()`, which may
   be a model, `list[Model]`, or any other type that Pydantic validates.
 - Comparison dunders: `def __eq__(self, other: Any) -> bool`.
+
+A value that is only stored, compared or passed on is `object`, not `Any`: it
+accepts anything and keeps the checker on, e.g. `json: object` in
+`SmarterHttpClient.request()`.
 
 ## When `Any` is wrong
 
@@ -32,6 +47,15 @@ If you can list the types, list them:
 - **`Any` to dodge a circular import.** Import under `if TYPE_CHECKING:` and
   quote the annotation (see `smarter/resources/base.py`, which imports `Smarter`).
 - **A return type with a finite set of possibilities.** Write the `Union`.
+  If callers must then narrow it, that's the truth; consider splitting the
+  method in two.
+- **A return type that depends on an argument's type.** Use `@overload`, or a
+  `TypeVar`, as `SmarterKindResource` does with `ModelT` in
+  `smarter/resources/base.py`.
+- **A third-party object whose type you didn't look up**, e.g. an `httpx`
+  response. Look it up.
+- **`:type ...: Any` or `:rtype: Any` in a docstring.** Keep it in step with
+  the annotation.
 
 ## Aliases in `smarter.core.typing`
 
@@ -42,9 +66,26 @@ If you can list the types, list them:
 | `SmarterIdType`         | `Union[int, str]`      | a resource's id or hashed id                               |
 | `SmarterDictType`       | `dict[str, Any]`       | a mapping whose values really can be anything (rare here)  |
 
-They mirror the platform's `smarter.lib.typing`. Use the alias, not the
-construction. `smarter.core.typing` imports only the standard library and
-pydantic, so that any module can import it. Keep it that way.
+They mirror the platform's `smarter.lib.typing`. `smarter.core.typing`
+imports only the standard library and pydantic, so that any module can import
+it. Keep it that way.
+
+- **Use the alias**, not the construction it stands for.
+- **Compose it** at the point of use (`list[SmarterJsonObjectType]`,
+  `SmarterDictType | None`). Don't add aliases such as
+  `SmarterOptionalDictType`.
+- **An alias doesn't make a loose type right.** A dict whose values are all
+  strings is `dict[str, str]`, and a response is a Pydantic model.
+- **Add an alias here** when a construction that carries meaning recurs across
+  modules. Use the platform's name if it has one, else `Smarter<Name>Type`;
+  give it a docstring (Sphinx publishes it), add it to `__all__` and to the
+  table above, and replace the existing uses in the same change.
+- **A construction that belongs to one module's job** gets a module-level
+  alias with a docstring there, which other modules import, e.g.
+  `QueryParamValue` in `smarter/core/http.py` and `ManifestInput` in
+  `smarter/resources/base.py`.
+- **Don't alias** single-level generics of concrete types (`list[str]`,
+  `dict[str, str]`) or `X | None`. They're as clear as a name would be.
 
 ## SDK traps
 

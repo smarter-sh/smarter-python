@@ -43,6 +43,17 @@ class TestManifest(unittest.TestCase):
             with self.subTest(text=text), self.assertRaises(SmarterValueError):
                 Manifest.from_yaml(text)
 
+    def test_unquoted_dates(self):
+        """An unquoted date or time in the YAML is kept as its ISO 8601 string."""
+        text = (
+            "apiVersion: smarter.sh/v1\nkind: LLMClient\n"
+            "metadata:\n  name: x\n  annotations:\n    - example.com/release-date: 2024-06-15\n"
+            "spec:\n  config:\n    at: 2024-06-15 10:30:00\n    sizes: [2024-01-01]\n"
+        )
+        manifest = Manifest.from_yaml(text)
+        self.assertEqual(manifest.metadata.annotations, [{"example.com/release-date": "2024-06-15"}])
+        self.assertEqual(manifest.spec["config"], {"at": "2024-06-15T10:30:00", "sizes": ["2024-01-01"]})
+
     def test_from_file_and_to_yaml(self):
         """A manifest round-trips through a YAML file, without its status."""
         manifest = Manifest.model_validate(SmarterTestBase.load_json("describe_llmclient")["data"])

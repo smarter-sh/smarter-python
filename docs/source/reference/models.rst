@@ -11,6 +11,11 @@ Models
 
 .. automodule:: smarter.models.manifest
 
+``smarter.models.kinds``
+------------------------
+
+.. automodule:: smarter.models.kinds
+
 ``smarter.models.platform``
 ---------------------------
 

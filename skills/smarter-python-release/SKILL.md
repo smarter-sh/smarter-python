@@ -100,8 +100,11 @@ gh run watch
    the variable `PUBLISH_TO_TESTPYPI` is `"true"`. The verify job installs the
    upload back, its dependencies from PyPI and only smarter-api from TestPyPI
    (anyone can upload a look-alike of a dependency there), and checks the
-   installed `smarter.__version__`. Keep its list of dependencies the same as
-   `pyproject.toml`'s.
+   installed `smarter.__version__`. It reads
+   those dependencies from the uploaded package's own metadata
+   (`importlib.metadata.requires`), so there is no list to keep in step with
+   `pyproject.toml`: a hand-written one once missed smarter-types, and the job
+   failed with `ModuleNotFoundError`.
 6. `publish-pypi`, then `verify-pypi`: PyPI, **from `main` only**, when
    `PUBLISH_TO_PYPI` is `"true"`, and only if the rehearsal passed or is off.
    Prereleases from `alpha` and `beta` stop at TestPyPI.
@@ -136,6 +139,36 @@ against `GITHUB_TOKEN`'s pushes. Variables: `PUBLISH_TO_TESTPYPI` and
 public repository must not contain an account or distribution id. The `docs`
 environment allows only `main`, as `pypi` does.
 
+## When a release didn't happen
+
+When the user says that a release didn't happen, they mean `main`, PyPI and
+the docs site, unless they say otherwise. A prerelease on `alpha` or TestPyPI
+is not an answer. Work down this list, stop at the first step that explains
+it, and fix it or hand the user the one command or click that does:
+
+1. **Did a Release run start?** `gh run list --workflow release.yml --branch main --limit 5`.
+   A push to `alpha` or `beta` makes a prerelease, which stops at TestPyPI.
+2. **Did CI pass?** `gh run view <id> --log-failed`. Nothing is released
+   unless it does.
+3. **Was anything releasable?**
+   `git log --oneline "$(git describe --tags --abbrev=0 origin/main)"..origin/main`.
+   Only `fix`, `perf`, `feat` and a `BREAKING CHANGE:` footer release;
+   `docs`, `ci`, `build` and `chore` don't. The fix is a commit of the right
+   type, never a hand-made tag or version. `origin/main` is only as fresh
+   as the last fetch: compare it with `gh release list --limit 3`.
+4. **Did it publish?** `gh variable list`: `publish-pypi` is skipped unless
+   `PUBLISH_TO_PYPI` is `"true"`, and waits for `verify-testpypi` when the
+   rehearsal is on. A failed upload can be re-run (`make release`): uploads
+   `skip-existing`.
+5. **Is the docs site behind?** `publish-docs` runs only after `verify-pypi`,
+   and only when `PUBLISH_DOCS` is `"true"`.
+6. **Is it on PyPI, but not where the user looks?** Check that their
+   environment upgraded: `pip index versions smarter-api` and
+   `pip show smarter-api`.
+
+Changing a repository variable or re-running a release is the user's call:
+give them the command rather than running it.
+
 ## Dependencies and requirements
 
 Laid out as cache-results' and Smarter's:
@@ -159,7 +192,8 @@ make init                  # rebuild venv/ from local.txt, install the package e
 - A new development tool goes into `in/local.in`, with a comment saying what
   it is for, then `make python-requirements`. A new runtime dependency is a
   decision: it goes into `pyproject.toml` **and** `in/base.in`, with the same
-  range in `constraints.in`, and into the `verify-testpypi` job's install.
+  range in `constraints.in`. The `verify-testpypi` job reads it from the
+  package's metadata, so the workflow needs no change.
 - `datamodel-code-generator` is pinned in `constraints.in`: it generated
   `smarter/models/sam/`, and a new version can change every generated file.
   Upgrade it together with `make sam-models`.

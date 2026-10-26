@@ -167,7 +167,8 @@ PYTHONPATH= venv/bin/pip list --outdated
   revisions. Nothing else updates them.
 - **The ranges:** for each runtime dependency whose newest version is outside
   its range (a new major version), raise the upper bound in `pyproject.toml`
-  **and** `constraints.in`, and in `release.yml`'s `verify-testpypi` install.
+  **and** `constraints.in`. (`release.yml`'s `verify-testpypi` reads them from
+  the package's metadata, so it needs no change.)
   Raise a lower bound only when the SDK starts to need a newer feature, and
   say which.
 

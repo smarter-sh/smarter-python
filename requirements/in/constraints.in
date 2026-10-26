@@ -13,5 +13,6 @@ pydantic>=2.14.0,<3                 # response and manifest models (pyproject.to
 pydantic-settings>=2.3,<3           # SMARTER_* environment variables (pyproject.toml)
 PyYAML>=6.0,<7                      # YAML manifests, and the smarter cli's config.yaml (pyproject.toml)
 email-validator>=2.0,<3             # the SAM models' EmailStr fields (pyproject.toml)
+smarter-types>=0.1,<1               # SAMKinds (pyproject.toml)
 datamodel-code-generator==0.34.0    # the version that generated smarter/models/sam/: upgrade it together with make sam-models
 pip-tools>=7.6.1                    # 7.5.x is incompatible with pip 26.2+ (stdlib_pkgs was removed)
