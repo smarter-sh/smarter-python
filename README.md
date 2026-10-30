@@ -9,6 +9,7 @@
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue?logo=python&logoColor=white)](https://www.python.org/)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](LICENSE.txt)
 [![Docs](https://img.shields.io/badge/docs-docs.smarter--python.smarter.sh-blue?logo=readthedocs)](https://docs.smarter-python.smarter.sh/)
+[![Slack](https://img.shields.io/badge/Slack-The%20Smarter%20Project-4A154B?logo=slack&logoColor=white)](https://join.slack.com/t/thesmarterproject/shared_invite/zt-4f0t6v46q-e2c5Of4hS4fBr_XwfQARCw)
 
 `smarter-api` is the official Python SDK of the
 [Smarter platform](https://github.com/smarter-sh/smarter). It is to Smarter what
