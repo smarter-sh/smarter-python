@@ -25,8 +25,9 @@ from typing import Annotated, Literal, Union
 
 from pydantic import Field
 
-from smarter.core.typing import SmarterJsonObjectType, SmarterJsonType
+from smarter.core.typing import SmarterJsonType
 
+from .annotations import SmarterAnnotations
 from .base import SmarterModel
 
 CHAT_CONTRACT_V2 = 2
@@ -268,7 +269,7 @@ class PromptChatApiPluginMeta(PromptChatApiOrmModel):
     description: str | None = None
     version: str | None = None
     tags: list[str] = []
-    annotations: list[SmarterJsonObjectType] | SmarterJsonObjectType | None = None
+    annotations: SmarterAnnotations | None = None
     plugin_class: str = Field(..., description="api, skill, sql, static, websearch or imagesearch.")
 
 

@@ -17,6 +17,7 @@ from pydantic import Field, model_validator
 from smarter.core.exceptions import SmarterValueError
 from smarter.core.typing import SmarterJsonObjectType
 
+from .annotations import SmarterAnnotations
 from .base import SmarterCamelModel, SmarterModel
 
 if TYPE_CHECKING:
@@ -53,8 +54,10 @@ class ManifestMetadata(SmarterModel):
     description: str | None = None
     version: str | None = Field(None, description="The resource's semantic version, e.g. 1.0.0.")
     tags: list[str] = []
-    annotations: list[SmarterJsonObjectType] = Field(
-        default_factory=list, description="Key-value pairs, as a list of single-key objects."
+    annotations: SmarterAnnotations = Field(
+        default_factory=dict,
+        description="Kubernetes-style annotations: string keys mapped to string values, e.g. "
+        "{'acme.com/crm-account-id': 'A-10042'}. The list of one-key maps of older manifests is also accepted.",
     )
 
 

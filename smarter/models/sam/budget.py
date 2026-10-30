@@ -6,10 +6,8 @@ Do not edit: run ``scripts/generate_sam_models.py``. See :mod:`smarter.models.sa
 
 from __future__ import annotations
 
-from datetime import date, datetime
+from datetime import datetime
 from enum import Enum
-from typing import Any
-from uuid import UUID
 
 from pydantic import Field, confloat, conint, constr
 
@@ -19,17 +17,15 @@ from smarter.models.sam.base import SAMModel
 class SAMBudgetMetadata(SAMModel):
     """Smarter API Budget Manifest - Metadata class."""
 
-    annotations: None | (
-        list[dict[str, str | int | float | bool | date | datetime | UUID | bytes | list | dict[str, Any]]]
-    ) = Field(None, title="Annotations")
+    annotations: dict[str, str] | None = Field(
+        None,
+        examples=[{"acme.com/crm-account-id": "A-10042", "smarter.sh/llmclient/use-case": "customer support"}],
+        title="Annotations",
+    )
     """
-    The manifest annotations.
+    Annotations, as in Kubernetes: a map of keys to string values that clients and integrations attach to a resource for their own purposes, e.g. to associate it with a resource in another system.
 
-    Used for storing arbitrary metadata as
-                key-value pairs. Example: [{'smarter.sh/test-manifest/project-name': 'Scooby dooby do'}]. The
-                key should be a valid url-friendly string. The value accepts
-                multi-line string values (YAML block scalars) and various scalar types including
-                str, int, float, bool, datetime.date, datetime.datetime, decimal.Decimal, uuid.UUID, bytes, list, dict.
+    A key is an optional DNS-subdomain prefix that names its owner, then a slash and a name of one or more slash-separated segments, e.g. 'acme.com/crm-account-id'. The prefix 'smarter.sh' and its subdomains are reserved for the Smarter platform. Values are strings: unquoted YAML scalars such as true, 42 or dates are converted to strings, and structured data belongs in a JSON string. All annotations together are limited to 256 KiB. The list of one-key maps of older manifests, e.g. [{'acme.com/crm-account-id': 'A-10042'}], is also accepted.
     """
     description: str | None = Field(..., title="Description")
     """

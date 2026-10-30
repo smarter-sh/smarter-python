@@ -32,6 +32,9 @@ class TestHistory(SmarterTestBase):
         self.assertEqual(page.pagination.page_size, 25)
         self.assertEqual((page.pagination.filter, page.pagination.filters), ("", []))
         self.assertEqual(
+            (page.pagination.tags, page.pagination.annotations, page.pagination.annotation_error), ([], [], "")
+        )
+        self.assertEqual(
             dict(self.last_request.url.params),
             {"page": "2", "page_size": "10", "search": "apply", "ordering": "-createdAt"},
         )

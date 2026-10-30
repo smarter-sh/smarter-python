@@ -60,4 +60,7 @@ REST models
 
 The other modules model the REST API's resources, e.g. :class:`~smarter.models.llmclient.LLMClient`,
 :class:`~smarter.models.guardrail.Guardrail` and :class:`~smarter.models.vectorstore.Vectorstore`.
-Their attributes are snake_case, and they read the API's camelCase fields.
+Their attributes are snake_case, and they read the API's camelCase fields. Every resource has the
+metadata of its manifest (``name``, ``description``, ``version``, ``tags`` and ``annotations``), its
+``manifest_url``, and its ``detail_url``: the page of the web console that shows its manifest, the
+resources that it uses, and those that use it.

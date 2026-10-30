@@ -21,7 +21,7 @@ import os
 import unittest
 import uuid
 
-from smarter import APIStatusError, NotFoundError, ResourceNotFoundError, Smarter
+from smarter import APIStatusError, BadRequestError, NotFoundError, ResourceNotFoundError, Smarter
 from smarter.models.manifest import Manifest
 from smarter.resources.catalog import PLUGIN_KINDS
 
@@ -143,10 +143,11 @@ class TestLive(unittest.TestCase):
                 self.assertEqual(manifest.to_sam().metadata.name.replace("-", "_"), names[0].replace("-", "_"))
 
     def test_manifest_lifecycle(self):
-        """A Guardrail is validated, applied, described, found, evaluated and deleted."""
+        """A Guardrail is validated, applied, described, selected by annotation, found, evaluated and deleted."""
         manifest = self.client.guardrails.example_manifest()
         name = f"sdk_live_test_{uuid.uuid4().hex[:8]}"
         manifest.metadata.name = name
+        manifest.metadata.annotations = {"example.com/sdk-live-test": name, "example.com/active": "true"}
         self.assertTrue(self.client.manifests.validate(manifest).valid)
         self.client.guardrails.apply(manifest)
         self.addCleanup(self.client.guardrails.delete, name)
@@ -154,6 +155,14 @@ class TestLive(unittest.TestCase):
         self.assertIsInstance(described, Manifest)
         self.assertEqual(described.metadata.name, name)
         self.assertEqual(self.client.manifests.get("Guardrail", name).names, [name])
+        self.assertEqual(described.metadata.annotations["example.com/sdk-live-test"], name)
+        selector = [f"example.com/sdk-live-test={name}", "example.com/active"]
+        self.assertEqual(self.client.manifests.get("Guardrail", annotation=selector).names, [name])
+        self.assertEqual(
+            self.client.manifests.get("Guardrail", annotation=selector + ["!example.com/active"]).names, []
+        )
+        with self.assertRaises(BadRequestError):
+            self.client.manifests.get("Guardrail", annotation="Not A Key=")
         guardrail = self.client.guardrails.find(name)
         self.assertEqual(self.client.guardrails.retrieve(guardrail.id).name, name)
         stage = guardrail.stage or "input"
@@ -167,7 +176,7 @@ class TestLive(unittest.TestCase):
         llmclient = self.client.llm_clients.find(LLMCLIENT)
         response = self.client.llm_clients.prompt(llmclient.id, "What is 17 times 23? Use the calculator.")
         self.assertIn("391", response.text.replace(",", ""))
-        self.assertIn(("calculator", "Function"), [(tool.name, tool.kind) for tool in llmclient.tools])
+        self.assertIn(("calculator", "Extension"), [(tool.name, tool.kind) for tool in llmclient.tools])
         self.client.llm_clients.extensions(llmclient.id)
         self.client.llm_clients.plugins(llmclient.id)
         self.client.llm_clients.api_keys(llmclient.id)

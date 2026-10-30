@@ -30,6 +30,16 @@ class TestBaseModels(unittest.TestCase):
         self.assertEqual(resource.to_dict()["hashedId"], "h")
         self.assertEqual(json.loads(resource.to_json(indent=None))["newField"], 2)
 
+    def test_annotations_and_detail_url(self):
+        """A resource's annotations are a map, also from the legacy list, and it reads detailUrl."""
+        resource = SmarterResource.model_validate(
+            {"id": 1, "name": "a", "annotations": [{"acme.com/a": 1}], "detailUrl": "/dashboard/x/"}
+        )
+        self.assertEqual(resource.annotations, {"acme.com/a": "1"})
+        self.assertEqual(resource.detail_url, "/dashboard/x/")
+        self.assertEqual(SmarterResource.model_validate({"id": 1, "name": "a", "annotations": None}).annotations, {})
+        self.assertEqual(SmarterResource(id=1, name="a").annotations, {})
+
 
 class TestManifest(unittest.TestCase):
     """Test Manifest and ManifestList."""
@@ -51,7 +61,7 @@ class TestManifest(unittest.TestCase):
             "spec:\n  config:\n    at: 2024-06-15 10:30:00\n    sizes: [2024-01-01]\n"
         )
         manifest = Manifest.from_yaml(text)
-        self.assertEqual(manifest.metadata.annotations, [{"example.com/release-date": "2024-06-15"}])
+        self.assertEqual(manifest.metadata.annotations, {"example.com/release-date": "2024-06-15"})
         self.assertEqual(manifest.spec["config"], {"at": "2024-06-15T10:30:00", "sizes": ["2024-01-01"]})
 
     def test_from_file_and_to_yaml(self):

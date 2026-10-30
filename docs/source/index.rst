@@ -1,5 +1,5 @@
-Smarter Python SDK
-==================
+Smarter Python SDK |project_version|
+====================================
 
 .. image:: https://img.shields.io/badge/a%20project%20of-The%20Smarter%20Project-2F6FEB
    :target: https://smarter.sh
@@ -17,7 +17,7 @@ Smarter Python SDK
    :target: https://github.com/smarter-sh/smarter-python/releases
    :alt: Latest release
 
-.. image:: https://img.shields.io/pypi/v/smarter-api?logo=pypi&label=PyPI
+.. image:: https://img.shields.io/pypi/v/smarter-api?logo=pypi&logoColor=white&label=PyPI
    :target: https://pypi.org/project/smarter-api/
    :alt: PyPI
 

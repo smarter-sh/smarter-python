@@ -20,6 +20,7 @@ from __future__ import annotations
 
 from smarter.core.exceptions import SmarterValueError
 from smarter.core.typing import SmarterJsonObjectType, SmarterJsonType
+from smarter.models.annotations import AnnotationSelector, annotation_selector
 from smarter.models.base import SmarterModel
 from smarter.models.journal import SmarterJournaledResponse, SmarterJournalMessage
 from smarter.models.manifest import Manifest, ManifestList
@@ -89,18 +90,28 @@ class Manifests(SmarterAPIResource):
         )
         return response.data or ManifestValidation(valid=False)
 
-    def get(self, kind: str, name: str | None = None) -> ManifestList:
+    def get(self, kind: str, name: str | None = None, *, annotation: AnnotationSelector | None = None) -> ManifestList:
         """
         The resources of one kind, as a table.
 
+        .. code-block:: python
+
+            client.manifests.get("LLMClient", annotation="acme.com/crm-account-id=A-10042")
+            client.manifests.get("LLMClient", annotation=["acme.com/crm-account-id", "!acme.com/archived"])
+
         :param kind: The manifest kind, e.g. ``LLMClient``.
         :param name: Only the resource of this name.
+        :param annotation: Only the resources that match this annotation selector: one requirement,
+            or a list of them that must all match, in the syntax of Kubernetes label selectors
+            (``key``, ``!key``, ``key=value``, ``key!=value``). See
+            :data:`smarter.models.annotations.AnnotationSelector`.
         :returns: The table: ``.items`` are its rows, and ``.names`` the resources' names.
+        :raises BadRequestError: If the annotation selector is invalid.
         """
         response = self._http.request(
             "POST",
             f"{CLI_PATH}get/{kind_segment(kind)}/",
-            params={"name": name},
+            params={"name": name, "annotation": annotation_selector(annotation)},
             cast_to=SmarterJournaledResponse[ManifestList],
         )
         result = response.data or ManifestList(kind=kind)

@@ -21,7 +21,13 @@ SmarterJsonType = JsonValue
 SmarterJsonObjectType = dict[str, JsonValue]
 """A JSON object whose shape is not fixed, e.g. a manifest's ``spec``, whose fields depend on its kind."""
 
+SmarterAnnotationsType = dict[str, str]
+"""A resource's annotations, as in Kubernetes: string keys mapped to string values.
+
+E.g. ``{"acme.com/crm-id": "42"}``.
+"""
+
 SmarterIdType = Union[int, str]
 """A resource's id: its integer primary key, or its hashed id, e.g. ``rMTAwMDAwNQx``."""
 
-__all__ = ["SmarterDictType", "SmarterIdType", "SmarterJsonObjectType", "SmarterJsonType"]
+__all__ = ["SmarterAnnotationsType", "SmarterDictType", "SmarterIdType", "SmarterJsonObjectType", "SmarterJsonType"]

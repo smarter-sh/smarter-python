@@ -34,11 +34,16 @@ class TestHttpHelpers(SmarterTestBase):
     """Test the transport's helper functions."""
 
     def test_query_params(self):
-        """Booleans become true and false, and None values are left out."""
+        """Booleans become true and false, None values are left out, and a list repeats its parameter."""
         self.assertEqual(
-            http.query_params({"a": True, "b": False, "c": None, "d": 3}), {"a": "true", "b": "false", "d": "3"}
+            http.query_params({"a": True, "b": False, "c": None, "d": 3}),
+            [("a", "true"), ("b", "false"), ("d", "3")],
         )
-        self.assertEqual(http.query_params(None), {})
+        self.assertEqual(
+            http.query_params({"annotation": ["x", None, "!y"], "tag": ("t",), "none": []}),
+            [("annotation", "x"), ("annotation", "!y"), ("tag", "t")],
+        )
+        self.assertEqual(http.query_params(None), [])
 
     def test_parse_body(self):
         """A body is its JSON, its text, or None when it is empty."""

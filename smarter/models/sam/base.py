@@ -1,8 +1,9 @@
 """The base class of the generated SAM models."""
 
 import yaml
-from pydantic import ConfigDict
+from pydantic import ConfigDict, model_validator
 
+from smarter.models.annotations import normalize_annotations
 from smarter.models.base import SmarterModel
 
 
@@ -21,6 +22,25 @@ class SAMModel(SmarterModel):
     model_config = ConfigDict(
         extra="allow", populate_by_name=True, regex_engine="python-re", use_attribute_docstrings=True
     )
+
+    @model_validator(mode="before")
+    @classmethod
+    def _legacy_annotations(cls, data: object) -> object:
+        """
+        Accept a metadata's annotations in the list form of Smarter 0.37 and earlier, as the platform does.
+
+        The platform's schemas describe only the map, so the generated ``annotations`` fields are maps.
+        A list of one-key maps, and values that YAML read as booleans, numbers or dates, are converted
+        to it. See :func:`smarter.models.annotations.normalize_annotations`.
+
+        :param data: The model's input, before validation.
+        :returns: The input, with its annotations as a map of strings.
+        """
+        if isinstance(data, dict) and "annotations" in cls.model_fields:
+            annotations = data.get("annotations")
+            if isinstance(annotations, (list, dict)):
+                data = {**data, "annotations": normalize_annotations(annotations)}
+        return data
 
     def to_manifest_dict(self) -> dict:
         """

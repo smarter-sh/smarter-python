@@ -10,7 +10,7 @@ JSON against a Pydantic model.
 import logging
 import random
 import time
-from collections.abc import Iterator, Mapping
+from collections.abc import Iterator, Mapping, Sequence
 from contextlib import contextmanager
 from functools import lru_cache
 from typing import Any, TypeVar, Union
@@ -44,10 +44,13 @@ logger = logging.getLogger("smarter.client")
 
 T = TypeVar("T")
 
-QueryParamValue = Union[str, int, float, bool, None]
+QueryParamScalar = Union[str, int, float, bool, None]
+"""One value of a query parameter."""
+
+QueryParamValue = Union[QueryParamScalar, Sequence[QueryParamScalar]]
 """A query parameter's value.
 
-None leaves the parameter out.
+None leaves the parameter out, and a list or tuple repeats it once per value.
 """
 
 USER_AGENT = f"smarter-python/{__version__}"
@@ -191,20 +194,35 @@ def retry_delay(attempt: int, response: httpx.Response | None = None) -> float:
     return min(0.5 * 2**attempt, 8.0) * (1 - 0.25 * random.random())  # nosec B311 - jitter, not security
 
 
-def query_params(params: Mapping[str, QueryParamValue] | None) -> dict[str, str]:
+def query_param(value: QueryParamScalar) -> str:
+    """
+    One query parameter's value as a string: a boolean as ``true`` or ``false``.
+
+    :param value: The value, which is not None.
+    :returns: The text that httpx sends.
+    """
+    return ("true" if value else "false") if isinstance(value, bool) else str(value)
+
+
+def query_params(params: Mapping[str, QueryParamValue] | None) -> list[tuple[str, QueryParamScalar]]:
     """
     Query parameters as strings: booleans as ``true`` or ``false``, and None values left out.
 
+    A list or tuple value is a repeated parameter, e.g. ``{"annotation": ["a", "!b"]}`` is sent as
+    ``?annotation=a&annotation=!b``.
+
     :param params: The parameters.
-    :returns: The parameters that httpx sends.
+    :returns: The parameters that httpx sends, in order.
     """
     if not params:
-        return {}
-    result: dict[str, str] = {}
+        return []
+    result: list[tuple[str, QueryParamScalar]] = []
     for key, value in params.items():
-        if value is None:
-            continue
-        result[key] = ("true" if value else "false") if isinstance(value, bool) else str(value)
+        # a list or tuple repeats the parameter; a string is one value, though it is a Sequence too.
+        values: Sequence[QueryParamScalar] = (
+            value if isinstance(value, (list, tuple)) else [value]  # type: ignore[list-item]
+        )
+        result.extend((key, query_param(item)) for item in values if item is not None)
     return result
 
 
@@ -464,6 +482,7 @@ class SmarterHttpClient:
 
 __all__ = [
     "CLIENT_NAME",
+    "QueryParamScalar",
     "QueryParamValue",
     "SmarterHttpClient",
     "USER_AGENT",
@@ -472,6 +491,7 @@ __all__ = [
     "journal_error",
     "make_status_error",
     "parse_body",
+    "query_param",
     "query_params",
     "retry_delay",
 ]

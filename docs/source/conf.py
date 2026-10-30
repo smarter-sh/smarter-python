@@ -26,6 +26,12 @@ copyright = f"{date.today().year}, {author}"  # noqa: A001
 version = __version__
 release = __version__
 
+# |project_version| puts the release in the home page's heading, the way
+# docs.smarter.sh does, so every reader can see which release the site documents.
+rst_epilog = f"""
+.. |project_version| replace:: v{release}
+"""
+
 SITE_URL = "https://docs.smarter-python.smarter.sh/"
 GITHUB_URL = "https://github.com/smarter-sh/smarter-python"
 
@@ -66,7 +72,7 @@ copybutton_prompt_is_regexp = True
 # -- HTML -----------------------------------------------------------------------
 
 html_theme = "sphinx_rtd_theme"
-html_title = f"smarter-python {__version__}"
+html_title = f"smarter-python v{__version__}"
 html_short_title = "smarter-python"
 html_baseurl = SITE_URL
 html_theme_options = {

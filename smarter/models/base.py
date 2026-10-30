@@ -9,10 +9,12 @@ are kept, and are available as attributes and in :meth:`SmarterModel.to_dict`.
 import json
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 from pydantic.alias_generators import to_camel
 
-from smarter.core.typing import SmarterDictType, SmarterJsonObjectType
+from smarter.core.typing import SmarterDictType
+
+from .annotations import SmarterAnnotations
 
 
 class SmarterModel(BaseModel):
@@ -87,12 +89,21 @@ class SmarterResource(SmarterCamelModel):
     description: str | None = None
     version: str | None = None
     tags: list[str] = []
-    annotations: list[SmarterJsonObjectType] = []
+    annotations: SmarterAnnotations = Field(
+        default_factory=dict,
+        description="Kubernetes-style annotations: string keys mapped to string values. "
+        "See smarter.models.annotations.",
+    )
     created_at: datetime | None = None
     updated_at: datetime | None = None
     user_profile: SmarterOwner | None = None
     can_delete: bool | None = None
     manifest_url: str | None = None
+    detail_url: str | None = Field(
+        None,
+        description="The url of the resource's detail in the web console: its manifest, the resources that it uses, "
+        "and those that use it.",
+    )
     ready: bool | None = None
 
 

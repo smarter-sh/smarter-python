@@ -59,6 +59,21 @@ class TestManifests(SmarterTestBase):
         self.route("POST", "cli/get/LLMClient/", json_body={"api": "smarter.sh/v1"})
         self.assertEqual(self.client.manifests.get("LLMClient").items, [])
 
+    def test_get_annotation_selector(self):
+        """Get() sends an annotation selector as repeated annotation parameters, and an invalid one is a 400."""
+        self.route("POST", "cli/get/LLMClient/", fixture="get_llmclient")
+        self.client.manifests.get("LLMClient", annotation=["acme.com/crm-id=A-1", "!acme.com/archived"])
+        self.assertEqual(
+            self.last_request.url.params.get_list("annotation"), ["acme.com/crm-id=A-1", "!acme.com/archived"]
+        )
+        self.client.manifests.get("LLMClient", annotation="acme.com/crm-id")
+        self.assertEqual(self.last_request.url.params.get_list("annotation"), ["acme.com/crm-id"])
+        self.client.manifests.get("LLMClient")
+        self.assertNotIn("annotation", self.last_request.url.params)
+        self.route("POST", "cli/get/LLMClient/", status=400, fixture="get_bad")
+        with self.assertRaises(BadRequestError):
+            self.client.manifests.get("LLMClient", annotation="Not A Key=")
+
     def test_describe(self):
         """Describe() returns the manifest, with its status."""
         self.route("POST", "cli/describe/LLMClient/", fixture="describe_llmclient")
