@@ -116,6 +116,7 @@ class Provider(SmarterCamelModel):
     description: str | None = None
     base_url: str | None = None
     is_active: bool | None = None
+    detail_url: str | None = Field(None, description="The url of the provider's detail in the web console.")
 
 
 class ProviderModel(SmarterCamelModel):

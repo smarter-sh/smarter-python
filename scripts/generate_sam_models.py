@@ -41,12 +41,23 @@ def module_name(kind: str) -> str:
     return kind.lower()
 
 
+def codegen() -> str:
+    """
+    The datamodel-codegen command: the one installed beside this Python, e.g. in venv/bin.
+
+    make sam-models runs this script with venv/bin/python, without activating the venv, so the command
+    isn't necessarily on PATH.
+    """
+    command = Path(sys.executable).parent / "datamodel-codegen"
+    return str(command) if command.exists() else "datamodel-codegen"
+
+
 def generate(kind: str) -> None:
     """Generate a kind's module from its saved schema."""
     output = PACKAGE / f"{module_name(kind)}.py"
     subprocess.run(  # nosec B603 B607 - fixed arguments
         [
-            "datamodel-codegen",
+            codegen(),
             "--input",
             str(DATA / f"{kind}.schema.json"),
             "--input-file-type",

@@ -112,6 +112,14 @@ class JournalPagination(SmarterCamelModel):
         "", description="The named filter that narrows the list, e.g. pending, or an empty string for none."
     )
     filters: list[str] = Field(default_factory=list, description="The named filters that the list offers.")
+    tags: list[str] = Field(default_factory=list, description="The tags that every entry of the list has.")
+    annotations: list[str] = Field(
+        default_factory=list,
+        description="The annotation selector's requirements that every entry matches, e.g. acme.com/crm-id=A-1.",
+    )
+    annotation_error: str = Field(
+        "", description="Why the annotation selector is invalid, in which case it is not applied, or an empty string."
+    )
 
 
 class JournalPage(SmarterModel):

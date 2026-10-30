@@ -75,6 +75,46 @@ The typed models build manifests in code, too:
 
 There is a model of every kind: see :doc:`Models <models>`.
 
+Annotations
+-----------
+
+A manifest's ``metadata.annotations`` are `annotations as in Kubernetes <https://docs.smarter.sh/en/latest/smarter-framework/smarter-manifests.html>`__: a map of string
+keys to string values that your own software attaches to a resource, e.g. to associate an LLMClient
+with an account in a CRM. A key is an optional DNS-subdomain prefix that names its owner, then a
+slash and a name, e.g. ``acme.com/crm-account-id``. The prefix ``smarter.sh`` and its subdomains are
+reserved for the platform.
+
+.. code-block:: yaml
+
+   metadata:
+     name: customer_support
+     annotations:
+       acme.com/crm-account-id: A-10042
+       acme.com/active: "true"
+
+Every model of a resource or a manifest has its annotations as a ``dict[str, str]``. Manifests of
+Smarter 0.37 and earlier wrote them as a list of one-key maps, which the platform still accepts on
+apply. So does the SDK: it converts the list, and values that YAML reads as booleans, numbers or
+dates, to the map of strings that the platform stores
+(:func:`~smarter.models.annotations.normalize_annotations`).
+
+.. code-block:: python
+
+   manifest = client.llm_clients.describe("customer_support")
+   manifest.metadata.annotations["acme.com/crm-account-id"]     # "A-10042"
+
+``get()`` takes an annotation selector, in the syntax of Kubernetes label selectors: ``key`` (the
+resource has the key), ``!key`` (it hasn't), ``key=value`` and ``key!=value``, which also matches
+resources without the key. Pass one requirement, or a list of them that must all match:
+
+.. code-block:: python
+
+   client.manifests.get("LLMClient", annotation="acme.com/crm-account-id=A-10042").names
+   client.manifests.get("LLMClient", annotation=["acme.com/crm-account-id", "!acme.com/archived"])
+
+The platform validates the selector, and an invalid one raises
+:class:`~smarter.core.exceptions.BadRequestError`.
+
 Manifests in CI/CD
 ------------------
 
