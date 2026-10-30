@@ -1,3 +1,19 @@
+# [1.0.0](https://github.com/smarter-sh/smarter-python/compare/v0.6.0...v1.0.0) (2026-10-30)
+
+
+### Features
+
+* **models:** sync with smarter v0.38.0, annotations become a map ([3159e9c](https://github.com/smarter-sh/smarter-python/commit/3159e9c59cd8f2cd83730529ba9f861fe5f85c12))
+
+
+### BREAKING CHANGES
+
+* **models:** annotations are a dict[str, str] on SmarterResource, ManifestMetadata, PromptChatApiPluginMeta and every generated SAM model, instead of a list of one-key dicts. Read them as a mapping, e.g. resource.annotations["acme.com/crm-id"]. The legacy list is still accepted as input and converted.
+
+Synced with smarter 9f2c3cda24b6602de9674e8cc20607180f5e7d3f
+
+Co-authored-by: Claude <noreply@anthropic.com>
+
 # [0.6.0](https://github.com/smarter-sh/smarter-python/compare/v0.5.4...v0.6.0) (2026-10-26)
 
 
