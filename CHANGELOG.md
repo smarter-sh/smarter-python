@@ -1,3 +1,10 @@
+## [1.0.1-alpha.1](https://github.com/smarter-sh/smarter-python/compare/v1.0.0...v1.0.1-alpha.1) (2026-11-01)
+
+
+### Bug Fixes
+
+* **contracts:** sync with smarter v0.40.4 ([76806fd](https://github.com/smarter-sh/smarter-python/commit/76806fd8e73bc8e5f26df4db96613d5c217d2b4a))
+
 # [1.0.0](https://github.com/smarter-sh/smarter-python/compare/v0.6.0...v1.0.0) (2026-10-30)
 
 

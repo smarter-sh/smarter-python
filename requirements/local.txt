@@ -47,7 +47,7 @@ codespell==2.4.3
     # via -r requirements/in/local.in
 coverage[toml]==7.17.0
     # via -r requirements/in/local.in
-datamodel-code-generator==0.34.0
+datamodel-code-generator==0.87.0
     # via
     #   -c requirements/in/constraints.in
     #   -r requirements/in/local.in
@@ -133,7 +133,7 @@ more-itertools==11.2.1
     #   inflect
     #   jaraco-classes
     #   jaraco-functools
-mypy==2.4.0
+mypy==2.4.1
     # via -r requirements/in/local.in
 mypy-extensions==1.1.0
     # via
@@ -160,7 +160,7 @@ pip-tools==7.6.2
     # via
     #   -c requirements/in/constraints.in
     #   -r requirements/in/local.in
-platformdirs==4.13.5
+platformdirs==4.14.0
     # via
     #   black
     #   virtualenv
@@ -182,7 +182,7 @@ pydantic-settings==2.16.1
     #   -r requirements/in/base.in
 pydocstringformatter==1.0.0
     # via -r requirements/in/local.in
-pyflakes==4.0.3
+pyflakes==4.1.0
     # via flake8
 pygments==2.21.0
     # via
@@ -237,7 +237,7 @@ smarter-types==0.1.0
     #   -r requirements/in/base.in
 snowballstemmer==3.1.1
     # via sphinx
-sphinx==9.1.1
+sphinx==9.2.0
     # via
     #   -r requirements/in/local.in
     #   sphinx-copybutton

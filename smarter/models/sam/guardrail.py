@@ -212,7 +212,7 @@ class SAMGuardrailSpecConfig(SAMModel):
     """
     Guardrail.spec.config.replacement[str]: what redact and transform replace each match with.
 
-    Defaults to [REDACTED], which an empty replacement also means. {label} is replaced with what matched, e.g. credit_card. For the regex strategy, transform may refer to groups, e.g. \1.
+    Defaults to [REDACTED], which an empty replacement also means. {label} is replaced with what matched, e.g. credit_card. For the regex strategy, transform may refer to groups, e.g. \\1.
     """
     severity: conint(ge=1, le=5) | None = Field(3, title="Severity")
     """Guardrail.spec.config.severity[int]: from 1 (low) to 5 (critical), for reporting and review."""
