@@ -160,7 +160,7 @@ pip-tools==7.6.2
     # via
     #   -c requirements/in/constraints.in
     #   -r requirements/in/local.in
-platformdirs==4.13.5
+platformdirs==4.14.0
     # via
     #   black
     #   virtualenv
