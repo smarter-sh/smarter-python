@@ -133,7 +133,7 @@ more-itertools==11.2.1
     #   inflect
     #   jaraco-classes
     #   jaraco-functools
-mypy==2.4.0
+mypy==2.4.1
     # via -r requirements/in/local.in
 mypy-extensions==1.1.0
     # via
