@@ -237,7 +237,7 @@ class Parameter(SAMModel):
 class ApiData(SAMModel):
     """Smarter API - apiData class."""
 
-    body: dict[str, Any] | list | None = Field(None, title="Body")
+    body: dict[str, Any] | list[Any] | None = Field(None, title="Body")
     """Any valid JSON object containing the body of the API request, if applicable."""
     endpoint: constr(max_length=255) = Field(..., title="Endpoint")
     """
