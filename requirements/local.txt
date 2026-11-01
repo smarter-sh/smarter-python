@@ -182,7 +182,7 @@ pydantic-settings==2.16.1
     #   -r requirements/in/base.in
 pydocstringformatter==1.0.0
     # via -r requirements/in/local.in
-pyflakes==4.0.3
+pyflakes==4.1.0
     # via flake8
 pygments==2.21.0
     # via
