@@ -1,0 +1,23 @@
+---
+#------------------------------------------------------------------------------
+# Tests: the entry point of the organization's nightly Repository Tests
+# (smarter-sh/automation, scripts/repository_tests.py), which starts each
+# repository's .github/workflows/tests.yml with a workflow_dispatch event.
+#
+# It runs the whole of CI (ci.yml). Pull requests and releases call ci.yml
+# directly; this file only exists so the nightly run can find and start it.
+#------------------------------------------------------------------------------
+name: Tests
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    name: CI
+    uses: ./.github/workflows/ci.yml
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
