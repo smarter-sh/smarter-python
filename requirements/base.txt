@@ -38,7 +38,7 @@ pydantic==2.14.2
     #   -c requirements/in/constraints.in
     #   -r requirements/in/base.in
     #   pydantic-settings
-pydantic-core==2.50.1
+pydantic-core==2.50.2
     # via pydantic
 pydantic-settings==2.16.1
     # via
