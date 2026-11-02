@@ -141,7 +141,7 @@ mypy-extensions==1.1.0
     #   mypy
 nh3==0.3.7
     # via readme-renderer
-nodeenv==1.11.0
+nodeenv==1.11.1
     # via pre-commit
 packaging==26.3
     # via
