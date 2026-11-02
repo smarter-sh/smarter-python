@@ -33,7 +33,7 @@ idna==3.20
     #   httpx
 inflection==0.5.1
     # via smarter-types
-pydantic==2.14.1
+pydantic==2.14.2
     # via
     #   -c requirements/in/constraints.in
     #   -r requirements/in/base.in
