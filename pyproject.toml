@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "smarter-api"
 dynamic = ["version"]
-description = "The official Python SDK of the Smarter platform's api."
+description = "The official Python SDK of the Smarter Project's api."
 readme = "README.md"
 license = "AGPL-3.0-or-later"
 license-files = ["LICENSE.txt"]

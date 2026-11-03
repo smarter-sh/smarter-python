@@ -69,7 +69,7 @@ test:
 	@echo "==============================================================================="
 	$(BIN)/python -m unittest discover -s tests -t .
 
-# the SDK against a running Smarter platform, e.g. the local one:
+# the SDK against a running Smarter installation, e.g. the local one:
 # SMARTER_BASE_URL=http://localhost:9357 SMARTER_API_KEY=... make test-live
 # These prompt an LLMClient, which makes billable LLM requests.
 test-live:
@@ -204,7 +204,7 @@ help:
 	@echo 'python-requirements    - Compile requirements/in/*.in into the pinned requirements/*.txt, and install them'
 	@echo 'check-python           - Verify that Python 3.10 or newer is installed'
 	@echo 'test                   - Run the unit tests, which never reach a platform'
-	@echo 'test-live              - Test against a running Smarter platform (SMARTER_BASE_URL, SMARTER_API_KEY)'
+	@echo 'test-live              - Test against a running Smarter installation (SMARTER_BASE_URL, SMARTER_API_KEY)'
 	@echo 'coverage               - Run the unit tests with a coverage report, and write coverage.xml'
 	@echo 'build                  - Build the sdist and wheel into dist/, and check them'
 	@echo 'clean                  - Remove build, test and coverage artifacts'

@@ -3,7 +3,7 @@ ADR Introduction
 
 Architectural Design Records (ADRs) are short documents that capture a single architectural or design decision, its context, and its consequences. Less is more: keep them brief.
 
-These are the ADRs of the Smarter Python SDK. They follow the Smarter platform's own `ADRs <https://github.com/smarter-sh/smarter/tree/main/docs/source/adr>`__: where the SDK applies a platform decision, its ADR says so and links to it, and adapts it to a library that runs in other people's software. The platform's decisions about its own runtime (Django, Docker, Kubernetes, the database, Celery, React, templates, feature flags, internationalization) don't apply to the SDK and are not repeated here.
+These are the ADRs of the Smarter Python SDK. They follow the Smarter Project's own `ADRs <https://github.com/smarter-sh/smarter/tree/main/docs/source/adr>`__: where the SDK applies a platform decision, its ADR says so and links to it, and adapts it to a library that runs in other people's software. The platform's decisions about its own runtime (Django, Docker, Kubernetes, the database, Celery, React, templates, feature flags, internationalization) don't apply to the SDK and are not repeated here.
 
 See: `Michael Nygard's ADRs <https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions.html>`__
 

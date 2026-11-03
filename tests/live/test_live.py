@@ -1,5 +1,5 @@
 """
-Test the SDK against a running Smarter platform.
+Test the SDK against a running Smarter installation.
 
 These tests are skipped unless ``SMARTER_TEST_LIVE=true``. They read the client's configuration
 as the SDK always does (``SMARTER_API_KEY``, ``SMARTER_BASE_URL``, ...), e.g.:

@@ -1,7 +1,7 @@
 """
 Type aliases of the Smarter SDK.
 
-These mirror ``smarter.lib.typing`` in the Smarter platform. This module imports only from the
+These mirror ``smarter.lib.typing`` in the Smarter Project. This module imports only from the
 standard library and pydantic, so that any module of the SDK can import it without an import cycle.
 """
 

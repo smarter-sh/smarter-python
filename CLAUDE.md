@@ -2,8 +2,8 @@
 
 Guidance for Claude Code (and other coding agents) working in this repository.
 
-smarter-python is the Smarter platform's official Python SDK, published to PyPI
-as `smarter-api`, with the import name `smarter`. It is to the Smarter platform
+smarter-python is the Smarter Project's official Python SDK, published to PyPI
+as `smarter-api`, with the import name `smarter`. It is to the Smarter Project
 ([smarter-sh/smarter](https://github.com/smarter-sh/smarter), usually checked
 out beside this repository as `../smarter`) what the `openai` package is to the
 OpenAI api: the library that Python programmers import to build software on

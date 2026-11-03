@@ -1,7 +1,7 @@
 """
 The base class of the SDK's unit tests.
 
-The Smarter platform's tests subclass ``SmarterTestBase`` (ADR-013). The SDK's do too: this
+The Smarter Project's tests subclass ``SmarterTestBase`` (ADR-013). The SDK's do too: this
 ``SmarterTestBase`` gives each test a :class:`smarter.Smarter` client whose requests never leave the
 process. They are answered by an ``httpx.MockTransport`` from the routes that the test registers,
 usually with the sanitized JSON of a real platform response from ``tests/data/``.

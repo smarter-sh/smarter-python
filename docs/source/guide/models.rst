@@ -50,7 +50,7 @@ The platform publishes the contracts of its APIs as Pydantic models, and the SDK
    * - :mod:`smarter.models.react`
      - The `Django-React integration <https://docs.smarter.sh/en/latest/smarter-framework/developer-reference/react-integration.html>`__ contract: a
        React app's Vite manifest, and the assets that a template includes, for tools that build React
-       apps for a Smarter platform.
+       apps for a Smarter installation.
 
 The SDK's tests compare the chat and journal mirrors with the platform's committed JSON Schemas
 and examples, and fail when the platform adds a field that the SDK doesn't declare yet.

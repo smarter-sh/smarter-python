@@ -10,7 +10,7 @@ needs it. Each one contains a `SKILL.md` file, and sometimes `references/` and
 documented and committed. They are developer tooling, like the `Makefile` and
 `.pre-commit-config.yaml`, and no SDK code loads them.
 
-They are adapted from the Smarter platform's own skills, in
+They are adapted from the Smarter Project's own skills, in
 [smarter-sh/smarter/skills](https://github.com/smarter-sh/smarter/tree/main/skills),
 so that the SDK and the platform are developed the same way. The platform's
 skills that only concern the platform (Django apps, migrations, management

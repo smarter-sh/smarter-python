@@ -19,7 +19,7 @@ class WhoAmI(SmarterModel):
 class ApiVersion(SmarterModel):
     """The platform's version, and the versions of its main Python packages."""
 
-    version: str = Field(..., description="The Smarter platform's semantic version.")
+    version: str = Field(..., description="The Smarter installation's semantic version.")
     python: dict[str, str | None] = Field(default_factory=dict, description="Python package versions, by package.")
 
 

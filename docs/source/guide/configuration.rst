@@ -1,7 +1,7 @@
 Configuration
 =============
 
-A client needs a Smarter API key and the url of your Smarter platform. Every argument of
+A client needs a Smarter API key and the url of your Smarter installation. Every argument of
 ``Smarter(...)`` is optional, because each value is looked up in this order:
 
 1. the arguments of ``Smarter(...)``,

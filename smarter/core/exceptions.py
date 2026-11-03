@@ -2,7 +2,7 @@
 The exceptions of the Smarter Python SDK.
 
 Every exception that the SDK raises is a :class:`SmarterError`, so a caller can catch them all with
-one ``except`` clause. This follows the Smarter platform's own rule (ADR-012) that exceptions
+one ``except`` clause. This follows the Smarter Project's own rule (ADR-012) that exceptions
 subclass one hierarchy.
 
 The api errors mirror the http status that the Smarter api returned:
@@ -93,7 +93,7 @@ class APIResponseValidationError(APIError):
     """
     The api's response does not match the SDK's model of it.
 
-    This usually means that the SDK and the Smarter platform are of incompatible versions.
+    This usually means that the SDK and the Smarter installation are of incompatible versions.
 
     :param response: The http response.
     :param body: The response's parsed JSON body.

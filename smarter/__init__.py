@@ -1,5 +1,5 @@
 """
-The Smarter Python SDK: the official Python client of the Smarter platform's api.
+The Smarter Python SDK: the official Python client of the Smarter Project's api.
 
 .. code-block:: python
 

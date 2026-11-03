@@ -50,7 +50,7 @@ from smarter.resources import (
 
 class Smarter:
     """
-    A client of a Smarter platform's api.
+    A client of a Smarter installation's api.
 
     Every argument is optional. See :mod:`smarter.core.conf` for where each is looked up.
 

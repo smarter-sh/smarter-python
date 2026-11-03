@@ -5,7 +5,7 @@
 #
 # - lint: run the pre-commit hooks on every file.
 # - test: run the unit tests with coverage on every supported Python version.
-#   They never reach a Smarter platform: an httpx MockTransport answers every
+#   They never reach a Smarter installation: an httpx MockTransport answers every
 #   request, and the live tests (tests/live/) skip, because SMARTER_TEST_LIVE
 #   is not set. Each job uploads its coverage to Codecov, which merges them.
 # - docs: build the Sphinx site, with warnings as errors.

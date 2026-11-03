@@ -1,6 +1,6 @@
 ---
 name: monthly-maintenance
-description: Use when asked to do smarter-python's monthly maintenance, or either half of it - (1) bring the SDK back in sync with the Smarter platform by reviewing the platform's commits since smarter-python's last release and changing the SDK, its models, tests and docs as needed, and (2) update all of the SDK's Python requirements files, retest, and, if the tests pass, write a "fix" git commit. Covers finding the baseline, reading the delta by area, the mechanical refreshes (SAM models, contracts, api reference), the dependency update and its tests, and the commit messages.
+description: Use when asked to do smarter-python's monthly maintenance, or either half of it - (1) bring the SDK back in sync with the Smarter Project by reviewing the platform's commits since smarter-python's last release and changing the SDK, its models, tests and docs as needed, and (2) update all of the SDK's Python requirements files, retest, and, if the tests pass, write a "fix" git commit. Covers finding the baseline, reading the delta by area, the mechanical refreshes (SAM models, contracts, api reference), the dependency update and its tests, and the commit messages.
 ---
 
 # smarter-python Monthly Maintenance
