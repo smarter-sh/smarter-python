@@ -97,7 +97,7 @@ class Proxy(SmarterCamelModel):
     name: str
     description: str | None = None
     provider: str | None = None
-    url: str | None = Field(None, description="The proxy's base url on the Smarter platform.")
+    url: str | None = Field(None, description="The proxy's base url on the Smarter installation.")
     upstream_url: str | None = None
     allowed_paths: list[str] = []
     is_active: bool | None = None

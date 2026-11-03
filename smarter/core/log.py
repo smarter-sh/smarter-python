@@ -6,7 +6,7 @@ as a library should, adds no handlers unless asked to. Set ``SMARTER_LOG=info`` 
 request's method, url, status and duration to stderr, or ``SMARTER_LOG=debug`` to log their bodies
 too. Or configure the ``smarter`` logger as you would any other.
 
-The Smarter platform controls its logging per module with waffle switches (ADR-011). The SDK's
+The Smarter Project controls its logging per module with waffle switches (ADR-011). The SDK's
 equivalent is the logger hierarchy: e.g. ``logging.getLogger("smarter.client").setLevel(...)``.
 
 Api keys are never logged: see :func:`mask_secret`.

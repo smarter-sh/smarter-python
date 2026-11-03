@@ -1,5 +1,5 @@
 """
-Generate the SDK's SAM models from the Smarter platform's committed JSON Schemas.
+Generate the SDK's SAM models from the Smarter Project's committed JSON Schemas.
 
 The platform's SAM (Smarter Application Manifest) models are Pydantic models that depend on Django,
 so the SDK cannot import them. The platform commits each kind's JSON Schema, generated from those
@@ -29,7 +29,7 @@ DATA = ROOT / "tests" / "data" / "sam"
 PACKAGE = ROOT / "smarter" / "models" / "sam"
 
 HEADER = '''"""
-SAM model of the ``{kind}`` kind, generated from the Smarter platform's JSON Schema.
+SAM model of the ``{kind}`` kind, generated from the Smarter Project's JSON Schema.
 
 Do not edit: run ``scripts/generate_sam_models.py``. See :mod:`smarter.models.sam`.
 """
@@ -99,7 +99,7 @@ def write_package(kinds: list[str]) -> None:
     registry = "\n".join(f'    "{kind}": SAM{kind},' for kind in kinds)
     names = "\n".join(f'    "SAM{kind}",' for kind in kinds)
     (PACKAGE / "__init__.py").write_text(f'''"""
-Typed models of every SAM (Smarter Application Manifest) kind, generated from the Smarter platform's JSON Schemas.
+Typed models of every SAM (Smarter Application Manifest) kind, generated from the Smarter Project's JSON Schemas.
 
 Each model describes a complete manifest of its kind: ``apiVersion``, ``kind``, ``metadata``,
 ``spec`` and the read-only ``status``. Use them to build manifests in code, with your editor's

@@ -1,11 +1,11 @@
 ---
 name: smarter-python-development
-description: Start here for any change to the smarter-python repository, the Smarter platform's Python SDK (the smarter-api PyPI package). Gives the non-negotiable rules, the SDK's architecture (client, transport, resources, models, the generated SAM models and the mirrored api contracts), how to cover a new platform endpoint, and an index of the narrower skills to load for each kind of work.
+description: Start here for any change to the smarter-python repository, the Smarter Project's Python SDK (the smarter-api PyPI package). Gives the non-negotiable rules, the SDK's architecture (client, transport, resources, models, the generated SAM models and the mirrored api contracts), how to cover a new platform endpoint, and an index of the narrower skills to load for each kind of work.
 ---
 
 # Smarter Python SDK Development
 
-`smarter-api` (import name `smarter`) is to the Smarter platform what the
+`smarter-api` (import name `smarter`) is to the Smarter Project what the
 `openai` package is to the OpenAI api: the library that Python programmers
 import to build custom software on their own Smarter installation, running
 locally or on Kubernetes. The platform itself is

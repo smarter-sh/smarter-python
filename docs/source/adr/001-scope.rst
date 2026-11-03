@@ -9,7 +9,7 @@ Accepted
 Context
 -------
 
-The Smarter platform is managed through its REST api. The smarter cli (Go) serves people at a terminal, and Smarter Chat (React) serves web pages, but Python programmers who want to build their own software on a Smarter installation had only a prototype library that covered one deprecated endpoint. Without a complete SDK, the only way to integrate deeply with Smarter was to customize or fork the platform.
+The Smarter Project is managed through its REST api. The smarter cli (Go) serves people at a terminal, and Smarter Chat (React) serves web pages, but Python programmers who want to build their own software on a Smarter installation had only a prototype library that covered one deprecated endpoint. Without a complete SDK, the only way to integrate deeply with Smarter was to customize or fork the platform.
 
 Decision
 --------

@@ -1,7 +1,7 @@
 """
 The configuration of the Smarter SDK.
 
-A client needs an api key and the base url of a Smarter platform. Each is taken from the first of
+A client needs an api key and the base url of a Smarter installation. Each is taken from the first of
 these that sets it:
 
 1. the arguments of :class:`smarter.Smarter`,
@@ -16,7 +16,7 @@ Without an explicit base url, the url is derived from the environment as the cli
 ``local`` is ``http://localhost:9357``, ``alpha``, ``beta`` and ``next`` are
 ``https://<environment>.<root domain>``, and ``prod`` is ``https://<root domain>``.
 
-This follows the Smarter platform's settings design (ADR-007): one validated Pydantic settings
+This follows the Smarter Project's settings design (ADR-007): one validated Pydantic settings
 model is the only place that reads the environment.
 """
 
@@ -39,7 +39,7 @@ SmarterEnvironment = Literal["local", "alpha", "beta", "next", "prod"]
 DEFAULT_ENVIRONMENT: SmarterEnvironment = "prod"
 DEFAULT_ROOT_DOMAIN = "platform.smarter.sh"
 LOCAL_URL = "http://localhost:9357"
-"""The url of the Smarter platform's local development server."""
+"""The url of the Smarter Project's local development server."""
 
 API_PATH = "/api/v1/"
 """The path of the Smarter api, which every request url is relative to."""

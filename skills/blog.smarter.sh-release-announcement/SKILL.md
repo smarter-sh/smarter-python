@@ -70,7 +70,7 @@ python3 -m venv <scratchpad>/venv-announce
 <scratchpad>/venv-announce/bin/pip install "smarter-api==X.Y.Z"
 ```
 
-An example that needs a server, such as a Smarter platform or Redis, runs
+An example that needs a server, such as a Smarter installation or Redis, runs
 against a local one. If you can't run an example, say so in your reply.
 
 ## 4. Structure

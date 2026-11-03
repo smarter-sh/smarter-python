@@ -1,7 +1,7 @@
 """
 The base classes of the SDK's response models.
 
-Every model allows extra fields. The Smarter platform adds fields to its responses in minor
+Every model allows extra fields. The Smarter Project adds fields to its responses in minor
 releases, and an SDK that rejected them would break whenever the platform is upgraded. Extra fields
 are kept, and are available as attributes and in :meth:`SmarterModel.to_dict`.
 """

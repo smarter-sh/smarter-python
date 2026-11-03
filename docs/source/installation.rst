@@ -10,7 +10,7 @@ name is ``smarter``. It needs Python 3.10 or newer, and depends on httpx, Pydant
 pydantic-settings and PyYAML. It ships a ``py.typed`` marker, so type checkers read its
 annotations.
 
-You also need a Smarter platform to connect to, and an api key of one of its users. To run a
+You also need a Smarter installation to connect to, and an api key of one of its users. To run a
 platform on your own computer, see the platform's
 `Quick Start Guide <https://docs.smarter.sh/en/latest/smarter-platform/installation/quick-start.html>`__.
 

@@ -1,6 +1,6 @@
 # Canonical Git Commit
 
-A real Smarter platform commit (`fix(passthrough)`, released in 0.17.4), with
+A real Smarter Project commit (`fix(passthrough)`, released in 0.17.4), with
 this repository's authorship. What makes it a good one:
 
 - The subject has a type and the Django app as its scope, and it says what the

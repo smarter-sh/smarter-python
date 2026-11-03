@@ -2,7 +2,7 @@
 The SAM manifest kinds, and the order in which to apply a set of manifests.
 
 :class:`SAMKinds` is defined in `smarter-types <https://docs.smarter-types.smarter.sh/>`__, the package
-that the SDK shares with the Smarter platform, and is re-exported here, so that it is the platform's
+that the SDK shares with the Smarter Project, and is re-exported here, so that it is the platform's
 own definition of which kinds exist.
 
 SAM resources refer to one another by name, so a set of manifests, e.g. a repository of them, must

@@ -1,6 +1,6 @@
 ---
 name: smarter-python-testing
-description: Use when writing, fixing or running the smarter-python SDK's tests, or raising its coverage. Covers the unit tests (SmarterTestBase, routes answered by an httpx MockTransport, sanitized fixtures in tests/data), the opt-in live tests against a running Smarter platform, the contract and SAM model tests, coverage, and what never to do in a test.
+description: Use when writing, fixing or running the smarter-python SDK's tests, or raising its coverage. Covers the unit tests (SmarterTestBase, routes answered by an httpx MockTransport, sanitized fixtures in tests/data), the opt-in live tests against a running Smarter installation, the contract and SAM model tests, coverage, and what never to do in a test.
 ---
 
 # Smarter Python SDK Testing

@@ -32,11 +32,11 @@ Smarter Python SDK |project_version|
 
 The Smarter Python SDK is the official Python library of the `Smarter API <https://docs.smarter.sh/en/latest/smarter-framework/smarter-api.html>`__. It is
 to Smarter what the ``openai`` package is to the OpenAI API: one ``pip install`` gives your Python
-software typed, complete access to your own Smarter platform, whether it runs on your laptop or on
+software typed, complete access to your own Smarter installation, whether it runs on your laptop or on
 `Kubernetes <https://docs.smarter.sh/en/latest/smarter-framework/smarter-on-kubernetes.html>`__.
 
 Use it to build custom software that is tightly integrated with your Smarter resources, without
-customizing or forking the Smarter platform: a web application that chats with your
+customizing or forking the Smarter Project: a web application that chats with your
 `LLMClients <https://docs.smarter.sh/en/latest/smarter-resources/smarter-llmclient.html>`__, a CI/CD job that applies your
 `manifests <https://docs.smarter.sh/en/latest/smarter-framework/smarter-manifests.html>`__, a data pipeline that loads documents into a
 `Vectorstore <https://docs.smarter.sh/en/latest/smarter-resources/smarter-vectorstore.html>`__, a service that calls the tools of your

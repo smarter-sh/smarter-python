@@ -1,5 +1,5 @@
 """
-Pydantic models of the Smarter platform's Django-React integration.
+Pydantic models of the Smarter Project's Django-React integration.
 
 A React app's Vite manifest, and the assets that a template includes.
 
@@ -8,7 +8,7 @@ The platform's web console pages are React apps that Django hosts.
 Vite-generated ``manifest.json``, and each ``<app>_react_assets`` template tag returns the files
 that a template includes. These models are a copy of the platform's
 ``smarter.lib.django.templatetags.smarter_react_contract``, which is pure Pydantic, so that tools
-that build or check React apps for a Smarter platform can use them without the platform.
+that build or check React apps for a Smarter installation can use them without the platform.
 
 - :class:`ViteManifest` is a Vite-generated React ``manifest.json``: a map of
   :class:`ViteManifestChunk` keyed by source path. The manager validates the

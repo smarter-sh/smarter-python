@@ -1,5 +1,5 @@
 """
-SAM model of the ``Guardrail`` kind, generated from the Smarter platform's JSON Schema.
+SAM model of the ``Guardrail`` kind, generated from the Smarter Project's JSON Schema.
 
 Do not edit: run ``scripts/generate_sam_models.py``. See :mod:`smarter.models.sam`.
 """

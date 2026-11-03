@@ -1,5 +1,5 @@
 """
-Test the SDK against a running Smarter platform.
+Test the SDK against a running Smarter installation.
 
 These tests are skipped unless ``SMARTER_TEST_LIVE=true``. They read the client's configuration
 as the SDK always does (``SMARTER_API_KEY``, ``SMARTER_BASE_URL``, ...), e.g.:
@@ -187,7 +187,7 @@ class TestLive(unittest.TestCase):
         llmclient = self.client.llm_clients.find(LLMCLIENT)
         chat = self.client.llm_clients.chat(llmclient.hashed_id or llmclient.id)
         self.assertIn("1024", chat.send("What is 2 to the 10th power? Use the calculator.").text.replace(",", ""))
-        with chat.stream("Divide that by 4, with the calculator.") as stream:
+        with chat.stream("Divide your last answer by 4, with the calculator.") as stream:
             events = list(stream)
         self.assertTrue(any(event.type == "llm_request" for event in events))
         self.assertIn("256", stream.response.text)
