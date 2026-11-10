@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import builtins
+
 from smarter.models.misc import Provider, ProviderModel
 
 from .base import SmarterAPIResource, resource_id
@@ -29,7 +31,7 @@ class Providers(SmarterAPIResource):
         """
         return self._http.request("GET", f"{self.path}{resource_id(name)}/", cast_to=Provider)
 
-    def models(self, name: str) -> list[ProviderModel]:
+    def models(self, name: str) -> builtins.list[ProviderModel]:
         """
         A provider's models.
 

@@ -44,7 +44,7 @@ def resource_id(value: SmarterIdType) -> str:
     return text
 
 
-class SmarterAPIResource:
+class SmarterAPIResource:  # pylint: disable=too-few-public-methods
     """
     A group of api operations.
 

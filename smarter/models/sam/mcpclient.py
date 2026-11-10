@@ -4,12 +4,16 @@ SAM model of the ``MCPClient`` kind, generated from the Smarter Project's JSON S
 Do not edit: run ``scripts/generate_sam_models.py``. See :mod:`smarter.models.sam`.
 """
 
+# The docstrings are the schema's descriptions, and the enum members are its values, as is.
+# pylint: disable=line-too-long,invalid-name
+
 from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
+from typing import Annotated
 
-from pydantic import Field, conint
+from pydantic import Field
 
 from smarter.models.sam.base import SAMModel
 
@@ -42,7 +46,7 @@ class SAMMCPClientMetadata(SAMModel):
     """
     Annotations, as in Kubernetes: a map of keys to string values that clients and integrations attach to a resource for their own purposes, e.g. to associate it with a resource in another system.
 
-    A key is an optional DNS-subdomain prefix that names its owner, then a slash and a name of one or more slash-separated segments, e.g. 'acme.com/crm-account-id'. The prefix 'smarter.sh' and its subdomains are reserved for the Smarter platform. Values are strings: unquoted YAML scalars such as true, 42 or dates are converted to strings, and structured data belongs in a JSON string. All annotations together are limited to 256 KiB. The list of one-key maps of older manifests, e.g. [{'acme.com/crm-account-id': 'A-10042'}], is also accepted.
+    A key is an optional DNS-subdomain prefix that names its owner, then a slash and a name of one or more slash-separated segments, e.g. 'acme.com/crm-account-id'. The prefix 'smarter.sh' and its subdomains are reserved for the Smarter Project. Values are strings: unquoted YAML scalars such as true, 42 or dates are converted to strings, and structured data belongs in a JSON string. All annotations together are limited to 256 KiB. The list of one-key maps of older manifests, e.g. [{'acme.com/crm-account-id': 'A-10042'}], is also accepted.
     """
     description: str | None = Field(..., title="Description")
     """
@@ -107,13 +111,13 @@ class SAMMCPClientSpecConfig(SAMModel):
     """
     apiKeyHeader: str | None = Field("X-API-Key", title="Apikeyheader")
     """MCPClient.spec.config.apiKeyHeader[str]: the HTTP header that carries an api_key credential."""
-    authType: AuthType | None = Field("none", title="Authtype")
+    authType: AuthType | None = Field(AuthType.none, title="Authtype")
     """
     MCPClient.spec.config.authType[str]: how to authenticate with the MCP server.
 
     One of: ['none', 'api_key', 'bearer_token', 'oauth2']. oauth2 sends an OAuth access token, obtained elsewhere, as a bearer token.
     """
-    cacheTtl: conint(ge=0, le=86400) | None = Field(3600, title="Cachettl")
+    cacheTtl: Annotated[int, Field(ge=0, le=86400)] | None = Field(3600, title="Cachettl")
     """
     MCPClient.spec.config.cacheTtl[int]: seconds to cache the MCP server's tools, instructions and capabilities, and the results of its read-only tools and resource reads.
 
@@ -137,15 +141,15 @@ class SAMMCPClientSpecConfig(SAMModel):
     """MCPClient.spec.config.includeInstructions[bool]: add the MCP server's instructions to the system prompt."""
     isActive: bool | None = Field(True, title="Isactive")
     """MCPClient.spec.config.isActive[bool]: whether LLMClients use this MCPClient."""
-    priority: conint(ge=0) | None = Field(100, title="Priority")
+    priority: Annotated[int, Field(ge=0)] | None = Field(100, title="Priority")
     """
     MCPClient.spec.config.priority[int]: the order in which an LLMClient's MCPClients are offered to the LLM.
 
     Lower runs first.
     """
-    timeout: conint(ge=1, le=120) | None = Field(30, title="Timeout")
+    timeout: Annotated[int, Field(ge=1, le=120)] | None = Field(30, title="Timeout")
     """MCPClient.spec.config.timeout[int]: seconds to wait for the MCP server to connect and respond."""
-    transport: Transport | None = Field("http", title="Transport")
+    transport: Transport | None = Field(Transport.http, title="Transport")
     """
     MCPClient.spec.config.transport[str]: the MCP transport.
 

@@ -122,6 +122,43 @@ class TestLLMClients(SmarterTestBase):
         self.assertIsNone(config.history.prompt_tool_call_history)
         self.assertTrue(config.meta_data.is_authentication_required)
 
+    def test_provider_request(self):
+        """Provider_request() returns a session's conversation, as the body that Smarter sends to the LLM provider."""
+        self.route("POST", "llm-clients/5/provider-request/", fixture="provider_request")
+        body = self.client.llm_clients.provider_request(5, session_key="abc")
+        self.assertEqual(self.request_json(), {"session_key": "abc"})
+        self.assertEqual((body.model, body.temperature, body.max_completion_tokens), ("gpt-4o-mini", 1.0, 4096))
+        self.assertEqual(
+            [message.role for message in body.messages],
+            ["system", "assistant", "user", "assistant", "tool", "assistant"],
+        )
+        self.assertEqual(body.messages[3].tool_calls[0].function.name, "calculator")
+        self.assertEqual(
+            (body.messages[4].tool_call_id, body.messages[4].text), (body.messages[3].tool_calls[0].id, "16")
+        )
+        self.assertEqual(body.tools[0]["function"]["name"], "calculator")
+        self.assertEqual(body.tool_choice, "auto")
+        self.assertIsNone(body.reasoning_effort)
+
+    def test_provider_request_new_session(self):
+        """A new session's request body is the LLMClient's introduction, without tools."""
+        self.route(
+            "POST",
+            "llm-clients/rMTAwMDAwNQx/provider-request/",
+            json_body={"api": "smarter.sh/v1", "data": {"messages": [{"role": "system", "content": "Be brief."}]}},
+        )
+        body = self.client.llm_clients.provider_request("rMTAwMDAwNQx")
+        self.assertEqual(self.request_json(), {"session_key": None})
+        self.assertEqual([message.text for message in body.messages], ["Be brief."])
+        self.assertIsNone(body.model)
+        self.assertIsNone(body.tools)
+
+    def test_provider_request_not_found(self):
+        """An LLMClient that the user may not read, or a deployed LLMClient's own host, answers with a 404."""
+        self.route("POST", "llm-clients/5/provider-request/", status=404, json_body={"detail": "Not found."})
+        with self.assertRaises(ResourceNotFoundError):
+            self.client.llm_clients.provider_request(5)
+
     def test_prompt(self):
         """Prompt() sends the user's message, and returns the LLM's reply."""
         self.route("POST", "llm-clients/5/prompt/", json_body=self.prompt_response)

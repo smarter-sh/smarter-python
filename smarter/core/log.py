@@ -15,7 +15,7 @@ Api keys are never logged: see :func:`mask_secret`.
 import logging
 
 ROOT_LOGGER_NAME = "smarter"
-_configured = False
+_configured = False  # pylint: disable=invalid-name  # set once, by configure_logging()
 
 
 def mask_secret(secret: str | None) -> str:

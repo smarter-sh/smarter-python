@@ -4,12 +4,16 @@ SAM model of the ``ImageSearchPlugin`` kind, generated from the Smarter Project'
 Do not edit: run ``scripts/generate_sam_models.py``. See :mod:`smarter.models.sam`.
 """
 
+# The docstrings are the schema's descriptions, and the enum members are its values, as is.
+# pylint: disable=line-too-long,invalid-name
+
 from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
+from typing import Annotated
 
-from pydantic import Field, PositiveInt, confloat, conint, constr
+from pydantic import Field, PositiveInt
 
 from smarter.models.sam.base import SAMModel
 
@@ -31,13 +35,13 @@ class ImageSearchFilters(SAMModel):
 
     Any of: ['jpg', 'png', 'gif', 'svg', 'webp', 'avif', 'bmp', 'ico']
     """
-    minHeight: conint(ge=1, le=10000) | None = Field(None, title="Minheight")
+    minHeight: Annotated[int, Field(ge=1, le=10000)] | None = Field(None, title="Minheight")
     """
     ImageSearchPlugin.spec.filters.minHeight[int]: only images at least this many pixels high.
 
     Images whose height Brave does not report are skipped.
     """
-    minWidth: conint(ge=1, le=10000) | None = Field(None, title="Minwidth")
+    minWidth: Annotated[int, Field(ge=1, le=10000)] | None = Field(None, title="Minwidth")
     """ImageSearchPlugin.spec.filters.minWidth[int]: only images at least this many pixels wide. Images whose width Brave does not report are skipped."""
 
 
@@ -60,11 +64,11 @@ class ImageSearchParams(SAMModel):
     query itself, which the LLM supplies. See ``imageSearchData.queryTerms``.
     """
 
-    count: conint(ge=1, le=20) | None = Field(10, title="Count")
+    count: Annotated[int, Field(ge=1, le=20)] | None = Field(10, title="Count")
     """ImageSearchPlugin.spec.searchParams.count[int]: the maximum number of images per search, 1 to 20."""
     country: str | None = Field(None, title="Country")
     """ImageSearchPlugin.spec.searchParams.country[str]: a two letter country code, e.g. us, or all for worldwide results."""
-    safesearch: Safesearch | None = Field("strict", title="Safesearch")
+    safesearch: Safesearch | None = Field(Safesearch.strict, title="Safesearch")
     """
     ImageSearchPlugin.spec.searchParams.safesearch[str]: adult content filtering.
 
@@ -104,7 +108,7 @@ class SAMPluginCommonMetadata(SAMModel):
     """
     Annotations, as in Kubernetes: a map of keys to string values that clients and integrations attach to a resource for their own purposes, e.g. to associate it with a resource in another system.
 
-    A key is an optional DNS-subdomain prefix that names its owner, then a slash and a name of one or more slash-separated segments, e.g. 'acme.com/crm-account-id'. The prefix 'smarter.sh' and its subdomains are reserved for the Smarter platform. Values are strings: unquoted YAML scalars such as true, 42 or dates are converted to strings, and structured data belongs in a JSON string. All annotations together are limited to 256 KiB. The list of one-key maps of older manifests, e.g. [{'acme.com/crm-account-id': 'A-10042'}], is also accepted.
+    A key is an optional DNS-subdomain prefix that names its owner, then a slash and a name of one or more slash-separated segments, e.g. 'acme.com/crm-account-id'. The prefix 'smarter.sh' and its subdomains are reserved for the Smarter Project. Values are strings: unquoted YAML scalars such as true, 42 or dates are converted to strings, and structured data belongs in a JSON string. All annotations together are limited to 256 KiB. The list of one-key maps of older manifests, e.g. [{'acme.com/crm-account-id': 'A-10042'}], is also accepted.
     """
     description: str | None = Field(..., title="Description")
     """
@@ -155,13 +159,13 @@ class SAMPluginCommonSpecPrompt(SAMModel):
 
     Optional. The provider of the LLM. Defaults to openai. The provider is the vendor name for the LLM service that will be used to generate the prompt response.
     """
-    systemRole: constr(max_length=32768) = Field(..., title="Systemrole")
+    systemRole: Annotated[str, Field(max_length=32768)] = Field(..., title="Systemrole")
     """
     Plugin.spec.prompt.systemRole[str].
 
     Required. The system role that the Plugin will use for the LLM text completion prompt. Be verbose and specific. Ensure that systemRole accurately conveys to the LLM how you want it to use the Plugin data that is returned. The maximum length is 32768 characters.
     """
-    temperature: confloat(ge=0.0, le=1.0) | None = Field(1.0, title="Temperature")
+    temperature: Annotated[float, Field(ge=0.0, le=1.0)] | None = Field(1.0, title="Temperature")
     """
     Plugin.spec.prompt.temperature[float] Optional.
 
@@ -236,7 +240,7 @@ class ImageSearchData(SAMModel):
 
     The api key itself is never included in the manifest.
     """
-    cacheTtl: conint(ge=0, le=604800) | None = Field(604800, title="Cachettl")
+    cacheTtl: Annotated[int, Field(ge=0, le=604800)] | None = Field(604800, title="Cachettl")
     """
     ImageSearchPlugin.spec.cacheTtl[int]: seconds to cache search results.
 
@@ -250,7 +254,7 @@ class ImageSearchData(SAMModel):
 
     searchParams are then the defaults. If false, the LLM may only lower the count.
     """
-    queryTerms: constr(max_length=400) | None = Field(None, title="Queryterms")
+    queryTerms: Annotated[str, Field(max_length=400)] | None = Field(None, title="Queryterms")
     """
     ImageSearchPlugin.spec.queryTerms[str]: optional search terms appended to every query that the LLM sends, e.g. 'black and white photograph'.
 
@@ -258,7 +262,7 @@ class ImageSearchData(SAMModel):
     """
     searchParams: ImageSearchParams | None = None
     """ImageSearchPlugin.spec.searchParams[obj]: the Brave Image Search API query parameters."""
-    timeout: conint(ge=1, le=60) | None = Field(10, title="Timeout")
+    timeout: Annotated[int, Field(ge=1, le=60)] | None = Field(10, title="Timeout")
     """ImageSearchPlugin.spec.timeout[int]: seconds to wait for each web request, 1 to 60."""
     validateUrls: bool | None = Field(True, title="Validateurls")
     """

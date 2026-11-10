@@ -123,7 +123,7 @@ class TestOpenApiContract(SmarterTestBase):
             pattern = "^/api/v1" + re.sub(r"\\{[^/]+\\}", "[^/]+", re.escape(template)) + "$"
             if re.match(pattern, path) and method.lower() in item:
                 return item[method.lower()]["operationId"]
-        self.fail(f"{method} {path} is not in the platform's OpenAPI document.")
+        raise self.failureException(f"{method} {path} is not in the platform's OpenAPI document.")
 
     def test_requests_are_published(self):
         """Every request of the SDK to a documented family is an operation, and the SDK calls every operation."""
@@ -132,6 +132,11 @@ class TestOpenApiContract(SmarterTestBase):
         self.addCleanup(directory.cleanup)
         upload = Path(directory.name) / "notes.txt"
         upload.write_text("Some notes.", encoding="utf-8")
+
+        def stream() -> None:
+            with self.client.llm_clients.stream(12, "Hello") as events:
+                list(events)
+
         calls = [
             lambda: self.client.manifests.apply(manifest),
             lambda: self.client.manifests.validate(manifest),
@@ -147,24 +152,24 @@ class TestOpenApiContract(SmarterTestBase):
             self.client.version,
             self.client.status,
             self.client.kinds,
-            lambda: self.client.llm_clients.list(),
+            self.client.llm_clients.list,
             lambda: self.client.llm_clients.retrieve("rMTAwMDAxMgx"),
             lambda: self.client.llm_clients.plugins(12),
             lambda: self.client.llm_clients.extensions(12),
             lambda: self.client.llm_clients.api_keys(12),
             lambda: self.client.llm_clients.custom_domains(12),
-            lambda: self.client.guardrails.list(),
+            self.client.guardrails.list,
             lambda: self.client.guardrails.retrieve("rMTAwMDAwMQx"),
             lambda: self.client.guardrails.evaluate(1, "hello"),
             lambda: self.client.guardrails.events(1, reviewed=False),
-            lambda: self.client.secrets.list(),
+            self.client.secrets.list,
             lambda: self.client.secrets.retrieve(1),
-            lambda: self.client.mcp_clients.list(),
+            self.client.mcp_clients.list,
             lambda: self.client.mcp_clients.retrieve("rMTAwMDAwMQx"),
             lambda: self.client.mcp_clients.tools(1, refresh=True),
             lambda: self.client.mcp_clients.refresh(1),
             lambda: self.client.mcp_clients.call_tool(1, "add_numbers", {"a": 1, "b": 2}),
-            lambda: self.client.vectorstores.list(),
+            self.client.vectorstores.list,
             lambda: self.client.vectorstores.retrieve("rMTAwMDAwMQx"),
             lambda: self.client.vectorstores.status(1),
             lambda: self.client.vectorstores.deploy(1),
@@ -178,45 +183,46 @@ class TestOpenApiContract(SmarterTestBase):
             lambda: self.client.vectorstores.snapshots(1),
             lambda: self.client.vectorstores.create_snapshot(1),
             lambda: self.client.vectorstores.restore(1, 3),
-            lambda: self.client.llm_hosts.list(),
+            self.client.llm_hosts.list,
             lambda: self.client.llm_hosts.retrieve("rMTAwMDAwMQx"),
             lambda: self.client.llm_hosts.status(1),
             lambda: self.client.llm_hosts.logs(1, tail=20),
             lambda: self.client.llm_hosts.plan(1),
             lambda: self.client.llm_hosts.deploy(1),
             lambda: self.client.llm_hosts.undeploy(1, purge=True),
-            lambda: self.client.llm_hosts.report(),
+            self.client.llm_hosts.report,
             lambda: self.client.llm_hosts.discover(query="llama"),
             lambda: self.client.llm_hosts.discover_manifest("BAAI/bge-m3"),
-            lambda: self.client.plugins.list(),
+            self.client.plugins.list,
             lambda: self.client.plugins.retrieve(355),
-            lambda: self.client.providers.list(),
+            self.client.providers.list,
             lambda: self.client.providers.retrieve("openai"),
             lambda: self.client.providers.models("openai"),
-            lambda: self.client.proxies.list(),
-            lambda: self.client.orchestrators.list(),
+            self.client.proxies.list,
+            self.client.orchestrators.list,
             lambda: self.client.orchestrators.retrieve("rMTAwMDAwMQx"),
-            lambda: self.client.vectorsearches.list(),
+            self.client.vectorsearches.list,
             lambda: self.client.vectorsearches.retrieve(1),
-            lambda: self.client.accounts.list(),
+            self.client.accounts.list,
             lambda: self.client.accounts.retrieve(1),
-            lambda: self.client.accounts.users.list(),
+            self.client.accounts.users.list,
             lambda: self.client.accounts.users.retrieve(1),
-            lambda: self.client.accounts.user_profiles.list(),
+            self.client.accounts.user_profiles.list,
             lambda: self.client.accounts.user_profiles.retrieve(1),
-            lambda: self.client.accounts.contacts.list(),
+            self.client.accounts.contacts.list,
             lambda: self.client.accounts.contacts.retrieve(1),
-            lambda: self.client.history.sessions(),
+            self.client.history.sessions,
             lambda: self.client.history.session(1),
-            lambda: self.client.history.tool_calls(),
+            self.client.history.tool_calls,
             lambda: self.client.history.tool_call(1),
-            lambda: self.client.history.plugin_usage(),
+            self.client.history.plugin_usage,
             lambda: self.client.history.plugin_use(1),
             lambda: self.client.journal.list(page=2, search="apply"),
             lambda: self.client.journal.retrieve("0" * 64),
             lambda: self.client.llm_clients.config(12),
+            lambda: self.client.llm_clients.provider_request(12),
             lambda: self.client.llm_clients.prompt("rMTAwMDAxMgx", "Hello"),
-            lambda: list(self.client.llm_clients.stream(12, "Hello").__enter__()),
+            stream,
         ]
         for call in calls:
             try:
@@ -254,6 +260,7 @@ class TestRecordedResponses(unittest.TestCase):
         "llmclient_plugins": ("/llm-clients/{id}/plugins/", "get"),
         "llmclient_extensions": ("/llm-clients/{id}/extensions", "get"),
         "config": ("/llm-clients/{id}/config/", "post"),
+        "provider_request": ("/llm-clients/{id}/provider-request/", "post"),
         "prompt": ("/llm-clients/{id}/prompt/", "post"),
         "guardrails": ("/guardrails/", "get"),
         "guardrail_eval": ("/guardrails/{id}/evaluate/", "post"),
@@ -281,6 +288,7 @@ class TestRecordedResponses(unittest.TestCase):
     """Each fixture of tests/data/, by name, and the operation whose 200 response it is."""
 
     def test_fixtures_are_valid(self):
+        """Each recorded response is valid under its operation's 200 response schema."""
         document = load("openapi.json")
         registry = Registry().with_resource(
             self.URI, Resource.from_contents(document, default_specification=DRAFT202012)

@@ -157,8 +157,8 @@ class Vectorstores(SmarterKindResource[Vectorstore]):
                 handle.close()
 
     def delete_document(
-        self, id: SmarterIdType, document_id: int
-    ) -> VectorstoreDocumentDeleted:  # pylint: disable=redefined-builtin
+        self, id: SmarterIdType, document_id: int  # pylint: disable=redefined-builtin
+    ) -> VectorstoreDocumentDeleted:
         """
         Remove a document and its chunks.
 

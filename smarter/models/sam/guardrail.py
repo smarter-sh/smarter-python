@@ -4,12 +4,16 @@ SAM model of the ``Guardrail`` kind, generated from the Smarter Project's JSON S
 Do not edit: run ``scripts/generate_sam_models.py``. See :mod:`smarter.models.sam`.
 """
 
+# The docstrings are the schema's descriptions, and the enum members are its values, as is.
+# pylint: disable=line-too-long,invalid-name
+
 from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
+from typing import Annotated
 
-from pydantic import Field, confloat, conint
+from pydantic import Field
 
 from smarter.models.sam.base import SAMModel
 
@@ -42,7 +46,7 @@ class SAMGuardrailMetadata(SAMModel):
     """
     Annotations, as in Kubernetes: a map of keys to string values that clients and integrations attach to a resource for their own purposes, e.g. to associate it with a resource in another system.
 
-    A key is an optional DNS-subdomain prefix that names its owner, then a slash and a name of one or more slash-separated segments, e.g. 'acme.com/crm-account-id'. The prefix 'smarter.sh' and its subdomains are reserved for the Smarter platform. Values are strings: unquoted YAML scalars such as true, 42 or dates are converted to strings, and structured data belongs in a JSON string. All annotations together are limited to 256 KiB. The list of one-key maps of older manifests, e.g. [{'acme.com/crm-account-id': 'A-10042'}], is also accepted.
+    A key is an optional DNS-subdomain prefix that names its owner, then a slash and a name of one or more slash-separated segments, e.g. 'acme.com/crm-account-id'. The prefix 'smarter.sh' and its subdomains are reserved for the Smarter Project. Values are strings: unquoted YAML scalars such as true, 42 or dates are converted to strings, and structured data belongs in a JSON string. All annotations together are limited to 256 KiB. The list of one-key maps of older manifests, e.g. [{'acme.com/crm-account-id': 'A-10042'}], is also accepted.
     """
     description: str | None = Field(..., title="Description")
     """
@@ -152,7 +156,7 @@ class SAMGuardrailSpecConfig(SAMModel):
 
     Empty means all. Any of: ['harassment', 'harassment/threatening', 'hate', 'hate/threatening', 'illicit', 'illicit/violent', 'self-harm', 'self-harm/intent', 'self-harm/instructions', 'sexual', 'sexual/minors', 'violence', 'violence/graphic'].
     """
-    category: Category | None = Field("custom", title="Category")
+    category: Category | None = Field(Category.custom, title="Category")
     """
     Guardrail.spec.config.category[str]: the risk the guardrail addresses.
 
@@ -188,13 +192,13 @@ class SAMGuardrailSpecConfig(SAMModel):
     """Guardrail.spec.config.keywords[list]: the keyword strategy's words and phrases."""
     message: str | None = Field(None, title="Message")
     """Guardrail.spec.config.message[str]: what block returns to the user, instead of the LLM's reply."""
-    mode: Mode | None = Field("enforce", title="Mode")
+    mode: Mode | None = Field(Mode.enforce, title="Mode")
     """Guardrail.spec.config.mode[str]: enforce, to take the action, or monitor, to only record what the action would have been."""
     model: str | None = Field(None, title="Model")
     """Guardrail.spec.config.model[str]: the model of the semantic, moderation and llm_judge strategies."""
     pattern: str | None = Field(None, title="Pattern")
     """Guardrail.spec.config.pattern[str]: the regex strategy's regular expression."""
-    priority: conint(ge=0) | None = Field(100, title="Priority")
+    priority: Annotated[int, Field(ge=0)] | None = Field(100, title="Priority")
     """
     Guardrail.spec.config.priority[int]: the order in which guardrails run.
 
@@ -214,7 +218,7 @@ class SAMGuardrailSpecConfig(SAMModel):
 
     Defaults to [REDACTED], which an empty replacement also means. {label} is replaced with what matched, e.g. credit_card. For the regex strategy, transform may refer to groups, e.g. \\1.
     """
-    severity: conint(ge=1, le=5) | None = Field(3, title="Severity")
+    severity: Annotated[int, Field(ge=1, le=5)] | None = Field(3, title="Severity")
     """Guardrail.spec.config.severity[int]: from 1 (low) to 5 (critical), for reporting and review."""
     stage: Stage = Field(..., title="Stage")
     """
@@ -228,7 +232,7 @@ class SAMGuardrailSpecConfig(SAMModel):
 
     One of: ['regex', 'keyword', 'detector', 'semantic', 'moderation', 'llm_judge'].
     """
-    threshold: confloat(ge=0.0, le=1.0) | None = Field(None, title="Threshold")
+    threshold: Annotated[float, Field(ge=0.0, le=1.0)] | None = Field(None, title="Threshold")
     """
     Guardrail.spec.config.threshold[float]: the minimum confidence, from 0 to 1, at which the semantic, moderation and llm_judge strategies trigger.
 

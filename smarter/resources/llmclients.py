@@ -43,6 +43,8 @@ from smarter.models.chat import (
     PromptChatApiProgressEvent,
     PromptChatApiProgressResult,
     PromptChatApiPromptResponse,
+    PromptChatApiProviderRequest,
+    PromptChatApiProviderRequestResponse,
 )
 from smarter.models.journal import SmarterJournalMessage
 from smarter.models.llmclient import (
@@ -239,9 +241,9 @@ class ChatSession:
         """
         message = to_messages(content)[0] if isinstance(content, str) else to_messages([content])[0]
         thread = [*self.messages, message]
-        events = self._llmclients._events(
+        events = self._llmclients._events(  # pylint: disable=protected-access
             self.llmclient_id, thread, session_key=self.session_key
-        )  # pylint: disable=protected-access
+        )
         return ChatStream(events, self, thread)
 
 
@@ -262,7 +264,7 @@ class ChatStream(PromptStream):
         yield from super().__iter__()
         response = self._result.response if self._result is not None else None
         if isinstance(response, PromptChatApiPromptResponse) and response.error is None:
-            self._session.messages = [*self._thread, *self._result.response.data.messages]
+            self._session.messages = [*self._thread, *response.data.messages]
 
 
 class LLMClients(SmarterKindResource[LLMClient]):
@@ -273,8 +275,12 @@ class LLMClients(SmarterKindResource[LLMClient]):
     model = LLMClient
 
     def config(
-        self, id: SmarterIdType, *, session_key: str | None = None, verbose: bool = False
-    ) -> PromptChatApiConfig:  # pylint: disable=redefined-builtin
+        self,
+        id: SmarterIdType,  # pylint: disable=redefined-builtin
+        *,
+        session_key: str | None = None,
+        verbose: bool = False,
+    ) -> PromptChatApiConfig:
         """
         An LLMClient's chat configuration, and a chat session.
 
@@ -300,6 +306,40 @@ class LLMClients(SmarterKindResource[LLMClient]):
             params={"verbose": verbose or None},
             json={"session_key": session_key},
             cast_to=PromptChatApiConfigResponse,
+        )
+        return response.data
+
+    def provider_request(
+        self, id: SmarterIdType, *, session_key: str | None = None  # pylint: disable=redefined-builtin
+    ) -> PromptChatApiProviderRequest:
+        """
+        A chat session's conversation, as the request body that Smarter sends to the LLM provider.
+
+        The body of an OpenAI-compatible ``v1/chat/completions`` request: the model, temperature, token
+        limit and tools of the session's latest prompt (or the LLMClient's, before its first prompt), and
+        its system, user, assistant and tool messages, without Smarter's own messages, fields, api url
+        or key. It can be sent as is with any OpenAI-compatible client, or to the Prompt Passthrough api.
+
+        Only a user who may read the LLMClient receives it, because it holds the LLMClient's system
+        prompt and tool definitions. A deployed LLMClient's own host answers with a 404.
+
+        .. code-block:: python
+
+            chat = client.llm_clients.chat(llmclient.id)
+            chat.send("What is (3 + 5) * 2?")
+            body = client.llm_clients.provider_request(llmclient.id, session_key=chat.session_key)
+            print(body.model_dump_json(exclude_none=True, indent=2))
+
+        :param id: The LLMClient's id or hashed id.
+        :param session_key: An existing session's key, or None for a new session, whose conversation is
+            the LLMClient's introduction.
+        :returns: The request body, whose ``messages`` are the whole conversation, including the latest answer.
+        """
+        response = self._http.request(
+            "POST",
+            f"{self.path}{resource_id(id)}/provider-request/",
+            json={"session_key": session_key},
+            cast_to=PromptChatApiProviderRequestResponse,
         )
         return response.data
 
@@ -371,8 +411,8 @@ class LLMClients(SmarterKindResource[LLMClient]):
         )
 
     def chat(
-        self, id: SmarterIdType, *, session_key: str | None = None
-    ) -> ChatSession:  # pylint: disable=redefined-builtin
+        self, id: SmarterIdType, *, session_key: str | None = None  # pylint: disable=redefined-builtin
+    ) -> ChatSession:
         """
         Start or resume a conversation with an LLMClient.
 

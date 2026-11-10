@@ -20,7 +20,7 @@ module.exports = {
       "@semantic-release/exec",
       {
         prepareCmd:
-          "printf '# DO NOT EDIT.\\n# Managed by semantic-release, through release.config.js.\\n__version__ = \"%s\"\\n' '${nextRelease.version}' > smarter/__version__.py",
+          "printf '\"\"\"The version of the package.\"\"\"\\n\\n# DO NOT EDIT.\\n# Managed by semantic-release, through release.config.js.\\n__version__ = \"%s\"\\n' '${nextRelease.version}' > smarter/__version__.py",
       },
     ],
     [

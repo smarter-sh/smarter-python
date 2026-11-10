@@ -4,12 +4,16 @@ SAM model of the ``WebsearchPlugin`` kind, generated from the Smarter Project's 
 Do not edit: run ``scripts/generate_sam_models.py``. See :mod:`smarter.models.sam`.
 """
 
+# The docstrings are the schema's descriptions, and the enum members are its values, as is.
+# pylint: disable=line-too-long,invalid-name
+
 from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
+from typing import Annotated
 
-from pydantic import Field, PositiveInt, confloat, conint, constr
+from pydantic import Field, PositiveInt
 
 from smarter.models.sam.base import SAMModel
 
@@ -42,7 +46,7 @@ class SAMPluginCommonMetadata(SAMModel):
     """
     Annotations, as in Kubernetes: a map of keys to string values that clients and integrations attach to a resource for their own purposes, e.g. to associate it with a resource in another system.
 
-    A key is an optional DNS-subdomain prefix that names its owner, then a slash and a name of one or more slash-separated segments, e.g. 'acme.com/crm-account-id'. The prefix 'smarter.sh' and its subdomains are reserved for the Smarter platform. Values are strings: unquoted YAML scalars such as true, 42 or dates are converted to strings, and structured data belongs in a JSON string. All annotations together are limited to 256 KiB. The list of one-key maps of older manifests, e.g. [{'acme.com/crm-account-id': 'A-10042'}], is also accepted.
+    A key is an optional DNS-subdomain prefix that names its owner, then a slash and a name of one or more slash-separated segments, e.g. 'acme.com/crm-account-id'. The prefix 'smarter.sh' and its subdomains are reserved for the Smarter Project. Values are strings: unquoted YAML scalars such as true, 42 or dates are converted to strings, and structured data belongs in a JSON string. All annotations together are limited to 256 KiB. The list of one-key maps of older manifests, e.g. [{'acme.com/crm-account-id': 'A-10042'}], is also accepted.
     """
     description: str | None = Field(..., title="Description")
     """
@@ -93,13 +97,13 @@ class SAMPluginCommonSpecPrompt(SAMModel):
 
     Optional. The provider of the LLM. Defaults to openai. The provider is the vendor name for the LLM service that will be used to generate the prompt response.
     """
-    systemRole: constr(max_length=32768) = Field(..., title="Systemrole")
+    systemRole: Annotated[str, Field(max_length=32768)] = Field(..., title="Systemrole")
     """
     Plugin.spec.prompt.systemRole[str].
 
     Required. The system role that the Plugin will use for the LLM text completion prompt. Be verbose and specific. Ensure that systemRole accurately conveys to the LLM how you want it to use the Plugin data that is returned. The maximum length is 32768 characters.
     """
-    temperature: confloat(ge=0.0, le=1.0) | None = Field(1.0, title="Temperature")
+    temperature: Annotated[float, Field(ge=0.0, le=1.0)] | None = Field(1.0, title="Temperature")
     """
     Plugin.spec.prompt.temperature[float] Optional.
 
@@ -168,7 +172,7 @@ class SAMPluginCommonStatus(SAMModel):
 class WebsearchFetch(SAMModel):
     """Smarter API - WebsearchPlugin.spec.websearchData.fetch: reading web pages by URL."""
 
-    maxCharacters: conint(ge=1000, le=100000) | None = Field(20000, title="Maxcharacters")
+    maxCharacters: Annotated[int, Field(ge=1000, le=100000)] | None = Field(20000, title="Maxcharacters")
     """
     WebsearchPlugin.spec.fetch.maxCharacters[int]: the maximum number of characters of a web page to return, 1000 to 100000.
 
@@ -233,7 +237,7 @@ class WebsearchSearch(SAMModel):
     """
     language: str | None = Field(None, title="Language")
     """WebsearchPlugin.spec.search.language[str]: an ISO 639-1 language code, e.g. en, to localize results."""
-    maxResults: conint(ge=1, le=20) | None = Field(5, title="Maxresults")
+    maxResults: Annotated[int, Field(ge=1, le=20)] | None = Field(5, title="Maxresults")
     """WebsearchPlugin.spec.search.maxResults[int]: the maximum number of results per search, 1 to 20."""
     provider: Provider = Field(..., title="Provider")
     """
@@ -241,7 +245,7 @@ class WebsearchSearch(SAMModel):
 
     One of: ['brave', 'tavily']
     """
-    safeSearch: SafeSearch | None = Field("moderate", title="Safesearch")
+    safeSearch: SafeSearch | None = Field(SafeSearch.moderate, title="Safesearch")
     """
     WebsearchPlugin.spec.search.safeSearch[str]: adult content filtering.
 
@@ -256,7 +260,7 @@ class WebsearchData(SAMModel):
     """WebsearchPlugin.spec.allowedDomains[list]: if not empty, only these domains, and their subdomains, may be searched and read."""
     blockedDomains: list[str] | None = Field(None, title="Blockeddomains")
     """WebsearchPlugin.spec.blockedDomains[list]: these domains, and their subdomains, are never searched nor read."""
-    cacheTtl: conint(ge=0, le=86400) | None = Field(3600, title="Cachettl")
+    cacheTtl: Annotated[int, Field(ge=0, le=86400)] | None = Field(3600, title="Cachettl")
     """
     WebsearchPlugin.spec.cacheTtl[int]: seconds to cache search results and web pages.
 
@@ -270,7 +274,7 @@ class WebsearchData(SAMModel):
 
     Requires a web search API key.
     """
-    timeout: conint(ge=1, le=60) | None = Field(15, title="Timeout")
+    timeout: Annotated[int, Field(ge=1, le=60)] | None = Field(15, title="Timeout")
     """WebsearchPlugin.spec.timeout[int]: seconds to wait for each web request, 1 to 60."""
 
 

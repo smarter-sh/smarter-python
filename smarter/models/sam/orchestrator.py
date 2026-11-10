@@ -4,13 +4,16 @@ SAM model of the ``Orchestrator`` kind, generated from the Smarter Project's JSO
 Do not edit: run ``scripts/generate_sam_models.py``. See :mod:`smarter.models.sam`.
 """
 
+# The docstrings are the schema's descriptions, and the enum members are its values, as is.
+# pylint: disable=line-too-long,invalid-name
+
 from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
-from typing import Any
+from typing import Annotated, Any
 
-from pydantic import Field, conint
+from pydantic import Field
 
 from smarter.models.sam.base import SAMModel
 
@@ -75,13 +78,13 @@ class SAMOrchestratorHarnessConfig(SAMModel):
 
     config: dict[str, Any] | None = Field(None, title="Config")
     """Per-membership overrides (e.g. temperature, system prompt fragment, tool allowlist)."""
-    executionOrder: conint(ge=0) | None = Field(0, title="Executionorder")
+    executionOrder: Annotated[int, Field(ge=0)] | None = Field(0, title="Executionorder")
     """Relative ordering for sequential/supervisor strategies."""
     isActive: bool | None = Field(True, title="Isactive")
     """Whether this LLMClient's membership in the Orchestrator is active."""
     llmClientName: str = Field(..., title="Llmclientname")
     """Name of an existing LLMClient to attach as a Harness."""
-    role: HarnessRole | None = "executor"
+    role: HarnessRole | None = HarnessRole.executor
     """
     The part this LLMClient plays in the Orchestrator: planner, executor, critic, router, summarizer or tool_caller.
 
@@ -100,7 +103,7 @@ class SAMOrchestratorMetadata(SAMModel):
     """
     Annotations, as in Kubernetes: a map of keys to string values that clients and integrations attach to a resource for their own purposes, e.g. to associate it with a resource in another system.
 
-    A key is an optional DNS-subdomain prefix that names its owner, then a slash and a name of one or more slash-separated segments, e.g. 'acme.com/crm-account-id'. The prefix 'smarter.sh' and its subdomains are reserved for the Smarter platform. Values are strings: unquoted YAML scalars such as true, 42 or dates are converted to strings, and structured data belongs in a JSON string. All annotations together are limited to 256 KiB. The list of one-key maps of older manifests, e.g. [{'acme.com/crm-account-id': 'A-10042'}], is also accepted.
+    A key is an optional DNS-subdomain prefix that names its owner, then a slash and a name of one or more slash-separated segments, e.g. 'acme.com/crm-account-id'. The prefix 'smarter.sh' and its subdomains are reserved for the Smarter Project. Values are strings: unquoted YAML scalars such as true, 42 or dates are converted to strings, and structured data belongs in a JSON string. All annotations together are limited to 256 KiB. The list of one-key maps of older manifests, e.g. [{'acme.com/crm-account-id': 'A-10042'}], is also accepted.
     """
     description: str | None = Field(..., title="Description")
     """
@@ -137,9 +140,9 @@ class SAMOrchestratorSpecConfig(SAMModel):
     """LLMClients (Harnesses) that participate in this Orchestrator."""
     isActive: bool | None = Field(True, title="Isactive")
     """Whether the Orchestrator is active."""
-    maxIterations: conint(ge=1) | None = Field(10, title="Maxiterations")
+    maxIterations: Annotated[int, Field(ge=1)] | None = Field(10, title="Maxiterations")
     """Upper bound on orchestration loop iterations."""
-    strategy: OrchestrationStrategy | None = "sequential"
+    strategy: OrchestrationStrategy | None = OrchestrationStrategy.sequential
     """
     How the Orchestrator coordinates its LLMClients: sequential, parallel, supervisor, router, voting or debate.
 
