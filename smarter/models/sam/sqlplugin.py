@@ -4,13 +4,16 @@ SAM model of the ``SqlPlugin`` kind, generated from the Smarter Project's JSON S
 Do not edit: run ``scripts/generate_sam_models.py``. See :mod:`smarter.models.sam`.
 """
 
+# The docstrings are the schema's descriptions, and the enum members are its values, as is.
+# pylint: disable=line-too-long,invalid-name
+
 from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
-from typing import Any
+from typing import Annotated, Any
 
-from pydantic import Field, PositiveInt, confloat, constr
+from pydantic import Field, PositiveInt
 
 from smarter.models.sam.base import SAMModel
 
@@ -55,7 +58,7 @@ class SAMPluginCommonMetadata(SAMModel):
     """
     Annotations, as in Kubernetes: a map of keys to string values that clients and integrations attach to a resource for their own purposes, e.g. to associate it with a resource in another system.
 
-    A key is an optional DNS-subdomain prefix that names its owner, then a slash and a name of one or more slash-separated segments, e.g. 'acme.com/crm-account-id'. The prefix 'smarter.sh' and its subdomains are reserved for the Smarter platform. Values are strings: unquoted YAML scalars such as true, 42 or dates are converted to strings, and structured data belongs in a JSON string. All annotations together are limited to 256 KiB. The list of one-key maps of older manifests, e.g. [{'acme.com/crm-account-id': 'A-10042'}], is also accepted.
+    A key is an optional DNS-subdomain prefix that names its owner, then a slash and a name of one or more slash-separated segments, e.g. 'acme.com/crm-account-id'. The prefix 'smarter.sh' and its subdomains are reserved for the Smarter Project. Values are strings: unquoted YAML scalars such as true, 42 or dates are converted to strings, and structured data belongs in a JSON string. All annotations together are limited to 256 KiB. The list of one-key maps of older manifests, e.g. [{'acme.com/crm-account-id': 'A-10042'}], is also accepted.
     """
     description: str | None = Field(..., title="Description")
     """
@@ -106,13 +109,13 @@ class SAMPluginCommonSpecPrompt(SAMModel):
 
     Optional. The provider of the LLM. Defaults to openai. The provider is the vendor name for the LLM service that will be used to generate the prompt response.
     """
-    systemRole: constr(max_length=32768) = Field(..., title="Systemrole")
+    systemRole: Annotated[str, Field(max_length=32768)] = Field(..., title="Systemrole")
     """
     Plugin.spec.prompt.systemRole[str].
 
     Required. The system role that the Plugin will use for the LLM text completion prompt. Be verbose and specific. Ensure that systemRole accurately conveys to the LLM how you want it to use the Plugin data that is returned. The maximum length is 32768 characters.
     """
-    temperature: confloat(ge=0.0, le=1.0) | None = Field(1.0, title="Temperature")
+    temperature: Annotated[float, Field(ge=0.0, le=1.0)] | None = Field(1.0, title="Temperature")
     """
     Plugin.spec.prompt.temperature[float] Optional.
 

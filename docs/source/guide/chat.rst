@@ -67,6 +67,26 @@ deployed LLMClient's own host leaves them out either way.
    config = client.llm_clients.config(llmclient.id, verbose=True)
    print([plugin.plugin_meta.name for plugin in config.plugins.plugins])
 
+The request sent to the LLM provider
+------------------------------------
+
+``provider_request()`` returns a chat session's conversation as exactly the body that Smarter sends
+to the LLM provider's OpenAI-compatible ``v1/chat/completions`` API: the model, temperature, token
+limit and tools of the session's latest prompt, and its system, user, assistant and tool messages,
+including the latest answer. Smarter's own messages and fields, and the provider's API url and key,
+are left out. Before a session's first prompt, it is the LLMClient's introduction, with the
+LLMClient's settings and no tools. Use it to replay a conversation with any OpenAI-compatible
+client, or to continue it in the Prompt Passthrough.
+
+.. code-block:: python
+
+   body = client.llm_clients.provider_request(llmclient.id, session_key=chat.session_key)
+   print(body.model, len(body.messages))
+   print(body.model_dump_json(exclude_none=True, indent=2))
+
+It holds the LLMClient's system prompt and tool definitions, so only a user who may read the
+LLMClient receives it. A deployed LLMClient's own host answers with a 404.
+
 Streaming a prompt's progress
 -----------------------------
 

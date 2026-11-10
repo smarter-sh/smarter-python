@@ -4,12 +4,16 @@ SAM model of the ``Vectorstore`` kind, generated from the Smarter Project's JSON
 Do not edit: run ``scripts/generate_sam_models.py``. See :mod:`smarter.models.sam`.
 """
 
+# The docstrings are the schema's descriptions, and the enum members are its values, as is.
+# pylint: disable=line-too-long,invalid-name
+
 from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
+from typing import Annotated
 
-from pydantic import Field, conint, constr
+from pydantic import Field
 
 from smarter.models.sam.base import SAMModel
 
@@ -34,21 +38,21 @@ class SAMDependency(SAMModel):
 class SAMVectorstoreEmbeddings(SAMModel):
     """Vectorstore.spec.embeddings: how documents and queries are turned into vectors."""
 
-    batchSize: conint(ge=1, le=1000) | None = Field(64, title="Batchsize")
+    batchSize: Annotated[int, Field(ge=1, le=1000)] | None = Field(64, title="Batchsize")
     """Vectorstore.__init__.embeddings.batchSize: chunks per embeddings request and upsert."""
-    chunkOverlap: conint(ge=0, le=2000) | None = Field(200, title="Chunkoverlap")
+    chunkOverlap: Annotated[int, Field(ge=0, le=2000)] | None = Field(200, title="Chunkoverlap")
     """Vectorstore.__init__.embeddings.chunkOverlap: characters shared by consecutive chunks."""
-    chunkSize: conint(ge=100, le=8000) | None = Field(1000, title="Chunksize")
+    chunkSize: Annotated[int, Field(ge=100, le=8000)] | None = Field(1000, title="Chunksize")
     """Vectorstore.__init__.embeddings.chunkSize: characters per chunk."""
-    dimensions: conint(ge=1, le=20000) | None = Field(None, title="Dimensions")
+    dimensions: Annotated[int, Field(ge=1, le=20000)] | None = Field(None, title="Dimensions")
     """
     Vectorstore.__init__.embeddings.dimensions: ask the model for vectors of this size, if it supports it, e.g. text-embedding-3.
 
     It must equal index.dimension.
     """
-    model: constr(min_length=1) = Field(..., title="Model")
+    model: Annotated[str, Field(min_length=1)] = Field(..., title="Model")
     """Vectorstore.__init__.embeddings.model: the embeddings model, e.g. text-embedding-3-small."""
-    provider: constr(min_length=1) = Field(..., title="Provider")
+    provider: Annotated[str, Field(min_length=1)] = Field(..., title="Provider")
     """Vectorstore.__init__.embeddings.provider: a Provider with an OpenAI-compatible embeddings API, e.g. openai."""
 
 
@@ -65,11 +69,11 @@ class SAMVectorstoreIndex(SAMModel):
 
     deletionProtection: bool | None = Field(False, title="Deletionprotection")
     """Vectorstore.__init__.index.deletionProtection: refuse to destroy the database."""
-    dimension: conint(ge=1, le=20000) = Field(..., title="Dimension")
+    dimension: Annotated[int, Field(ge=1, le=20000)] = Field(..., title="Dimension")
     """Vectorstore.__init__.index.dimension: of the embeddings model's vectors."""
-    metric: Metric | None = Field("cosine", title="Metric")
+    metric: Metric | None = Field(Metric.cosine, title="Metric")
     """Vectorstore.__init__.index.metric: the distance metric."""
-    name: constr(max_length=45) | None = Field(None, title="Name")
+    name: Annotated[str, Field(max_length=45)] | None = Field(None, title="Name")
     """
     Vectorstore.__init__.index.name: the index or collection's name, in lowercase letters, digits and hyphens.
 
@@ -80,9 +84,9 @@ class SAMVectorstoreIndex(SAMModel):
 class SAMVectorstoreMaintenance(SAMModel):
     """Vectorstore.spec.maintenance: what Celery Beat does, besides checking its status."""
 
-    snapshotIntervalHours: conint(ge=1, le=720) | None = Field(24, title="Snapshotintervalhours")
+    snapshotIntervalHours: Annotated[int, Field(ge=1, le=720)] | None = Field(24, title="Snapshotintervalhours")
     """Vectorstore.__init__.maintenance.snapshotIntervalHours: how often."""
-    snapshotRetention: conint(ge=1, le=100) | None = Field(7, title="Snapshotretention")
+    snapshotRetention: Annotated[int, Field(ge=1, le=100)] | None = Field(7, title="Snapshotretention")
     """
     Vectorstore.__init__.maintenance.snapshotRetention: how many are kept.
 
@@ -103,7 +107,7 @@ class SAMVectorstoreMetadata(SAMModel):
     """
     Annotations, as in Kubernetes: a map of keys to string values that clients and integrations attach to a resource for their own purposes, e.g. to associate it with a resource in another system.
 
-    A key is an optional DNS-subdomain prefix that names its owner, then a slash and a name of one or more slash-separated segments, e.g. 'acme.com/crm-account-id'. The prefix 'smarter.sh' and its subdomains are reserved for the Smarter platform. Values are strings: unquoted YAML scalars such as true, 42 or dates are converted to strings, and structured data belongs in a JSON string. All annotations together are limited to 256 KiB. The list of one-key maps of older manifests, e.g. [{'acme.com/crm-account-id': 'A-10042'}], is also accepted.
+    A key is an optional DNS-subdomain prefix that names its owner, then a slash and a name of one or more slash-separated segments, e.g. 'acme.com/crm-account-id'. The prefix 'smarter.sh' and its subdomains are reserved for the Smarter Project. Values are strings: unquoted YAML scalars such as true, 42 or dates are converted to strings, and structured data belongs in a JSON string. All annotations together are limited to 256 KiB. The list of one-key maps of older manifests, e.g. [{'acme.com/crm-account-id': 'A-10042'}], is also accepted.
     """
     description: str | None = Field(..., title="Description")
     """
@@ -138,9 +142,9 @@ class Cloud(Enum):
 class SAMVectorstorePinecone(SAMModel):
     """Vectorstore.spec.pinecone: where Pinecone runs a serverless index."""
 
-    cloud: Cloud | None = Field("aws", title="Cloud")
+    cloud: Cloud | None = Field(Cloud.aws, title="Cloud")
     """Vectorstore.__init__.pinecone.cloud."""
-    region: constr(min_length=1) | None = Field("us-east-1", title="Region")
+    region: Annotated[str, Field(min_length=1)] | None = Field("us-east-1", title="Region")
     """Vectorstore.__init__.pinecone.region."""
 
 
@@ -190,7 +194,7 @@ class SAMVectorstoreSpec(SAMModel):
     """
     embeddings: SAMVectorstoreEmbeddings
     """Vectorstore.__init__.embeddings."""
-    hosting: Hosting | None = Field("managed", title="Hosting")
+    hosting: Hosting | None = Field(Hosting.managed, title="Hosting")
     """Vectorstore.__init__.hosting: self_hosted, run by Smarter on Kubernetes (qdrant only), or managed, a service reached through the ApiConnection in connection."""
     index: SAMVectorstoreIndex
     """Vectorstore.__init__.index."""

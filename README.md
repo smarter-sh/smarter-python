@@ -118,6 +118,10 @@ with chat.stream("Now take its square root.") as stream:
 session starts with. It has what a chat needs, and only the counts of the
 LLMClient's plugins and extensions. Pass `verbose=True` for the complete
 configuration, with their lists and the session's tool calls.
+`client.llm_clients.provider_request(llmclient.id, session_key=chat.session_key)`
+returns the session's conversation as exactly the body that Smarter sends to
+the LLM provider's `v1/chat/completions` api, ready to replay with any
+OpenAI-compatible client.
 
 ### Errors
 

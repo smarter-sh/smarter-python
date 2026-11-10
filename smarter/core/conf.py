@@ -22,7 +22,7 @@ model is the only place that reads the environment.
 
 import logging
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 from urllib.parse import urlsplit, urlunsplit
 
 import yaml
@@ -94,7 +94,8 @@ class CliConfig(BaseModel):
             return cls()
         if not isinstance(document, dict):
             return cls()
-        config = document.get("config") if isinstance(document.get("config"), dict) else {}
+        section = document.get("config")
+        config: dict[str, Any] = section if isinstance(section, dict) else {}
         api_keys = {
             name: section["api_key"]
             for name, section in document.items()
