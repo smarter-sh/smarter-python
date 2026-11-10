@@ -19,6 +19,7 @@ from .chat import (
     PromptChatApiProgressEvent,
     PromptChatApiPromptResponse,
     PromptChatApiPromptResult,
+    PromptChatApiProviderRequest,
 )
 from .guardrail import Guardrail, GuardrailEvaluation, GuardrailEvent, GuardrailEvents
 from .journal import (
@@ -119,6 +120,7 @@ __all__ = [
     "PromptChatApiProgressEvent",
     "PromptChatApiPromptResponse",
     "PromptChatApiPromptResult",
+    "PromptChatApiProviderRequest",
     "PromptPluginUsage",
     "PromptSession",
     "PromptToolCall",

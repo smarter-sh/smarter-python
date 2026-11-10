@@ -4,12 +4,16 @@ SAM model of the ``Budget`` kind, generated from the Smarter Project's JSON Sche
 Do not edit: run ``scripts/generate_sam_models.py``. See :mod:`smarter.models.sam`.
 """
 
+# The docstrings are the schema's descriptions, and the enum members are its values, as is.
+# pylint: disable=line-too-long,invalid-name
+
 from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
+from typing import Annotated
 
-from pydantic import Field, confloat, conint, constr
+from pydantic import Field
 
 from smarter.models.sam.base import SAMModel
 
@@ -75,37 +79,37 @@ class Unit(Enum):
 class SAMBudgetSpecConfig(SAMModel):
     """Smarter API Budget Manifest Budget.spec.config: the budget's limits."""
 
-    absoluteLimit: confloat(ge=0.0) | str | None = Field("0", title="Absolutelimit")
+    absoluteLimit: Annotated[float, Field(ge=0.0)] | str | None = Field("0", title="Absolutelimit")
     """
     Budget.spec.config.absoluteLimit: the most that may be spent in total, from when the budget is attached.
 
     0 means no limit.
     """
-    action: Action | None = Field("block", title="Action")
+    action: Action | None = Field(Action.block, title="Action")
     """Budget.spec.config.action: block further charges when a limit is reached, or only warn."""
-    duration: conint(ge=0) | None = Field(0, title="Duration")
+    duration: Annotated[int, Field(ge=0)] | None = Field(0, title="Duration")
     """
     Budget.spec.config.duration: the billing periods, from when the budget is attached, after which it no longer applies.
 
     0 means never.
     """
-    message: constr(max_length=1000) | None = Field(None, title="Message")
+    message: Annotated[str, Field(max_length=1000)] | None = Field(None, title="Message")
     """
     Budget.spec.config.message: what people are told when the budget blocks their request.
 
     Defaults to a description of the limit that was reached.
     """
-    period: Period | None = Field("month", title="Period")
+    period: Period | None = Field(Period.month, title="Period")
     """Budget.spec.config.period: the billing period of periodicLimit and duration."""
-    periodicLimit: confloat(ge=0.0) | str | None = Field("0", title="Periodiclimit")
+    periodicLimit: Annotated[float, Field(ge=0.0)] | str | None = Field("0", title="Periodiclimit")
     """
     Budget.spec.config.periodicLimit: the most that may be spent in a billing period.
 
     0 means no limit.
     """
-    unit: Unit | None = Field("cost", title="Unit")
+    unit: Unit | None = Field(Unit.cost, title="Unit")
     """Budget.spec.config.unit: what the limits measure: cost in USD, or total tokens."""
-    warningThreshold: conint(ge=0, le=100) | None = Field(80, title="Warningthreshold")
+    warningThreshold: Annotated[int, Field(ge=0, le=100)] | None = Field(80, title="Warningthreshold")
     """
     Budget.spec.config.warningThreshold: the percentage of a limit at which a warning is sent.
 

@@ -4,12 +4,15 @@ SAM model of the ``Plugin`` kind, generated from the Smarter Project's JSON Sche
 Do not edit: run ``scripts/generate_sam_models.py``. See :mod:`smarter.models.sam`.
 """
 
+# The docstrings are the schema's descriptions, and the enum members are its values, as is.
+# pylint: disable=line-too-long,invalid-name
+
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any
+from typing import Annotated, Any
 
-from pydantic import Field, PositiveInt, confloat, constr
+from pydantic import Field, PositiveInt
 
 from smarter.models.sam.base import SAMModel
 
@@ -93,13 +96,13 @@ class SAMPluginCommonSpecPrompt(SAMModel):
 
     Optional. The provider of the LLM. Defaults to openai. The provider is the vendor name for the LLM service that will be used to generate the prompt response.
     """
-    systemRole: constr(max_length=32768) = Field(..., title="Systemrole")
+    systemRole: Annotated[str, Field(max_length=32768)] = Field(..., title="Systemrole")
     """
     Plugin.spec.prompt.systemRole[str].
 
     Required. The system role that the Plugin will use for the LLM text completion prompt. Be verbose and specific. Ensure that systemRole accurately conveys to the LLM how you want it to use the Plugin data that is returned. The maximum length is 32768 characters.
     """
-    temperature: confloat(ge=0.0, le=1.0) | None = Field(1.0, title="Temperature")
+    temperature: Annotated[float, Field(ge=0.0, le=1.0)] | None = Field(1.0, title="Temperature")
     """
     Plugin.spec.prompt.temperature[float] Optional.
 

@@ -20,6 +20,7 @@ usage, from the repository root (``make sam-models`` runs both):
 """
 
 import argparse
+import re
 import subprocess  # nosec B404 - runs datamodel-codegen, with fixed arguments
 import sys
 from pathlib import Path
@@ -33,7 +34,36 @@ SAM model of the ``{kind}`` kind, generated from the Smarter Project's JSON Sche
 
 Do not edit: run ``scripts/generate_sam_models.py``. See :mod:`smarter.models.sam`.
 """
+
+# The docstrings are the schema's descriptions, and the enum members are its values, as is.
+# pylint: disable=line-too-long,invalid-name
 '''
+
+CONSTRAINED = re.compile(r"\bcon(int|float|str)\(((?:[^()\"]|\"[^\"]*\")*)\)")
+"""A constrained type, e.g. ``conint(ge=0)``, whose arguments may hold a quoted pattern."""
+
+CONSTRAINED_IMPORTS = re.compile(r", (?:conint|confloat|constr)\b")
+"""The constrained types' names in the generated ``from pydantic import`` line."""
+
+
+def annotate_constraints(text: str) -> str:
+    """
+    Rewrite each ``conint(ge=0)``, ``confloat(...)`` or ``constr(...)`` as ``Annotated[int, Field(ge=0)]``.
+
+    The two validate alike, but mypy and Pylance reject a call in an annotation. datamodel-codegen's
+    own alternative, ``--field-constraints``, wraps each nullable constrained field in a RootModel, so
+    that e.g. ``LLMClient.defaultTemperature`` would no longer be a float.
+
+    :param text: a generated module.
+    :returns: the module, with ``Annotated`` imported when it is used.
+    """
+    rewritten = CONSTRAINED.sub(lambda match: f"Annotated[{match[1]}, Field({match[2]})]", text)
+    if rewritten == text:
+        return text
+    rewritten = CONSTRAINED_IMPORTS.sub("", rewritten)
+    if "from typing import" in rewritten:
+        return re.sub(r"from typing import ", "from typing import Annotated, ", rewritten, count=1)
+    return rewritten.replace("from pydantic import", "from typing import Annotated\n\nfrom pydantic import", 1)
 
 
 def module_name(kind: str) -> str:
@@ -73,6 +103,8 @@ def generate(kind: str) -> None:
             "--use-standard-collections",
             "--use-double-quotes",
             "--disable-timestamp",
+            # an enum field's default is its member, e.g. AuthType.none, rather than the string "none".
+            "--set-default-enum-member",
             # the platform's example manifests have naive timestamps, and its describe has aware ones.
             "--output-datetime-class",
             "datetime",
@@ -88,7 +120,7 @@ def generate(kind: str) -> None:
     lines = text.splitlines()
     while lines and lines[0].startswith("#"):
         lines.pop(0)
-    body = "\n".join(lines).strip("\n")
+    body = annotate_constraints("\n".join(lines).strip("\n"))
     output.write_text(HEADER.format(kind=kind) + "\n" + body + "\n")
     print(f"generated {output.relative_to(ROOT)}")
 

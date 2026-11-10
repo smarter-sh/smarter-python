@@ -4,13 +4,16 @@ SAM model of the ``LLMHost`` kind, generated from the Smarter Project's JSON Sch
 Do not edit: run ``scripts/generate_sam_models.py``. See :mod:`smarter.models.sam`.
 """
 
+# The docstrings are the schema's descriptions, and the enum members are its values, as is.
+# pylint: disable=line-too-long,invalid-name
+
 from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
-from typing import Any
+from typing import Annotated, Any
 
-from pydantic import ConfigDict, Field, confloat, conint
+from pydantic import ConfigDict, Field
 
 from smarter.models.sam.base import SAMModel
 
@@ -73,7 +76,7 @@ class SAMLLMHostEngineConfig(SAMModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    apiFormat: ApiFormat | None = Field("openai_compatible", title="Apiformat")
+    apiFormat: ApiFormat | None = Field(ApiFormat.openai_compatible, title="Apiformat")
     """
     LLMHost.spec.engine.apiFormat[str]: the wire protocol.
 
@@ -87,13 +90,13 @@ class SAMLLMHostEngineConfig(SAMModel):
 
     For custom engines.
     """
-    contextLength: conint(ge=1) | None = Field(None, title="Contextlength")
+    contextLength: Annotated[int, Field(ge=1)] | None = Field(None, title="Contextlength")
     """LLMHost.spec.engine.contextLength[int]: the maximum context the server allocates, in tokens."""
     dtype: str | None = Field(None, title="Dtype")
     """LLMHost.spec.engine.dtype[str]: e.g. auto, bfloat16, float16."""
     env: dict[str, str] | None = Field(None, title="Env")
     """LLMHost.spec.engine.env[dict]: additional environment variables."""
-    gpuMemoryUtilization: confloat(le=1.0, gt=0.0) | None = Field(None, title="Gpumemoryutilization")
+    gpuMemoryUtilization: Annotated[float, Field(le=1.0, gt=0.0)] | None = Field(None, title="Gpumemoryutilization")
     """LLMHost.spec.engine.gpuMemoryUtilization[float]: the fraction of GPU memory the server may use."""
     image: str | None = Field(None, title="Image")
     """
@@ -101,7 +104,7 @@ class SAMLLMHostEngineConfig(SAMModel):
 
     Defaults to the engine's official image. Pin a version in production. Required for custom.
     """
-    maxConcurrentRequests: conint(ge=1) | None = Field(None, title="Maxconcurrentrequests")
+    maxConcurrentRequests: Annotated[int, Field(ge=1)] | None = Field(None, title="Maxconcurrentrequests")
     """LLMHost.spec.engine.maxConcurrentRequests[int]: the requests that one replica serves at once."""
     name: Name = Field(..., title="Name")
     """
@@ -109,13 +112,13 @@ class SAMLLMHostEngineConfig(SAMModel):
 
     One of: ['vllm', 'tgi', 'sglang', 'llama_cpp', 'ollama', 'tei', 'custom'].
     """
-    port: conint(ge=1, le=65535) | None = Field(None, title="Port")
+    port: Annotated[int, Field(ge=1, le=65535)] | None = Field(None, title="Port")
     """
     LLMHost.spec.engine.port[int]: the container port.
 
     Defaults to the engine's port. Required for custom.
     """
-    tensorParallelSize: conint(ge=1, le=16) | None = Field(None, title="Tensorparallelsize")
+    tensorParallelSize: Annotated[int, Field(ge=1, le=16)] | None = Field(None, title="Tensorparallelsize")
     """LLMHost.spec.engine.tensorParallelSize[int]: the GPUs that one replica shards the model across."""
     trustRemoteCode: bool | None = Field(False, title="Trustremotecode")
     """
@@ -137,9 +140,9 @@ class SAMLLMHostHealthCheck(SAMModel):
 
     Defaults to the engine's, e.g. /health.
     """
-    periodSeconds: conint(ge=1, le=300) | None = Field(10, title="Periodseconds")
+    periodSeconds: Annotated[int, Field(ge=1, le=300)] | None = Field(10, title="Periodseconds")
     """LLMHost.spec.healthCheck.periodSeconds[int]: how often the probes run."""
-    startupTimeoutSeconds: conint(ge=60, le=21600) | None = Field(3600, title="Startuptimeoutseconds")
+    startupTimeoutSeconds: Annotated[int, Field(ge=60, le=21600)] | None = Field(3600, title="Startuptimeoutseconds")
     """
     LLMHost.spec.healthCheck.startupTimeoutSeconds[int]: the time the server has to download and load the weights before it is restarted.
 
@@ -298,7 +301,7 @@ class SAMLLMHostResources(SAMModel):
     )
     cpu: str | None = Field(None, title="Cpu")
     """LLMHost.spec.resources.cpu[str]: the pod's CPU request, e.g. 4 or 3500m."""
-    gpuCount: conint(ge=0, le=16) | None = Field(0, title="Gpucount")
+    gpuCount: Annotated[int, Field(ge=0, le=16)] | None = Field(0, title="Gpucount")
     """
     LLMHost.spec.resources.gpuCount[int]: the GPUs per replica.
 
@@ -320,7 +323,7 @@ class SAMLLMHostResources(SAMModel):
 
     When gpuCount > 0, a toleration of the gpuResource taint is added.
     """
-    vramRequiredGb: conint(ge=0) | None = Field(None, title="Vramrequiredgb")
+    vramRequiredGb: Annotated[int, Field(ge=0)] | None = Field(None, title="Vramrequiredgb")
     """
     LLMHost.spec.resources.vramRequiredGb[int]: the GPU memory the model requires.
 
@@ -334,7 +337,7 @@ class SAMLLMHostScaling(SAMModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    replicas: conint(ge=1, le=16) | None = Field(1, title="Replicas")
+    replicas: Annotated[int, Field(ge=1, le=16)] | None = Field(1, title="Replicas")
     """
     LLMHost.spec.scaling.replicas[int]: the replicas.
 
@@ -475,7 +478,7 @@ class SAMLLMHostStorage(SAMModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    accessMode: AccessMode | None = Field("ReadWriteOnce", title="Accessmode")
+    accessMode: AccessMode | None = Field(AccessMode.ReadWriteOnce, title="Accessmode")
     """LLMHost.spec.storage.accessMode[str]: One of: ['ReadWriteOnce', 'ReadWriteMany', 'ReadOnlyMany']."""
     existingClaim: str | None = Field(None, title="Existingclaim")
     """
@@ -505,9 +508,9 @@ class SAMLLMHostModel(SAMModel):
     """LLMHost.spec.model.architecture[str]: e.g. llama, qwen3, gemma3."""
     capabilities: SAMLLMHostModelCapabilities | None = None
     """LLMHost.spec.model.capabilities[object]: what the model can do."""
-    contextWindow: conint(ge=0) | None = Field(None, title="Contextwindow")
+    contextWindow: Annotated[int, Field(ge=0)] | None = Field(None, title="Contextwindow")
     """LLMHost.spec.model.contextWindow[int]: the model's maximum context, in tokens."""
-    embeddingDimensions: conint(ge=0) | None = Field(None, title="Embeddingdimensions")
+    embeddingDimensions: Annotated[int, Field(ge=0)] | None = Field(None, title="Embeddingdimensions")
     """LLMHost.spec.model.embeddingDimensions[int]: for embedding models."""
     file: str | None = Field(None, title="File")
     """
@@ -517,9 +520,9 @@ class SAMLLMHostModel(SAMModel):
     """
     license: str | None = Field(None, title="License")
     """LLMHost.spec.model.license[str]: e.g. apache-2.0."""
-    parameterCount: conint(ge=0) | None = Field(None, title="Parametercount")
+    parameterCount: Annotated[int, Field(ge=0)] | None = Field(None, title="Parametercount")
     """LLMHost.spec.model.parameterCount[int]: the number of parameters."""
-    quantization: Quantization | None = Field("none", title="Quantization")
+    quantization: Quantization | None = Field(Quantization.none, title="Quantization")
     """
     LLMHost.spec.model.quantization[str]: the weights' precision.
 
@@ -539,13 +542,13 @@ class SAMLLMHostModel(SAMModel):
 
     Defaults to the LLMHost's name. Ollama always uses repository.
     """
-    source: Source | None = Field("huggingface", title="Source")
+    source: Source | None = Field(Source.huggingface, title="Source")
     """
     LLMHost.spec.model.source[str]: where the weights come from.
 
     One of: ['huggingface', 'ollama', 's3', 'url', 'pvc'].
     """
-    task: Task | None = Field("text-generation", title="Task")
+    task: Task | None = Field(Task.text_generation, title="Task")
     """
     LLMHost.spec.model.task[str]: what the model does.
 

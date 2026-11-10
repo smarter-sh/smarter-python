@@ -9,7 +9,9 @@ from smarter.models.base import SmarterModel
 
 class SAMModel(SmarterModel):
     """
-    The base class of the generated SAM models: a :class:`~smarter.models.base.SmarterModel`, which keeps unknown fields.
+    The base class of the generated SAM models.
+
+    A :class:`~smarter.models.base.SmarterModel`, which keeps unknown fields.
 
     Its fields keep the manifest's own names, e.g. ``apiVersion`` and ``recordLocator``.
 
@@ -36,7 +38,7 @@ class SAMModel(SmarterModel):
         :param data: The model's input, before validation.
         :returns: The input, with its annotations as a map of strings.
         """
-        if isinstance(data, dict) and "annotations" in cls.model_fields:
+        if isinstance(data, dict) and "annotations" in cls.model_fields:  # pylint: disable=unsupported-membership-test
             annotations = data.get("annotations")
             if isinstance(annotations, (list, dict)):
                 data = {**data, "annotations": normalize_annotations(annotations)}

@@ -25,7 +25,7 @@ from typing import Annotated, Literal, Union
 
 from pydantic import Field
 
-from smarter.core.typing import SmarterJsonType
+from smarter.core.typing import SmarterJsonObjectType, SmarterJsonType
 
 from .annotations import SmarterAnnotations
 from .base import SmarterModel
@@ -433,6 +433,40 @@ class PromptChatApiConfigResponse(PromptChatApiEnvelope):
     data: PromptChatApiConfig
 
 
+class PromptChatApiProviderRequest(SmarterModel):
+    """
+    The chat session's conversation, as the request body that Smarter sends to the LLM provider.
+
+    It is a request to an OpenAI-compatible ``v1/chat/completions`` api, without any of Smarter's own
+    content: no ``smarter`` or ``smarter_error`` messages, no ``smarter_*`` fields, no api url or key.
+    It can be sent with curl, or pasted into the Prompt Passthrough page. Its messages are the whole
+    conversation, including the latest answer, so that a prompt engineer can add the next user
+    message. Its model, temperature, token limit and tools are those of the session's latest
+    prompt, or the LLMClient's, before its first prompt.
+
+    :meth:`~smarter.resources.llmclients.LLMClients.provider_request` returns it. Fields without a
+    value are left out.
+    """
+
+    model: str | None = Field(None, description="The LLM's model, e.g. gpt-4o-mini.")
+    messages: list[PromptChatApiMessage] = Field(
+        default_factory=list, description="The conversation's system, user, assistant and tool messages."
+    )
+    temperature: float | None = None
+    max_completion_tokens: int | None = None
+    tools: list[SmarterJsonObjectType] | None = Field(
+        None, description="The function definitions that the LLM may call, in the OpenAI format."
+    )
+    tool_choice: str | None = Field(None, description="auto, when the request has tools.")
+    reasoning_effort: str | None = Field(None, description="none, for a model that requires it with tools.")
+
+
+class PromptChatApiProviderRequestResponse(PromptChatApiEnvelope):
+    """The provider request api's response."""
+
+    data: PromptChatApiProviderRequest
+
+
 # ------------------------------------------------------------------------------
 # the prompt api
 # ------------------------------------------------------------------------------
@@ -594,6 +628,8 @@ __all__ = [
     "PromptChatApiPromptResponse",
     "PromptChatApiPromptResult",
     "PromptChatApiPromptToolCall",
+    "PromptChatApiProviderRequest",
+    "PromptChatApiProviderRequestResponse",
     "PromptChatApiRefusalPart",
     "PromptChatApiStyleSection",
     "PromptChatApiStyles",

@@ -4,11 +4,15 @@ SAM model of the ``Proxy`` kind, generated from the Smarter Project's JSON Schem
 Do not edit: run ``scripts/generate_sam_models.py``. See :mod:`smarter.models.sam`.
 """
 
+# The docstrings are the schema's descriptions, and the enum members are its values, as is.
+# pylint: disable=line-too-long,invalid-name
+
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Annotated
 
-from pydantic import ConfigDict, Field, conint
+from pydantic import ConfigDict, Field
 
 from smarter.models.sam.base import SAMModel
 
@@ -188,7 +192,7 @@ class SAMProxySpec(SAMModel):
 
     It must belong to, or be shared with, the manifest's owner.
     """
-    timeout: conint(ge=1, le=600) | None = Field(120, title="Timeout")
+    timeout: Annotated[int, Field(ge=1, le=600)] | None = Field(120, title="Timeout")
     """Proxy.spec.timeout[int]: the most seconds to wait for the provider's response."""
 
 

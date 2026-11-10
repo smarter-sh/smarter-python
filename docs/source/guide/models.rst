@@ -42,8 +42,9 @@ The platform publishes the contracts of its APIs as Pydantic models, and the SDK
      - Platform contract
    * - :mod:`smarter.models.chat`
      - The `Smarter Chat API contract <https://docs.smarter.sh/en/latest/smarter-framework/smarter-chat/api-contract.html>`__, version 2: an LLMClient's
-       configuration (``PromptChatApiConfig``), the prompt API's request and response, and the
-       prompt's progress events.
+       configuration (``PromptChatApiConfig``), the prompt API's request and response, the
+       prompt's progress events, and the request that Smarter sends to the LLM provider
+       (``PromptChatApiProviderRequest``).
    * - :mod:`smarter.models.journal`
      - The `Smarter Journal <https://docs.smarter.sh/en/latest/smarter-framework/smarter-api/smarter-journal.html>`__ contract: the envelope of every
        journaled response, its error body, and a journal entry.

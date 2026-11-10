@@ -4,11 +4,15 @@ SAM model of the ``LLMHostCompute`` kind, generated from the Smarter Project's J
 Do not edit: run ``scripts/generate_sam_models.py``. See :mod:`smarter.models.sam`.
 """
 
+# The docstrings are the schema's descriptions, and the enum members are its values, as is.
+# pylint: disable=line-too-long,invalid-name
+
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Annotated
 
-from pydantic import ConfigDict, Field, confloat, conint, constr
+from pydantic import ConfigDict, Field
 
 from smarter.models.sam.base import SAMModel
 
@@ -38,7 +42,7 @@ class SAMLLMHostComputeCost(SAMModel):
     )
     currency: str | None = Field("USD", title="Currency")
     """LLMHostCompute.spec.cost.currency[str]: e.g. USD."""
-    perHour: confloat(ge=0.0) | str | None = Field(None, title="Perhour")
+    perHour: Annotated[float, Field(ge=0.0)] | str | None = Field(None, title="Perhour")
     """LLMHostCompute.spec.cost.perHour[decimal]: the cost per hour of one node, e.g. its on-demand price."""
 
 
@@ -48,9 +52,9 @@ class SAMLLMHostComputeGpu(SAMModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    count: conint(ge=1, le=16) = Field(..., title="Count")
+    count: Annotated[int, Field(ge=1, le=16)] = Field(..., title="Count")
     """LLMHostCompute.spec.node.gpu.count[int]: the node's GPUs."""
-    memoryGb: conint(ge=1) = Field(..., title="Memorygb")
+    memoryGb: Annotated[int, Field(ge=1)] = Field(..., title="Memorygb")
     """LLMHostCompute.spec.node.gpu.memoryGb[int]: the memory of one GPU, in GB."""
     resource: str | None = Field("nvidia.com/gpu", title="Resource")
     """LLMHostCompute.spec.node.gpu.resource[str]: the Kubernetes extended resource that advertises the GPUs."""
@@ -105,11 +109,11 @@ class SAMLLMHostComputeNode(SAMModel):
 
     Defaults to the NVIDIA AMI for a GPU node, else the standard AMI.
     """
-    capacityType: constr(pattern=r"^(ON_DEMAND|SPOT)$") | None = Field("ON_DEMAND", title="Capacitytype")
+    capacityType: Annotated[str, Field(pattern=r"^(ON_DEMAND|SPOT)$")] | None = Field("ON_DEMAND", title="Capacitytype")
     """LLMHostCompute.spec.node.capacityType[str]: ON_DEMAND or SPOT."""
-    cpu: conint(ge=1) = Field(..., title="Cpu")
+    cpu: Annotated[int, Field(ge=1)] = Field(..., title="Cpu")
     """LLMHostCompute.spec.node.cpu[int]: the node's vCPUs."""
-    diskSizeGb: conint(ge=20) | None = Field(100, title="Disksizegb")
+    diskSizeGb: Annotated[int, Field(ge=20)] | None = Field(100, title="Disksizegb")
     """
     LLMHostCompute.spec.node.diskSizeGb[int]: the node's root volume, for container images.
 
@@ -123,7 +127,7 @@ class SAMLLMHostComputeNode(SAMModel):
     """
     instanceType: str = Field(..., title="Instancetype")
     """LLMHostCompute.spec.node.instanceType[str]: e.g. g6.2xlarge."""
-    memoryGb: conint(ge=1) = Field(..., title="Memorygb")
+    memoryGb: Annotated[int, Field(ge=1)] = Field(..., title="Memorygb")
     """LLMHostCompute.spec.node.memoryGb[int]: the node's memory, in GiB."""
 
 
@@ -133,7 +137,7 @@ class SAMLLMHostComputeNodeGroup(SAMModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    maxNodes: conint(ge=1, le=100) | None = Field(4, title="Maxnodes")
+    maxNodes: Annotated[int, Field(ge=1, le=100)] | None = Field(4, title="Maxnodes")
     """LLMHostCompute.spec.nodeGroup.maxNodes[int]: the most nodes that Smarter adds to the node group."""
     subnetIds: list[str] | None = Field(None, title="Subnetids")
     """

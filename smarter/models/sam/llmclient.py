@@ -4,12 +4,16 @@ SAM model of the ``LLMClient`` kind, generated from the Smarter Project's JSON S
 Do not edit: run ``scripts/generate_sam_models.py``. See :mod:`smarter.models.sam`.
 """
 
+# The docstrings are the schema's descriptions, and the enum members are its values, as is.
+# pylint: disable=line-too-long,invalid-name
+
 from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
+from typing import Annotated
 
-from pydantic import ConfigDict, Field, PositiveInt, confloat, constr
+from pydantic import ConfigDict, Field, PositiveInt
 
 from smarter.models.sam.base import SAMModel
 
@@ -179,7 +183,7 @@ class SAMLLMClientSpecConfigPrompt(SAMModel):
 
     Optional. How much a reasoning model reasons before it answers: none, minimal, low, medium, high or xhigh. When it is not set, the model reasons at its own default effort. Each model supports some of these values, and models that don't reason, e.g. gpt-4o, support none of them: an effort that the model doesn't support is left out, with a warning in the chat's sandbox mode. Some models use function tools only with none, e.g. gpt-6-luna, so the requests that offer the llmclient's tools use none, and the final answer uses this effort. A reasoning model ignores defaultTemperature at any effort but none. Example: high.
     """
-    defaultSystemRole: constr(max_length=32768) | None = Field(None, title="Defaultsystemrole")
+    defaultSystemRole: Annotated[str, Field(max_length=32768)] | None = Field(None, title="Defaultsystemrole")
     """
     LLMClient.spec.configuration.prompt.default_system_role[str].
 
@@ -187,7 +191,7 @@ class SAMLLMClientSpecConfigPrompt(SAMModel):
     You are a helpful llmclient. When given the opportunity to utilize function calling, you should always do so. This will allow you to provide the best possible responses to the user. If you are unable to provide a response, you should prompt the user for more information. If you are still unable to provide a response, you should inform the user that you are unable to help them at this time..
     The system prompt is the first message in the conversation and is used to set the context for the llmclient. It is sent with every prompt, so its tokens count towards every turn's cost. The maximum length of the system prompt is 32768 characters.
     """
-    defaultTemperature: confloat(ge=0.0, le=1.0) | None = Field(None, title="Defaulttemperature")
+    defaultTemperature: Annotated[float, Field(ge=0.0, le=1.0)] | None = Field(None, title="Defaulttemperature")
     """
     LLMClient.spec.configuration.prompt.default_temperature[float].
 

@@ -4,13 +4,16 @@ SAM model of the ``Vectorsearch`` kind, generated from the Smarter Project's JSO
 Do not edit: run ``scripts/generate_sam_models.py``. See :mod:`smarter.models.sam`.
 """
 
+# The docstrings are the schema's descriptions, and the enum members are its values, as is.
+# pylint: disable=line-too-long,invalid-name
+
 from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
-from typing import Any
+from typing import Annotated, Any
 
-from pydantic import Field, PositiveInt, confloat
+from pydantic import Field, PositiveInt
 
 from smarter.models.sam.base import SAMModel
 
@@ -131,7 +134,7 @@ class SAMVectorsearchSpecConfig(SAMModel):
     """Whether this Vectorsearch is active and eligible to be queried."""
     k: PositiveInt | None = Field(4, title="K")
     """Number of top results to return from the search."""
-    lambda_mult: confloat(ge=0.0, le=1.0) | None = Field(None, title="Lambda Mult")
+    lambda_mult: Annotated[float, Field(ge=0.0, le=1.0)] | None = Field(None, title="Lambda Mult")
     """
     Diversity vs.
 
@@ -139,13 +142,13 @@ class SAMVectorsearchSpecConfig(SAMModel):
     """
     metadata_filter: dict[str, Any] | None = Field(None, title="Metadata Filter")
     """Optional metadata filter applied to the Vectorstore query, e.g. {'source': 'faq'}."""
-    score_threshold: confloat(ge=0.0, le=1.0) | None = Field(None, title="Score Threshold")
+    score_threshold: Annotated[float, Field(ge=0.0, le=1.0)] | None = Field(None, title="Score Threshold")
     """
     Minimum relevance score a result must meet to be included.
 
     Only valid when search_type='similarity_score_threshold'.
     """
-    search_type: VectorsearchSearchType | None = "similarity"
+    search_type: VectorsearchSearchType | None = VectorsearchSearchType.similarity
     """The retrieval strategy to use when querying the Vectorstore."""
     vectorstore_name: str = Field(..., title="Vectorstore Name")
     """The name of the locally-hosted Vectorstore this search queries against."""

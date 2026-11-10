@@ -4,11 +4,15 @@ SAM model of the ``ApiConnection`` kind, generated from the Smarter Project's JS
 Do not edit: run ``scripts/generate_sam_models.py``. See :mod:`smarter.models.sam`.
 """
 
+# The docstrings are the schema's descriptions, and the enum members are its values, as is.
+# pylint: disable=line-too-long,invalid-name
+
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Annotated
 
-from pydantic import Field, conint
+from pydantic import Field
 
 from smarter.models.sam.base import SAMModel
 
@@ -44,7 +48,7 @@ class ApiConnection(SAMModel):
     """
     proxyUsername: str | None = Field(None, title="Proxyusername")
     """The username for the proxy connection."""
-    timeout: conint(ge=1) | None = Field(30, title="Timeout")
+    timeout: Annotated[int, Field(ge=1)] | None = Field(30, title="Timeout")
     """
     The timeout for the API request in seconds.
 
