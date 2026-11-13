@@ -21,6 +21,14 @@ from .chat import (
     PromptChatApiPromptResult,
     PromptChatApiProviderRequest,
 )
+from .extension import (
+    ExtensionActionResult,
+    ExtensionDetail,
+    ExtensionList,
+    ExtensionRegistry,
+    ExtensionRegistryEntry,
+    ExtensionSummary,
+)
 from .guardrail import Guardrail, GuardrailEvaluation, GuardrailEvent, GuardrailEvents
 from .journal import (
     JournalEntry,
@@ -63,10 +71,12 @@ from .misc import (
     Proxy,
     Secret,
     Vectorsearch,
+    VectorsearchResults,
 )
 from .platform import PlatformStatus, PlatformVersion, WhoAmI
 from .plugin import Plugin
 from .react import ReactAppAssets, ReactAppBuildInfo, ViteManifest, ViteManifestChunk
+from .usage import DataExport, DataExportOverview, TokenUsage, TokenUsagePoint
 from .vectorstore import (
     Vectorstore,
     VectorstoreDocument,
@@ -84,8 +94,16 @@ from .vectorstore import (
 __all__ = [
     "Account",
     "AccountContact",
+    "DataExport",
+    "DataExportOverview",
     "DiscoveredModel",
     "DiscoveredModels",
+    "ExtensionActionResult",
+    "ExtensionDetail",
+    "ExtensionList",
+    "ExtensionRegistry",
+    "ExtensionRegistryEntry",
+    "ExtensionSummary",
     "Guardrail",
     "GuardrailEvaluation",
     "GuardrailEvent",
@@ -135,9 +153,12 @@ __all__ = [
     "SmarterJournaledResponse",
     "SmarterModel",
     "SmarterResource",
+    "TokenUsage",
+    "TokenUsagePoint",
     "User",
     "UserProfile",
     "Vectorsearch",
+    "VectorsearchResults",
     "Vectorstore",
     "VectorstoreDocument",
     "VectorstoreDocumentDeleted",

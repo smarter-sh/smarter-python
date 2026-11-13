@@ -1,6 +1,6 @@
 """Test smarter.resources.catalog."""
 
-from smarter.core.exceptions import SmarterValueError
+from smarter.core.exceptions import BadRequestError, PaymentRequiredError, SmarterValueError
 
 from .base import SmarterTestBase
 
@@ -54,3 +54,31 @@ class TestCatalog(SmarterTestBase):
         self.route("GET", "vectorsearches/", json_body=[{"id": 1, "name": "v"}])
         self.assertEqual(self.client.orchestrators.list(), [])
         self.assertEqual(self.client.vectorsearches.list()[0].name, "v")
+
+    def test_vectorsearch_run(self):
+        """Run() sends the query, and the filter only when it is given."""
+        results = {
+            "vectorsearch": "refunds_search",
+            "vectorstore": "kb",
+            "results": [{"id": "a", "text": "30 days", "metadata": {"topic": "refunds"}, "score": 0.9}],
+        }
+        self.route("POST", "vectorsearches/rMTAwMDAxMgx/vectorsearch/", json_body=results)
+        found = self.client.vectorsearches.run("rMTAwMDAxMgx", "How long is the refund window?")
+        self.assertEqual((found.vectorsearch, found.vectorstore), ("refunds_search", "kb"))
+        self.assertEqual(found.results[0].metadata, {"topic": "refunds"})
+        self.assertEqual(self.request_json(), {"query": "How long is the refund window?"})
+        self.client.vectorsearches.run("rMTAwMDAxMgx", "refunds", filter={"lang": "en"})
+        self.assertEqual(self.request_json(), {"query": "refunds", "filter": {"lang": "en"}})
+
+    def test_vectorsearch_run_refused(self):
+        """A disabled Vectorsearch is a BadRequestError, and a budget's refusal a PaymentRequiredError."""
+        self.route(
+            "POST", "vectorsearches/1/vectorsearch/", status=400, json_body={"detail": "Vectorsearch v is disabled."}
+        )
+        self.route("POST", "vectorsearches/2/vectorsearch/", status=402, fixture="vectorsearch_budget")
+        with self.assertRaises(BadRequestError):
+            self.client.vectorsearches.run(1, "refunds")
+        with self.assertRaises(PaymentRequiredError) as context:
+            self.client.vectorsearches.run(2, "refunds")
+        self.assertEqual(context.exception.status_code, 402)
+        self.assertEqual(context.exception.message, "This account has reached its monthly budget.")

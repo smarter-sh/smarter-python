@@ -20,6 +20,7 @@ The api errors mirror the http status that the Smarter api returned:
         └── APIStatusError               the api returned a 4xx or 5xx status
             ├── BadRequestError          400
             ├── AuthenticationError      401
+            ├── PaymentRequiredError     402
             ├── PermissionDeniedError    403
             ├── NotFoundError            404, also a ResourceNotFoundError
             ├── ConflictError            409
@@ -146,6 +147,16 @@ class AuthenticationError(APIStatusError):
     """401: the api key is missing, invalid, or inactive."""
 
 
+class PaymentRequiredError(APIStatusError):
+    """
+    402: a budget refused the charge.
+
+    The platform's budgets lock an account, a user profile or a resource, e.g. a Vectorsearch or a
+    Proxy, once its spending limit is reached. Retrying won't help until the budget allows it again,
+    e.g. in its next period or after its limit is raised, so the SDK never retries a 402.
+    """
+
+
 class PermissionDeniedError(APIStatusError):
     """403: the api key's user may not perform the operation."""
 
@@ -181,6 +192,7 @@ __all__ = [
     "ConflictError",
     "InternalServerError",
     "NotFoundError",
+    "PaymentRequiredError",
     "PermissionDeniedError",
     "RateLimitError",
     "ResourceNotFoundError",

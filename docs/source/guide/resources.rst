@@ -36,12 +36,19 @@ are for superusers only.
    * - ``client.llm_hosts``
      - LLMHosts: ``status()``, ``logs()``, ``plan()``, ``deploy()``, ``undeploy()``, ``report()``,
        ``discover()`` and ``discover_manifest()``.
-   * - ``client.secrets``, ``client.plugins``, ``client.orchestrators``, ``client.vectorsearches``
+   * - ``client.vectorsearches``
+     - Vectorsearches, saved searches of a vectorstore: ``run()``.
+   * - ``client.secrets``, ``client.plugins``, ``client.orchestrators``
      - Read them, and manage them with manifests. A plugin's manifest kind is its class, e.g.
        ``SqlPlugin``, which ``client.plugins`` looks up for you.
+   * - ``client.extensions``
+     - The platform's extensions, packages of LLM tools: ``list()``, ``registry()``, ``retrieve()``,
+       and, for superusers, ``install()``, ``upload()``, ``configure()``, ``enable()``, ``disable()``,
+       ``update()``, ``rollback()``, ``set_availability()``, ``check_updates()`` and ``uninstall()``.
    * - ``client.accounts``
      - Accounts, and ``accounts.users``, ``accounts.user_profiles`` (each user's membership of an
-       account) and ``accounts.contacts``. Superusers only.
+       account) and ``accounts.contacts``: superusers only. Every user may read their own token
+       usage with ``accounts.usage()``, and export their own data with ``accounts.data_exports``.
    * - ``client.history``
      - The chat sessions, their tool calls and their plugin uses, newest first: the user's own, their
        account's users' for an account admin, and every one for a superuser.
@@ -93,6 +100,82 @@ Vectorstores
 
 Documents are split, embedded and loaded asynchronously, and only once the vectorstore is deployed.
 The platform serves these endpoints when ``SMARTER_ENABLE_VECTORSTORE`` is true.
+
+Vectorsearches
+--------------
+
+A Vectorsearch is a saved search of one vectorstore: its search type, ``k``, score threshold and
+metadata filter. ``run()`` searches with that configuration. A ``filter`` adds metadata that every
+result must match; the Vectorsearch's own filter wins where both name the same key, so a filter can
+narrow a Vectorsearch, but never widen it.
+
+.. code-block:: python
+
+   results = client.vectorsearches.run(vectorsearch.id, "How long is the refund window?", filter={"lang": "en"})
+   for hit in results.results:
+       print(hit.score, hit.text)
+
+The platform answers 400 (``BadRequestError``) when the Vectorsearch is disabled, and 402
+(``PaymentRequiredError``) when a budget locks the Vectorsearch, the user's profile or their account.
+
+Extensions
+----------
+
+An extension is a package of LLM tools that a superuser installs on the platform, from the
+`Smarter extension registry <https://docs.smarter.sh/smarter-platform/extensions.html>`__ or from a
+.zip archive, and that LLMClients then offer the LLM. Every user may list the extensions that their
+account may use; only superusers may install and manage them, and other users get a
+``PermissionDeniedError``. An extension is installed disabled: configure its settings, then enable it.
+
+.. code-block:: python
+
+   for entry in client.extensions.registry().objects:
+       print(entry.slug, entry.latest_version, entry.action)    # e.g. weather 0.2.1 install
+
+   client.extensions.install("weather")
+   client.extensions.configure(
+       "weather",
+       values={"weather_api_url": None},                        # None resets a setting to its default
+       secrets={"google_maps_api_key": "AIza..."},              # saved encrypted in a new Secret
+   )
+   client.extensions.enable("weather")
+   client.extensions.set_availability("weather", all_accounts=False, account_ids=[2, 5])
+
+   weather = client.extensions.retrieve("weather")
+   print(weather.installed_version, [tool.function_name for tool in weather.tools])
+
+A secret setting's value is a string to save in a new Secret, the id of one of the platform admin's
+Secrets, or ``None`` to clear it. ``upload()`` installs an archive by its path, or from a binary file
+object. ``rollback()`` takes the id of one of the extension's ``versions``. The extensions of one
+LLMClient are ``client.llm_clients.extensions()``.
+
+Token usage and data exports
+----------------------------
+
+Every user may read the tokens and cost of their own LLM requests, one point per hour, day or
+month, oldest first. The window is ``12_hours``, ``24_hours`` (the default), ``7_days``,
+``1_month`` or ``1_year``.
+
+.. code-block:: python
+
+   for point in client.accounts.usage("7_days").points:
+       print(point.period_start.date(), point.total_tokens, point.total_cost)
+
+``accounts.data_exports`` is the web console's Download My Data: a zip file of the manifest of
+every resource that the user owns, with Secrets' values redacted. The platform builds it in the
+background and emails the user a link to it; the API never returns the link.
+
+.. code-block:: python
+
+   overview = client.accounts.data_exports.overview()
+   print(overview.email, overview.exports_left_today)
+   export = client.accounts.data_exports.start()
+   print(client.accounts.data_exports.retrieve(export.id).step)    # e.g. manifests, then done
+
+``start()`` returns the export that is already in progress, if there is one. The platform refuses
+an export with a 429, a ``RateLimitError`` whose message says why, when the user has no email
+address or has started too many exports today. ``start()`` is never retried, whatever the client's
+``max_retries``.
 
 LLMHosts
 --------

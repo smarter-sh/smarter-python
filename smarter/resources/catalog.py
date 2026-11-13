@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
+
 from smarter.core.exceptions import SmarterValueError
-from smarter.core.typing import SmarterIdType
+from smarter.core.typing import SmarterIdType, SmarterJsonObjectType, SmarterJsonType
 from smarter.models.journal import SmarterJournalMessage
 from smarter.models.manifest import Manifest
-from smarter.models.misc import Orchestrator, Secret, Vectorsearch
+from smarter.models.misc import Orchestrator, Secret, Vectorsearch, VectorsearchResults
 from smarter.models.plugin import Plugin
 
 from .base import ManifestInput, SmarterKindResource, resource_id, to_manifest
@@ -101,11 +103,42 @@ class Orchestrators(SmarterKindResource[Orchestrator]):
 
 
 class Vectorsearches(SmarterKindResource[Vectorsearch]):
-    """Vectorsearches: ``/api/v1/vectorsearches/``, and the manifest api's ``Vectorsearch`` kind."""
+    """
+    Vectorsearches: ``/api/v1/vectorsearches/``, and the manifest api's ``Vectorsearch`` kind.
+
+    A Vectorsearch is a saved search of one vectorstore: its search type, ``k``, score threshold, mmr
+    settings and metadata filter. :meth:`run` searches with that configuration.
+    """
 
     kind = "Vectorsearch"
     path = "vectorsearches/"
     model = Vectorsearch
+
+    def run(
+        self,
+        id: SmarterIdType,  # pylint: disable=redefined-builtin
+        query: str,
+        *,
+        filter: Mapping[str, SmarterJsonType] | None = None,  # pylint: disable=redefined-builtin
+    ) -> VectorsearchResults:
+        """
+        Run a Vectorsearch: search its vectorstore for a query, with the Vectorsearch's own configuration.
+
+        :param id: The Vectorsearch's id or hashed id.
+        :param query: The text to find similar chunks of.
+        :param filter: Metadata that every result must also match. The Vectorsearch's own
+            ``metadataFilter`` wins where both name the same key, so a filter can narrow a
+            Vectorsearch, but never widen it.
+        :returns: The chunks that it found, most similar first.
+        :raises BadRequestError: If the Vectorsearch is disabled, or the search failed.
+        :raises PaymentRequiredError: If a budget locks the Vectorsearch, the user's profile or their account.
+        """
+        body: SmarterJsonObjectType = {"query": query}
+        if filter:
+            body["filter"] = dict(filter)
+        return self._http.request(
+            "POST", f"{self.path}{resource_id(id)}/vectorsearch/", json=body, cast_to=VectorsearchResults
+        )
 
 
 __all__ = ["Orchestrators", "PLUGIN_KINDS", "Plugins", "Secrets", "Vectorsearches"]

@@ -31,6 +31,7 @@ from smarter.models.manifest import KindInfo
 from smarter.models.platform import PlatformStatus, PlatformVersion, WhoAmI
 from smarter.resources import (
     Accounts,
+    Extensions,
     Guardrails,
     Journal,
     LLMClients,
@@ -72,7 +73,9 @@ class Smarter:
     - :attr:`llm_clients`: LLMClients, and prompting and chatting with them
     - :attr:`guardrails`, :attr:`mcp_clients`, :attr:`vectorstores`, :attr:`llm_hosts`,
       :attr:`secrets`, :attr:`plugins`, :attr:`orchestrators`, :attr:`vectorsearches`
-    - :attr:`accounts` (and ``accounts.users`` and ``accounts.contacts``)
+    - :attr:`extensions`: the platform's extensions, from the registry or uploaded
+    - :attr:`accounts` (and ``accounts.users``, ``accounts.contacts``, ``accounts.usage()`` and
+      ``accounts.data_exports``)
     - :attr:`history`, :attr:`journal`, :attr:`providers`, :attr:`proxies`
     - :meth:`whoami`, :meth:`version`, :meth:`status` and :meth:`kinds`
 
@@ -164,8 +167,13 @@ class Smarter:
         return Vectorsearches(self)
 
     @cached_property
+    def extensions(self) -> Extensions:
+        """The platform's extensions."""
+        return Extensions(self)
+
+    @cached_property
     def accounts(self) -> Accounts:
-        """Accounts, and their users and contacts."""
+        """Accounts, their users and contacts, and the user's token usage and data exports."""
         return Accounts(self)
 
     @cached_property

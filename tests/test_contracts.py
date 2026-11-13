@@ -132,6 +132,8 @@ class TestOpenApiContract(SmarterTestBase):
         self.addCleanup(directory.cleanup)
         upload = Path(directory.name) / "notes.txt"
         upload.write_text("Some notes.", encoding="utf-8")
+        archive = Path(directory.name) / "weather-0.2.1.zip"
+        archive.write_bytes(b"PK")
 
         def stream() -> None:
             with self.client.llm_clients.stream(12, "Hello") as events:
@@ -203,6 +205,20 @@ class TestOpenApiContract(SmarterTestBase):
             lambda: self.client.orchestrators.retrieve("rMTAwMDAwMQx"),
             self.client.vectorsearches.list,
             lambda: self.client.vectorsearches.retrieve(1),
+            lambda: self.client.vectorsearches.run("rMTAwMDAxMgx", "refunds", filter={"lang": "en"}),
+            self.client.extensions.list,
+            lambda: self.client.extensions.registry(refresh=True),
+            lambda: self.client.extensions.retrieve("weather"),
+            self.client.extensions.check_updates,
+            lambda: self.client.extensions.install("weather", version="0.2.1"),
+            lambda: self.client.extensions.upload(archive),
+            lambda: self.client.extensions.enable("weather"),
+            lambda: self.client.extensions.disable("weather"),
+            lambda: self.client.extensions.update("weather"),
+            lambda: self.client.extensions.rollback("weather", 3),
+            lambda: self.client.extensions.configure("weather", values={"weather_api_url": None}),
+            lambda: self.client.extensions.set_availability("weather", False, account_ids=[1]),
+            lambda: self.client.extensions.uninstall("weather"),
             self.client.accounts.list,
             lambda: self.client.accounts.retrieve(1),
             self.client.accounts.users.list,
@@ -211,6 +227,10 @@ class TestOpenApiContract(SmarterTestBase):
             lambda: self.client.accounts.user_profiles.retrieve(1),
             self.client.accounts.contacts.list,
             lambda: self.client.accounts.contacts.retrieve(1),
+            lambda: self.client.accounts.usage("7_days"),
+            self.client.accounts.data_exports.overview,
+            self.client.accounts.data_exports.start,
+            lambda: self.client.accounts.data_exports.retrieve(7),
             self.client.history.sessions,
             lambda: self.client.history.session(1),
             self.client.history.tool_calls,
@@ -284,18 +304,28 @@ class TestRecordedResponses(unittest.TestCase):
         "journal": ("/journal/", "get"),
         "plugin_usage": ("/prompts/history/plugin-usage/", "get"),
         "user_profiles": ("/accounts/user-profiles/", "get"),
+        "extensions": ("/extensions/", "get"),
+        "extension_registry": ("/extensions/registry/", "get"),
+        "extension": ("/extensions/{slug}/", "get"),
+        "extension_action": ("/extensions/{slug}/availability/", "post"),
+        "token_usage": ("/accounts/usage/", "get"),
+        "data_export_overview": ("/accounts/data-exports/", "get"),
+        "data_export": ("/accounts/data-exports/", "post", "202"),
+        "data_export_refused": ("/accounts/data-exports/", "post", "429"),
+        "vectorsearch_budget": ("/vectorsearches/{id}/vectorsearch/", "post", "402"),
     }
-    """Each fixture of tests/data/, by name, and the operation whose 200 response it is."""
+    """Each fixture of tests/data/, by name, and the operation whose response it is: its 200, or the status named."""
 
     def test_fixtures_are_valid(self):
-        """Each recorded response is valid under its operation's 200 response schema."""
+        """Each recorded response is valid under its operation's response schema for its status."""
         document = load("openapi.json")
         registry = Registry().with_resource(
             self.URI, Resource.from_contents(document, default_specification=DRAFT202012)
         )
-        for name, (path, method) in self.FIXTURES.items():
+        for name, (path, method, *status) in self.FIXTURES.items():
             with self.subTest(fixture=name):
-                schema = document["paths"][path][method]["responses"]["200"]["content"]["application/json"]["schema"]
+                response = document["paths"][path][method]["responses"][status[0] if status else "200"]
+                schema = response["content"]["application/json"]["schema"]
                 schema = json.loads(json.dumps(schema).replace('"#/components/', f'"{self.URI}#/components/'))
                 body = json.loads((CONTRACTS.parent / f"{name}.json").read_text(encoding="utf-8"))
                 errors = [

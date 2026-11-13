@@ -8,6 +8,7 @@ from smarter.core.typing import SmarterJsonObjectType, SmarterJsonType
 
 from .base import SmarterCamelModel, SmarterModel, SmarterResource
 from .plugin import Plugin
+from .vectorstore import VectorstoreSearchResults
 
 
 class Secret(SmarterResource):
@@ -43,6 +44,12 @@ class Vectorsearch(SmarterResource):
     is_enabled: bool | None = None
     vectorstore: int | None = Field(None, description="The id of its vectorstore.")
     auth_secret: int | None = Field(None, description="The id of its Secret, if any.")
+
+
+class VectorsearchResults(VectorstoreSearchResults):
+    """The chunks that a run of a Vectorsearch found in its vectorstore, most similar first."""
+
+    vectorsearch: str = Field(..., description="The Vectorsearch's name.")
 
 
 class PromptSession(SmarterModel):
@@ -141,4 +148,5 @@ __all__ = [
     "Proxy",
     "Secret",
     "Vectorsearch",
+    "VectorsearchResults",
 ]

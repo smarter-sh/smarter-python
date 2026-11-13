@@ -196,6 +196,47 @@ class TestLive(unittest.TestCase):
         self.assertEqual(resumed.session_key, chat.session_key)
         self.assertTrue(resumed.messages)
 
+    def test_extensions(self):
+        """
+        The installed extensions, the registry, and an installed extension parse.
+
+        Nothing is installed or changed.
+        """
+        extensions = self.client.extensions.list()
+        self.client.extensions.registry()
+        if not extensions.objects:
+            self.skipTest("no extension is installed")
+        slug = extensions.objects[0].slug
+        self.assertEqual(self.client.extensions.retrieve(slug).slug, slug)
+
+    def test_usage_and_data_exports(self):
+        """
+        The user's token usage and data export overview parse.
+
+        No export is started: an export writes to real storage and sends a real email.
+        """
+        usage = self.client.accounts.usage("7_days")
+        self.assertEqual((usage.period, len(usage.points)), ("day", 7))
+        overview = self.client.accounts.data_exports.overview()
+        self.assertGreaterEqual(overview.exports_per_day, 1)
+        if overview.latest is not None:
+            self.assertEqual(self.client.accounts.data_exports.retrieve(overview.latest.id).id, overview.latest.id)
+
+    def test_vectorsearch_run(self):
+        """
+        A Vectorsearch runs, when one exists.
+
+        Its vectorstore must already be deployed: nothing is deployed here.
+        """
+        vectorsearches = self.client.vectorsearches.list()
+        if not vectorsearches:
+            self.skipTest("there is no Vectorsearch to run")
+        try:
+            results = self.client.vectorsearches.run(vectorsearches[0].id, "hello")
+        except APIStatusError as e:
+            self.skipTest(f"the platform's run of Vectorsearch {vectorsearches[0].name} failed: {e}")
+        self.assertEqual(results.vectorsearch, vectorsearches[0].name)
+
     def test_mcp_and_llmhosts(self):
         """The MCPClient tools and the LLMHost report parse."""
         mcpclients = self.client.mcp_clients.list()
