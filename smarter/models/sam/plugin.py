@@ -171,11 +171,11 @@ class SAMPluginCommonStatus(SAMModel):
 class SAMPluginStaticSpecData(SAMModel):
     """Smarter API Plugin Manifest Plugin.spec.data."""
 
-    staticData: dict[str, Any] | None = Field(None, title="Staticdata")
+    staticData: dict[str, Any] = Field(..., title="Staticdata")
     """
-    Plugin.spec.data.staticData[obj]: The static data returned by the Plugin when the class is 'static'.
+    Plugin.spec.data.staticData[obj]: Required.
 
-    LLM's are adept at understanding the context of json data structures. Try to provide granular and specific data elements.
+    The static data returned by the Plugin when the class is 'static'. LLM's are adept at understanding the context of json data structures. Try to provide granular and specific data elements.
     """
 
 
