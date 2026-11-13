@@ -1,3 +1,10 @@
+# [1.1.0-alpha.1](https://github.com/smarter-sh/smarter-python/compare/v1.0.2-alpha.1...v1.1.0-alpha.1) (2026-11-13)
+
+
+### Features
+
+* **resources:** add extensions, usage, data exports, vectorsearch run ([11b188c](https://github.com/smarter-sh/smarter-python/commit/11b188c607a7e69dfaa2582b62e7cd3cc648493d))
+
 ## [1.0.2-alpha.1](https://github.com/smarter-sh/smarter-python/compare/v1.0.1...v1.0.2-alpha.1) (2026-11-10)
 
 
