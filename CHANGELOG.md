@@ -1,3 +1,10 @@
+# [1.1.0-alpha.2](https://github.com/smarter-sh/smarter-python/compare/v1.1.0-alpha.1...v1.1.0-alpha.2) (2026-11-13)
+
+
+### Bug Fixes
+
+* **sam:** require staticData in a static plugin manifest ([d14886f](https://github.com/smarter-sh/smarter-python/commit/d14886f6b05ac082f0f8f3745dfe3d7c83844ef5))
+
 # [1.1.0-alpha.1](https://github.com/smarter-sh/smarter-python/compare/v1.0.2-alpha.1...v1.1.0-alpha.1) (2026-11-13)
 
 
