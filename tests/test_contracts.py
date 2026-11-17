@@ -203,6 +203,9 @@ class TestOpenApiContract(SmarterTestBase):
             self.client.proxies.list,
             self.client.orchestrators.list,
             lambda: self.client.orchestrators.retrieve("rMTAwMDAwMQx"),
+            lambda: self.client.orchestrators.run("rMTAwMDAwMQx", "Summarize the refund policy."),
+            lambda: self.client.orchestrators.runs(1),
+            lambda: self.client.orchestrators.run_status(1, 3),
             self.client.vectorsearches.list,
             lambda: self.client.vectorsearches.retrieve(1),
             lambda: self.client.vectorsearches.run("rMTAwMDAxMgx", "refunds", filter={"lang": "en"}),
@@ -313,6 +316,7 @@ class TestRecordedResponses(unittest.TestCase):
         "data_export": ("/accounts/data-exports/", "post", "202"),
         "data_export_refused": ("/accounts/data-exports/", "post", "429"),
         "vectorsearch_budget": ("/vectorsearches/{id}/vectorsearch/", "post", "402"),
+        "orchestration_run": ("/orchestrators/{id}/runs/{run_id}/", "get"),
     }
     """Each fixture of tests/data/, by name, and the operation whose response it is: its 200, or the status named."""
 

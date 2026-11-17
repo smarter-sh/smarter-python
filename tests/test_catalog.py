@@ -1,6 +1,6 @@
 """Test smarter.resources.catalog."""
 
-from smarter.core.exceptions import BadRequestError, PaymentRequiredError, SmarterValueError
+from smarter.core.exceptions import BadRequestError, PaymentRequiredError, SmarterError, SmarterValueError
 
 from .base import SmarterTestBase
 
@@ -54,6 +54,34 @@ class TestCatalog(SmarterTestBase):
         self.route("GET", "vectorsearches/", json_body=[{"id": 1, "name": "v"}])
         self.assertEqual(self.client.orchestrators.list(), [])
         self.assertEqual(self.client.vectorsearches.list()[0].name, "v")
+
+    def test_orchestrator_run(self):
+        """Run() starts a run with its objective, once, and run_status() and runs() read it with its steps."""
+        run = self.load_json("orchestration_run")
+        pending = {**run, "status": "pending", "iterationCount": 0, "result": None, "steps": []}
+        self.route("POST", "orchestrators/rMTAwMDAwMQx/runs/", status=202, json_body=pending)
+        self.route("GET", "orchestrators/rMTAwMDAwMQx/runs/3/", fixture="orchestration_run")
+        self.route("GET", "orchestrators/1/runs/", json_body=[run])
+        started = self.client.orchestrators.run("rMTAwMDAwMQx", run["objective"])
+        self.assertEqual((started.id, started.status, started.done), (3, "pending", False))
+        self.assertEqual(self.request_json(), {"objective": run["objective"]})
+        finished = self.client.orchestrators.run_status("rMTAwMDAwMQx", started.id)
+        self.assertTrue(finished.done)
+        self.assertEqual(finished.result, run["result"])
+        self.assertEqual((finished.steps[0].sequence, finished.steps[0].role), (1, "executor"))
+        self.assertEqual(finished.started_by.account.account_number, "1234-5678-9012")
+        self.assertIsNotNone(finished.completed_at)
+        self.assertEqual([listed.id for listed in self.client.orchestrators.runs(1)], [3])
+
+    def test_orchestrator_run_is_not_retried(self):
+        """A refused run is raised at once, never retried: a retry would start a second run."""
+        self.route("POST", "orchestrators/1/runs/", status=503, json_body={"detail": "unavailable"})
+        self.route("POST", "orchestrators/2/runs/", status=400, json_body={"detail": "Strategy debate can't run yet."})
+        with self.assertRaises(SmarterError):
+            self.client.orchestrators.run(1, "Do it.")
+        self.assertEqual(len(self.requests), 1)
+        with self.assertRaises(BadRequestError):
+            self.client.orchestrators.run(2, "Do it.")
 
     def test_vectorsearch_run(self):
         """Run() sends the query, and the filter only when it is given."""

@@ -38,7 +38,11 @@ are for superusers only.
        ``discover()`` and ``discover_manifest()``.
    * - ``client.vectorsearches``
      - Vectorsearches, saved searches of a vectorstore: ``run()``.
-   * - ``client.secrets``, ``client.plugins``, ``client.orchestrators``
+   * - ``client.orchestrators``
+     - Orchestrators, multi-agent workflows over LLMClients: ``run()`` starts a run toward an
+       objective, which the platform executes in the background, ``run_status()`` reads it until
+       its ``done``, and ``runs()`` lists the newest.
+   * - ``client.secrets``, ``client.plugins``
      - Read them, and manage them with manifests. A plugin's manifest kind is its class, e.g.
        ``SqlPlugin``, which ``client.plugins`` looks up for you.
    * - ``client.extensions``

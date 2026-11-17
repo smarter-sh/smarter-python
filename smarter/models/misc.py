@@ -1,4 +1,4 @@
-"""Models of secrets, prompt history, proxies, orchestrators and vectorsearches."""
+"""Models of secrets, prompt history, proxies, orchestrators and their runs, and vectorsearches."""
 
 from datetime import datetime
 
@@ -6,7 +6,7 @@ from pydantic import Field
 
 from smarter.core.typing import SmarterJsonObjectType, SmarterJsonType
 
-from .base import SmarterCamelModel, SmarterModel, SmarterResource
+from .base import SmarterCamelModel, SmarterModel, SmarterOwner, SmarterResource
 from .plugin import Plugin
 from .vectorstore import VectorstoreSearchResults
 
@@ -30,6 +30,60 @@ class Orchestrator(SmarterResource):
     max_iterations: int | None = None
     is_active: bool | None = None
     llmclients: list[int] = Field(default_factory=list, description="The ids of its LLMClients.")
+
+
+class OrchestrationStep(SmarterCamelModel):
+    """
+    One step of a run of an Orchestrator: one call of a harness LLMClient, as its owner.
+
+    Its messages, tokens and charges are those of its prompt session, which the LLMClient's owner may read.
+    """
+
+    sequence: int = Field(..., description="The step's position in the run, from 1.")
+    llmclient: str = Field(..., description="The harness LLMClient's name.")
+    account_number: str = Field(..., description="The account that the LLMClient belongs to.")
+    role: str = Field(
+        ..., description="The harness's role: planner, executor, critic, router, summarizer or tool_caller."
+    )
+    status: str = Field(..., description="succeeded, failed or skipped.")
+    error_message: str | None = Field(None, description="Why the step failed, if it did.")
+    created_at: datetime | None = Field(None, description="When the step ended.")
+
+
+class OrchestrationRun(SmarterCamelModel):
+    """
+    A run of an Orchestrator: an attempt at an objective, its status, its steps and its result.
+
+    A run starts ``pending``, and the platform executes it in the background, one step at a time.
+    Poll it until its status is final: ``succeeded``, ``failed``, ``cancelled`` or
+    ``max_iterations_exceeded``.
+    """
+
+    id: int
+    orchestrator: int = Field(..., description="The Orchestrator's id.")
+    objective: str = Field(..., description="What the run is to achieve.")
+    status: str = Field(..., description="pending, running, succeeded, failed, cancelled or max_iterations_exceeded.")
+    iteration_count: int = Field(..., description="How many steps the run has taken.")
+    result: str | None = Field(None, description="The run's result: its last step's text, once it succeeded.")
+    error_message: str | None = Field(None, description="Why the run failed, or stopped, if it did.")
+    started_by: SmarterOwner | None = Field(None, description="Who started the run.")
+    steps: list[OrchestrationStep] = Field(default_factory=list, description="Its steps, in order.")
+    created_at: datetime | None = Field(None, description="When the run was requested.")
+    started_at: datetime | None = Field(None, description="When its execution began.")
+    completed_at: datetime | None = Field(None, description="When it ended.")
+
+    @property
+    def done(self) -> bool:
+        """
+        Whether the run has ended, and its status will not change again.
+
+        :returns: True once the status is ``succeeded``, ``failed``, ``cancelled`` or ``max_iterations_exceeded``.
+        """
+        return self.status in ORCHESTRATION_RUN_FINAL_STATUSES
+
+
+ORCHESTRATION_RUN_FINAL_STATUSES = frozenset({"succeeded", "failed", "cancelled", "max_iterations_exceeded"})
+"""The statuses of a run that has ended."""
 
 
 class Vectorsearch(SmarterResource):
@@ -138,6 +192,9 @@ class ProviderModel(SmarterCamelModel):
 
 
 __all__ = [
+    "ORCHESTRATION_RUN_FINAL_STATUSES",
+    "OrchestrationRun",
+    "OrchestrationStep",
     "Orchestrator",
     "PromptPluginUsage",
     "PromptSession",

@@ -62,6 +62,8 @@ from .mcpclient import (
     MCPToolResult,
 )
 from .misc import (
+    OrchestrationRun,
+    OrchestrationStep,
     Orchestrator,
     PromptPluginUsage,
     PromptSession,
@@ -129,6 +131,8 @@ __all__ = [
     "Manifest",
     "ManifestList",
     "ManifestMetadata",
+    "OrchestrationRun",
+    "OrchestrationStep",
     "Orchestrator",
     "PlatformStatus",
     "PlatformVersion",
