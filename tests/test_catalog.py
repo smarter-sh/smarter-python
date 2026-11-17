@@ -74,14 +74,15 @@ class TestCatalog(SmarterTestBase):
         self.assertEqual([listed.id for listed in self.client.orchestrators.runs(1)], [3])
 
     def test_orchestrator_run_is_not_retried(self):
-        """A refused run is raised at once, never retried: a retry would start a second run."""
+        """A refused run is raised at once, never retried, whatever max_retries is: a retry would start a second run."""
         self.route("POST", "orchestrators/1/runs/", status=503, json_body={"detail": "unavailable"})
         self.route("POST", "orchestrators/2/runs/", status=400, json_body={"detail": "Strategy debate can't run yet."})
+        client = self.make_client(max_retries=3)
         with self.assertRaises(SmarterError):
-            self.client.orchestrators.run(1, "Do it.")
+            client.orchestrators.run(1, "Do it.")
         self.assertEqual(len(self.requests), 1)
         with self.assertRaises(BadRequestError):
-            self.client.orchestrators.run(2, "Do it.")
+            client.orchestrators.run(2, "Do it.")
 
     def test_vectorsearch_run(self):
         """Run() sends the query, and the filter only when it is given."""
