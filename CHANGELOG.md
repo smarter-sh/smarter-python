@@ -1,16 +1,9 @@
-# [1.1.0-alpha.2](https://github.com/smarter-sh/smarter-python/compare/v1.1.0-alpha.1...v1.1.0-alpha.2) (2026-11-13)
+## [1.0.2](https://github.com/smarter-sh/smarter-python/compare/v1.0.1...v1.0.2) (2026-11-10)
 
 
 ### Bug Fixes
 
-* **sam:** require staticData in a static plugin manifest ([d14886f](https://github.com/smarter-sh/smarter-python/commit/d14886f6b05ac082f0f8f3745dfe3d7c83844ef5))
-
-# [1.1.0-alpha.1](https://github.com/smarter-sh/smarter-python/compare/v1.0.2-alpha.1...v1.1.0-alpha.1) (2026-11-13)
-
-
-### Features
-
-* **resources:** add extensions, usage, data exports, vectorsearch run ([11b188c](https://github.com/smarter-sh/smarter-python/commit/11b188c607a7e69dfaa2582b62e7cd3cc648493d))
+* **contracts:** sync with smarter v0.44.6 ([5f481a4](https://github.com/smarter-sh/smarter-python/commit/5f481a459494475fc059663782de8dad1be6f4b6))
 
 ## [1.0.2-alpha.1](https://github.com/smarter-sh/smarter-python/compare/v1.0.1...v1.0.2-alpha.1) (2026-11-10)
 
