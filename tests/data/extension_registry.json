@@ -1,0 +1,72 @@
+{
+  "enabled": true,
+  "error": null,
+  "objects": [
+    {
+      "slug": "calculator",
+      "displayName": "Calculator",
+      "description": "Evaluates arithmetic and math-function expressions exactly, so that LLMs don't guess.",
+      "publisher": "The Smarter Project",
+      "publisherUrl": "https://smarter.sh",
+      "trustBadge": "official",
+      "trustBadgeLabel": "Official Smarter Extension",
+      "homepage": "https://github.com/smarter-sh/smarter-extension-calculator",
+      "license": "AGPL-3.0",
+      "docsHtml": "<section id=\"calculator\">\n<h3>Calculator</h3>\n<p>Evaluates a math expression exactly, so that the LLM computes rather than guesses.</p>\n<p>An expression may use numbers, the operators <span class=\"docutils literal\">+ - * / ** %</span>, parentheses, the constants <span class=\"docutils literal\">pi</span>\nand <span class=\"docutils literal\">e</span>, every function of Python's <span class=\"docutils literal\">math</span> module, and <span class=\"docutils literal\">abs</span>, <span class=\"docutils literal\">round</span>, <span class=\"docutils literal\">pow</span>, <span class=\"docutils literal\">min</span>\nand <span class=\"docutils literal\">max</span>. It is parsed, not executed: anything else, such as a name or an attribute, is\nrefused.</p>\n<p>This extension has no settings.</p>\n<section id=\"tools\">\n<h4>Tools</h4>\n<dl class=\"simple\">\n<dt><span class=\"docutils literal\">calculator(expression)</span></dt>\n<dd><p>The value of the expression, e.g. <span class=\"docutils literal\">{&quot;result&quot;: 11}</span> for <span class=\"docutils literal\">2 + 3 * (4 - 1)</span>.</p>\n</dd>\n</dl>\n</section>\n</section>\n",
+      "latestVersion": "0.2.0",
+      "versions": [
+        {
+          "version": "0.2.0",
+          "requiresSmarter": ">=0.27",
+          "releasedAt": "2026-11-04T12:42:49.597685Z",
+          "compatible": true
+        },
+        {
+          "version": "0.1.0",
+          "requiresSmarter": ">=0.27",
+          "releasedAt": "2026-11-04T12:42:49.597615Z",
+          "compatible": true
+        }
+      ],
+      "installedVersion": "0.2.0",
+      "action": "installed",
+      "detailUrl": "/extensions/calculator/"
+    },
+    {
+      "slug": "weather",
+      "displayName": "Weather",
+      "description": "Current weather and a 24-hour forecast for any location.",
+      "publisher": "The Smarter Project",
+      "publisherUrl": "https://smarter.sh",
+      "trustBadge": "official",
+      "trustBadgeLabel": "Official Smarter Extension",
+      "homepage": "https://github.com/smarter-sh/smarter-extension-weather",
+      "license": "AGPL-3.0",
+      "docsHtml": "<section id=\"weather\">\n<h3>Weather</h3>\n<p>Current weather and a 24-hour forecast for any location, from the Open-Meteo api, with\nlocations found by the Google Maps Geocoding api.</p>\n<section id=\"settings\">\n<h4>Settings</h4>\n<dl class=\"simple\">\n<dt><span class=\"docutils literal\">google_maps_api_key</span></dt>\n<dd><p>Required. A Google Maps API key with the Geocoding API enabled. See\n<a class=\"reference external\" href=\"https://developers.google.com/maps/documentation/geocoding/get-api-key\">https://developers.google.com/maps/documentation/geocoding/get-api-key</a>.</p>\n</dd>\n<dt><span class=\"docutils literal\">weather_api_url</span></dt>\n<dd><p>The Open-Meteo forecast api. Change it only to use a self-hosted Open-Meteo.</p>\n</dd>\n</dl>\n</section>\n<section id=\"tools\">\n<h4>Tools</h4>\n<dl class=\"simple\">\n<dt><span class=\"docutils literal\">get_weather(location, unit)</span></dt>\n<dd><p>The current temperature, precipitation, wind speed and cloud cover, and the forecast for each\nof the next 24 hours, starting this hour, in metric or US customary units. Times are in the\nlocation's own timezone, and the result names the unit of every measurement.</p>\n</dd>\n</dl>\n</section>\n</section>\n",
+      "latestVersion": "0.2.1",
+      "versions": [
+        {
+          "version": "0.2.1",
+          "requiresSmarter": ">=0.27",
+          "releasedAt": "2026-11-04T12:42:49.597929Z",
+          "compatible": true
+        },
+        {
+          "version": "0.2.0",
+          "requiresSmarter": ">=0.27",
+          "releasedAt": "2026-11-04T12:42:49.597929Z",
+          "compatible": true
+        },
+        {
+          "version": "0.1.0",
+          "requiresSmarter": ">=0.27",
+          "releasedAt": "2026-11-04T12:42:49.597685Z",
+          "compatible": true
+        }
+      ],
+      "installedVersion": "0.2.1",
+      "action": "installed",
+      "detailUrl": "/extensions/weather/"
+    }
+  ]
+}

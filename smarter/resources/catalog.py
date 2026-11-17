@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
+
 from smarter.core.exceptions import SmarterValueError
-from smarter.core.typing import SmarterIdType
+from smarter.core.typing import SmarterIdType, SmarterJsonObjectType, SmarterJsonType
 from smarter.models.journal import SmarterJournalMessage
 from smarter.models.manifest import Manifest
-from smarter.models.misc import Orchestrator, Secret, Vectorsearch
+from smarter.models.misc import OrchestrationRun, Orchestrator, Secret, Vectorsearch, VectorsearchResults
 from smarter.models.plugin import Plugin
 
 from .base import ManifestInput, SmarterKindResource, resource_id, to_manifest
@@ -93,19 +95,104 @@ class Plugins(SmarterKindResource[Plugin]):
 
 
 class Orchestrators(SmarterKindResource[Orchestrator]):
-    """Orchestrators: ``/api/v1/orchestrators/``, and the manifest api's ``Orchestrator`` kind."""
+    """
+    Orchestrators: ``/api/v1/orchestrators/``, and the manifest api's ``Orchestrator`` kind.
+
+    :meth:`run` starts a run of an Orchestrator toward an objective, which the platform executes in
+    the background. Poll it with :meth:`run_status` until it is :attr:`~OrchestrationRun.done`.
+    """
 
     kind = "Orchestrator"
     path = "orchestrators/"
     model = Orchestrator
 
+    def run(self, id: SmarterIdType, objective: str) -> OrchestrationRun:  # pylint: disable=redefined-builtin
+        """
+        Start a run of an Orchestrator toward an objective.
+
+        The platform answers at once with the run, ``pending``, then executes it one step at a time.
+        Each step calls a harness LLMClient as its owner, and is charged to it. The request is never
+        retried, whatever the client's ``max_retries``: a retry would start a second run.
+
+        :param id: The Orchestrator's id or hashed id.
+        :param objective: What the run is to achieve, e.g. ``Prepare the board pack for Q4 2025``.
+            Every step receives it.
+        :returns: The new run.
+        :raises BadRequestError: If the objective is empty, or the Orchestrator's strategy can't run yet.
+        :raises PermissionDeniedError: If the user may not use every LLMClient of the Orchestrator.
+        :raises NotFoundError: If the user may not read the Orchestrator.
+        """
+        return self._http.request(
+            "POST",
+            f"{self.path}{resource_id(id)}/runs/",
+            json={"objective": objective},
+            cast_to=OrchestrationRun,
+            max_retries=0,
+        )
+
+    def runs(self, id: SmarterIdType) -> list[OrchestrationRun]:  # pylint: disable=redefined-builtin
+        """
+        The newest runs of an Orchestrator that the user started, up to 20, each with its steps.
+
+        A superuser gets every user's.
+
+        :param id: The Orchestrator's id or hashed id.
+        :returns: The runs, newest first.
+        :raises NotFoundError: If the user may not read the Orchestrator.
+        """
+        return self._http.request("GET", f"{self.path}{resource_id(id)}/runs/", cast_to=list[OrchestrationRun])
+
+    def run_status(self, id: SmarterIdType, run_id: int) -> OrchestrationRun:  # pylint: disable=redefined-builtin
+        """
+        A run of an Orchestrator, with its steps and, once it succeeded, its result.
+
+        :param id: The Orchestrator's id or hashed id.
+        :param run_id: The run's id.
+        :returns: The run.
+        :raises NotFoundError: If there is no such run, or the user neither started it nor is a superuser.
+        """
+        return self._http.request(
+            "GET", f"{self.path}{resource_id(id)}/runs/{resource_id(run_id)}/", cast_to=OrchestrationRun
+        )
+
 
 class Vectorsearches(SmarterKindResource[Vectorsearch]):
-    """Vectorsearches: ``/api/v1/vectorsearches/``, and the manifest api's ``Vectorsearch`` kind."""
+    """
+    Vectorsearches: ``/api/v1/vectorsearches/``, and the manifest api's ``Vectorsearch`` kind.
+
+    A Vectorsearch is a saved search of one vectorstore: its search type, ``k``, score threshold, mmr
+    settings and metadata filter. :meth:`run` searches with that configuration.
+    """
 
     kind = "Vectorsearch"
     path = "vectorsearches/"
     model = Vectorsearch
+
+    def run(
+        self,
+        id: SmarterIdType,  # pylint: disable=redefined-builtin
+        query: str,
+        *,
+        filter: Mapping[str, SmarterJsonType] | None = None,  # pylint: disable=redefined-builtin
+    ) -> VectorsearchResults:
+        """
+        Run a Vectorsearch: search its vectorstore for a query, with the Vectorsearch's own configuration.
+
+        :param id: The Vectorsearch's id or hashed id.
+        :param query: The text to find similar chunks of.
+        :param filter: Metadata that every result must also match. The Vectorsearch's own
+            ``metadataFilter`` wins where both name the same key, so a filter can narrow a
+            Vectorsearch, but never widen it.
+        :returns: The chunks that it found, most similar first.
+        :raises BadRequestError: If the Vectorsearch is disabled, or the search failed.
+        :raises PaymentRequiredError: If a budget locks the Vectorsearch, the user's profile or their account.
+        """
+        body: SmarterJsonObjectType = {"query": query}
+        if filter:
+            body["filter"] = dict(filter)
+        return self._http.request(
+            "POST", f"{self.path}{resource_id(id)}/vectorsearch/", json=body, cast_to=VectorsearchResults
+        )
 
 
 __all__ = ["Orchestrators", "PLUGIN_KINDS", "Plugins", "Secrets", "Vectorsearches"]

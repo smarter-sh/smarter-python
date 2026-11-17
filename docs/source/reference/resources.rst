@@ -41,6 +41,11 @@ Resources
 
 .. automodule:: smarter.resources.catalog
 
+``smarter.resources.extensions``
+--------------------------------
+
+.. automodule:: smarter.resources.extensions
+
 ``smarter.resources.accounts``
 ------------------------------
 

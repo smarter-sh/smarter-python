@@ -1,0 +1,107 @@
+{
+  "extension": {
+    "id": 3,
+    "slug": "weather",
+    "displayName": "Weather",
+    "description": "Current weather and a 24-hour forecast for any location.",
+    "publisher": "smarter-sh",
+    "source": "registry",
+    "trustBadge": "official",
+    "trustBadgeLabel": "Official Smarter Extension",
+    "enabled": true,
+    "installedVersion": "0.2.1",
+    "latestVersion": null,
+    "updateAvailable": false,
+    "latestCheckedAt": "2026-11-13T15:06:06.702275Z",
+    "error": "",
+    "detailUrl": "/extensions/weather/",
+    "homepage": "https://github.com/smarter-sh/smarter-extension-weather",
+    "license": "AGPL-3.0",
+    "docsHtml": "<section id=\"weather\">\n<h3>Weather</h3>\n<p>Current weather and a 24-hour forecast for any location, from the Open-Meteo api, with\nlocations found by the Google Maps Geocoding api.</p>\n<section id=\"settings\">\n<h4>Settings</h4>\n<dl class=\"simple\">\n<dt><span class=\"docutils literal\">google_maps_api_key</span></dt>\n<dd><p>Required. A Google Maps API key with the Geocoding API enabled. See\n<a class=\"reference external\" href=\"https://developers.google.com/maps/documentation/geocoding/get-api-key\">https://developers.google.com/maps/documentation/geocoding/get-api-key</a>.</p>\n</dd>\n<dt><span class=\"docutils literal\">weather_api_url</span></dt>\n<dd><p>The Open-Meteo forecast api. Change it only to use a self-hosted Open-Meteo.</p>\n</dd>\n</dl>\n</section>\n<section id=\"tools\">\n<h4>Tools</h4>\n<dl class=\"simple\">\n<dt><span class=\"docutils literal\">get_weather(location, unit)</span></dt>\n<dd><p>The current temperature, precipitation, wind speed and cloud cover, and the forecast for each\nof the next 24 hours, starting this hour, in metric or US customary units. Times are in the\nlocation's own timezone, and the result names the unit of every measurement.</p>\n</dd>\n</dl>\n</section>\n</section>\n",
+    "tools": [
+      {
+        "name": "get_weather",
+        "functionName": "ext_weather_get_weather",
+        "description": "Get the current weather, and the forecast for the next 24 hours, for a location.",
+        "parameters": {
+          "description": "The arguments of get_weather.",
+          "properties": {
+            "location": {
+              "description": "The city and state or country, e.g. San Francisco, CA",
+              "minLength": 1,
+              "title": "Location",
+              "type": "string"
+            },
+            "unit": {
+              "default": "METRIC",
+              "description": "Metric, or US customary, units.",
+              "enum": [
+                "METRIC",
+                "USCS"
+              ],
+              "title": "Unit",
+              "type": "string"
+            }
+          },
+          "required": [
+            "location"
+          ],
+          "type": "object"
+        }
+      }
+    ],
+    "loadError": null,
+    "settings": [
+      {
+        "name": "google_maps_api_key",
+        "type": "secret",
+        "description": "A Google Maps Geocoding API key, which finds the latitude and longitude of a location.",
+        "required": true,
+        "default": null,
+        "choices": null,
+        "value": null,
+        "secretId": 6,
+        "secretName": "google_maps_api_key",
+        "isSet": true
+      },
+      {
+        "name": "weather_api_url",
+        "type": "url",
+        "description": "The Open-Meteo forecast api.",
+        "required": false,
+        "default": "https://api.open-meteo.com/v1/forecast",
+        "choices": null,
+        "value": null,
+        "secretId": null,
+        "secretName": null,
+        "isSet": false
+      }
+    ],
+    "missingSettings": [],
+    "versions": [
+      {
+        "id": 3,
+        "version": "0.2.1",
+        "sha256": "35c73dda9636d1b0c03ce01ab615832fddbbe01932fdb515a7a7cc6cb31ce2b5",
+        "sourceUrl": "https://github.com/smarter-sh/smarter-extension-weather/releases/download/v0.2.1/weather-0.2.1.zip",
+        "installedBy": "admin",
+        "createdAt": "2026-10-19T16:03:42.162114Z",
+        "isInstalled": true
+      }
+    ],
+    "resources": [],
+    "switches": [],
+    "allAccounts": true,
+    "accounts": [],
+    "availableSecrets": [
+      {
+        "id": 6,
+        "name": "google_maps_api_key"
+      },
+      {
+        "id": 11,
+        "name": "openai_api_key"
+      }
+    ]
+  }
+}

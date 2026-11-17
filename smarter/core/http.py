@@ -33,6 +33,7 @@ from .exceptions import (
     ConflictError,
     InternalServerError,
     NotFoundError,
+    PaymentRequiredError,
     PermissionDeniedError,
     RateLimitError,
     UnprocessableEntityError,
@@ -72,6 +73,7 @@ A longer ``Retry-After`` is not waited for.
 STATUS_ERRORS: dict[int, type[APIStatusError]] = {
     400: BadRequestError,
     401: AuthenticationError,
+    402: PaymentRequiredError,
     403: PermissionDeniedError,
     404: NotFoundError,
     409: ConflictError,
@@ -319,31 +321,34 @@ class SmarterHttpClient:
             timeout=timeout if timeout is not None else self.config.timeout,
         )
 
-    def send(self, request: httpx.Request, *, stream: bool = False) -> httpx.Response:
+    def send(self, request: httpx.Request, *, stream: bool = False, max_retries: int | None = None) -> httpx.Response:
         """
         Send a request, with retries, and raise for an error status.
 
         :param request: The request.
         :param stream: True to return before the body is read, for Server-Sent Events. The caller
             must close the response.
+        :param max_retries: How many times to retry this request, instead of the client's
+            :attr:`max_retries`, e.g. 0 for a request that must not be sent twice.
         :returns: The successful response.
         :raises APIConnectionError: If no response was received after the retries.
         :raises APITimeoutError: If the request timed out after the retries.
         :raises APIStatusError: For a 4xx or 5xx response, as the status's subclass.
         """
+        retries = self.max_retries if max_retries is None else max_retries
         attempt = 0
         while True:
             started = time.monotonic()
             try:
                 response = self._http_client.send(request, stream=stream)
             except httpx.TimeoutException as e:
-                if attempt < self.max_retries:
+                if attempt < retries:
                     self._wait(attempt, request, reason="timeout")
                     attempt += 1
                     continue
                 raise APITimeoutError(request) from e
             except httpx.TransportError as e:
-                if attempt < self.max_retries:
+                if attempt < retries:
                     self._wait(attempt, request, reason=type(e).__name__)
                     attempt += 1
                     continue
@@ -360,7 +365,7 @@ class SmarterHttpClient:
                 return response
             response.read()
             response.close()
-            if attempt < self.max_retries and is_retryable(response):
+            if attempt < retries and is_retryable(response):
                 self._wait(attempt, request, reason=str(response.status_code), response=response)
                 attempt += 1
                 continue
@@ -386,6 +391,7 @@ class SmarterHttpClient:
         data: Mapping[str, Any] | None = None,
         headers: Mapping[str, str] | None = None,
         timeout: float | None = None,
+        max_retries: int | None = None,
     ) -> Any:
         """
         Send a request, and validate its JSON response.
@@ -401,6 +407,8 @@ class SmarterHttpClient:
         :param data: Form fields, for a multipart/form-data body.
         :param headers: Headers for this request.
         :param timeout: The timeout in seconds, instead of the client's.
+        :param max_retries: How many times to retry this request, instead of the client's, e.g. 0 for a
+            request that must not be sent twice.
         :returns: The validated response, an instance of ``cast_to``.
         :raises APIResponseValidationError: If the response does not match ``cast_to``.
         """
@@ -423,7 +431,7 @@ class SmarterHttpClient:
                 mask_secret(self.config.api_key.get_secret_value()),
                 request.content[:2000] if not files else "<multipart>",
             )
-        response = self.send(request)
+        response = self.send(request, max_retries=max_retries)
         body = parse_body(response)
         logger.debug("response %s %s", response.status_code, str(body)[:2000])
         if cast_to is None:

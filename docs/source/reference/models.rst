@@ -31,6 +31,11 @@ Models
 
 .. automodule:: smarter.models.account
 
+``smarter.models.usage``
+------------------------
+
+.. automodule:: smarter.models.usage
+
 ``smarter.models.llmclient``
 ----------------------------
 
@@ -60,6 +65,11 @@ Models
 --------------------------
 
 .. automodule:: smarter.models.llmhost
+
+``smarter.models.extension``
+----------------------------
+
+.. automodule:: smarter.models.extension
 
 ``smarter.models.misc``
 -----------------------

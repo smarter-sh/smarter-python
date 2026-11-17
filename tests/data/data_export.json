@@ -1,0 +1,13 @@
+{
+  "id": 7,
+  "status": "running",
+  "step": "manifests",
+  "resourceCount": 12,
+  "manifestCount": 5,
+  "failedCount": 0,
+  "sizeBytes": 0,
+  "email": "user@example.com",
+  "createdAt": "2026-11-13T15:00:00+00:00",
+  "expiresAt": null,
+  "error": ""
+}

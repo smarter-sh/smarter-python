@@ -16,6 +16,7 @@ from smarter.core.exceptions import (
     ConflictError,
     InternalServerError,
     NotFoundError,
+    PaymentRequiredError,
     PermissionDeniedError,
     RateLimitError,
     UnprocessableEntityError,
@@ -76,6 +77,7 @@ class TestHttpHelpers(SmarterTestBase):
         cases = {
             400: BadRequestError,
             401: AuthenticationError,
+            402: PaymentRequiredError,
             403: PermissionDeniedError,
             404: NotFoundError,
             409: ConflictError,
@@ -100,6 +102,7 @@ class TestHttpHelpers(SmarterTestBase):
         """Transient statuses are retried, and a 503 only when the platform did not send it."""
         self.assertTrue(http.is_retryable(response(502)))
         self.assertTrue(http.is_retryable(response(429)))
+        self.assertFalse(http.is_retryable(response(402)))
         self.assertTrue(http.is_retryable(response(503, text="Service Unavailable")))
         self.assertFalse(http.is_retryable(response(503, json=self.load_json("describe_missing"))))
         self.assertFalse(http.is_retryable(response(500)))
@@ -156,6 +159,28 @@ class TestSmarterHttpClient(SmarterTestBase):
             client.whoami()
         self.assertEqual(sleep.call_count, 2)
         self.assertEqual(len(self.requests), 3)
+
+    def test_max_retries_per_request(self):
+        """A request's own max_retries overrides the client's."""
+        self.route("GET", "guardrails/", status=502, json_body={})
+        client = self.make_client(max_retries=2)
+        with mock.patch.object(http.time, "sleep") as sleep, self.assertRaises(InternalServerError):
+            client.http.request("GET", "guardrails/", cast_to=None, max_retries=0)
+        sleep.assert_not_called()
+        self.assertEqual(len(self.requests), 1)
+        with mock.patch.object(http.time, "sleep"), self.assertRaises(InternalServerError):
+            client.http.request("GET", "guardrails/", cast_to=None, max_retries=1)
+        self.assertEqual(len(self.requests), 3)
+
+    def test_no_retry_for_budget_refusal(self):
+        """A 402, a budget's refusal, is raised at once as a PaymentRequiredError, whatever the client's max_retries."""
+        self.route("POST", "cli/whoami/", status=402, json_body={"detail": "The budget is exceeded."})
+        client = self.make_client(max_retries=3)
+        with mock.patch.object(http.time, "sleep") as sleep, self.assertRaises(PaymentRequiredError) as context:
+            client.whoami()
+        self.assertEqual(context.exception.message, "The budget is exceeded.")
+        sleep.assert_not_called()
+        self.assertEqual(len(self.requests), 1)
 
     def test_no_retry_for_client_errors(self):
         """A 4xx other than 408 and 429 is raised at once."""
