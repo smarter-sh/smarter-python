@@ -35,7 +35,7 @@ class Vectorstores(SmarterKindResource[Vectorstore]):
     """
     Vectorstores: ``/api/v1/vectorstores/``, and the manifest api's ``Vectorstore`` kind.
 
-    The platform serves these endpoints only when ``SMARTER_ENABLE_VECTORSTORE`` is true.
+    The platform serves these endpoints only when ``SMARTER_APP_VECTORSTORE_ENABLE`` is true.
     """
 
     kind = "Vectorstore"
