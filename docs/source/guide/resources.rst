@@ -103,7 +103,7 @@ Vectorstores
        print(hit.score, hit.text)
 
 Documents are split, embedded and loaded asynchronously, and only once the vectorstore is deployed.
-The platform serves these endpoints when ``SMARTER_ENABLE_VECTORSTORE`` is true.
+The platform serves these endpoints when ``SMARTER_APP_VECTORSTORE_ENABLE`` is true.
 
 Vectorsearches
 --------------
@@ -211,7 +211,7 @@ provider's own SDK:
    smarter = Smarter()
    openai = OpenAI(base_url=smarter.proxies.base_url("openai"), api_key=smarter.api_key)
 
-The platform serves proxies when ``SMARTER_ENABLE_PROXY`` is true.
+The platform serves proxies when ``SMARTER_APP_PROXY_ENABLE`` is true.
 
 Endpoints the SDK does not wrap
 -------------------------------
