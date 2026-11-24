@@ -81,7 +81,7 @@ class SAMBudgetSpecConfig(SAMModel):
 
     absoluteLimit: Annotated[float, Field(ge=0.0)] | str | None = Field("0", title="Absolutelimit")
     """
-    Budget.spec.config.absoluteLimit: the most that may be spent in total, from when the budget is attached.
+    Budget.spec.config.absoluteLimit: the most that may be spent in total, from when the budget is attached, in USD to the cent, or in tokens.
 
     0 means no limit.
     """
@@ -103,7 +103,7 @@ class SAMBudgetSpecConfig(SAMModel):
     """Budget.spec.config.period: the billing period of periodicLimit and duration."""
     periodicLimit: Annotated[float, Field(ge=0.0)] | str | None = Field("0", title="Periodiclimit")
     """
-    Budget.spec.config.periodicLimit: the most that may be spent in a billing period.
+    Budget.spec.config.periodicLimit: the most that may be spent in a billing period, in USD to the cent, or in tokens.
 
     0 means no limit.
     """
