@@ -35,6 +35,48 @@ class SAMDependency(SAMModel):
     """
 
 
+class Status(Enum):
+    """Vectorstore.status.condition.status: True if it is met, False if it isn't, Unknown before it is checked."""
+
+    True_ = "True"
+    False_ = "False"
+    Unknown = "Unknown"
+
+
+class Type(Enum):
+    """Vectorstore.status.condition.type: Credentials, Volume, Server or Index."""
+
+    Credentials = "Credentials"
+    Volume = "Volume"
+    Server = "Server"
+    Index = "Index"
+
+
+class SAMVectorstoreCondition(SAMModel):
+    """
+    One of the things that a Vectorstore's database needs before it is ready, and whether it has it.
+
+    A deploy has several independent points of failure, e.g. a refused api key, a volume that isn't
+    bound, or a server whose image can't be pulled. Each is a condition, as in Kubernetes: its
+    ``status`` is ``True`` when it is met, ``False`` when it isn't, and ``Unknown`` before it is
+    checked. A Pinecone or Qdrant Cloud Vectorstore has the conditions ``Credentials`` and ``Index``,
+    and a self-hosted one also ``Volume`` and ``Server``.
+
+    Read only.
+    """
+
+    lastTransitionTime: datetime | None = Field(None, title="Lasttransitiontime")
+    """Vectorstore.status.condition.lastTransitionTime: when its status last changed."""
+    message: str | None = Field("", title="Message")
+    """Vectorstore.status.condition.message: what was found, for a person."""
+    reason: str | None = Field("", title="Reason")
+    """Vectorstore.status.condition.reason: one word, e.g. Bound or ImagePullBackOff."""
+    status: Status = Field(..., title="Status")
+    """Vectorstore.status.condition.status: True if it is met, False if it isn't, Unknown before it is checked."""
+    type: Type = Field(..., title="Type")
+    """Vectorstore.status.condition.type: Credentials, Volume, Server or Index."""
+
+
 class SAMVectorstoreEmbeddings(SAMModel):
     """Vectorstore.spec.embeddings: how documents and queries are turned into vectors."""
 
@@ -223,6 +265,10 @@ class SAMVectorstoreStatus(SAMModel):
     """
     apiKeySecret: str | None = Field(None, title="Apikeysecret")
     """Vectorstore.status.apiKeySecret: the Secret with a self-hosted database's API key."""
+    attempt: int | None = Field(None, title="Attempt")
+    """Vectorstore.status.attempt: the number of checks that its last deploy has made."""
+    conditions: list[SAMVectorstoreCondition] | None = Field(None, title="Conditions")
+    """Vectorstore.status.conditions: what its database needs to be ready, as of its last deploy or check."""
     created: datetime = Field(..., title="Created")
     """
     The date in which this resource was created.
@@ -253,6 +299,8 @@ class SAMVectorstoreStatus(SAMModel):
 
     Read only.
     """
+    lastError: str | None = Field(None, title="Lasterror")
+    """Vectorstore.status.lastError: the last error of its last deploy, which may have been retried since."""
     lastMaintenanceAt: datetime | None = Field(None, title="Lastmaintenanceat")
     """
     Vectorstore.status.lastMaintenanceAt: when its maintenance last ran.
@@ -265,14 +313,18 @@ class SAMVectorstoreStatus(SAMModel):
 
     Read only.
     """
+    maxAttempts: int | None = Field(None, title="Maxattempts")
+    """Vectorstore.status.maxAttempts: the checks that a deploy makes before it fails."""
     message: str | None = Field(None, title="Message")
-    """Vectorstore.status.message: why, if it failed."""
+    """Vectorstore.status.message: what is happening, e.g. what a deploy waits for, or why it failed."""
     modified: datetime = Field(..., title="Modified")
     """
     The date in which this resource was most recently changed.
 
     Read only.
     """
+    nextRetryAt: datetime | None = Field(None, title="Nextretryat")
+    """Vectorstore.status.nextRetryAt: when a deploy in progress checks again."""
     recordLocator: str = Field(..., title="Recordlocator")
     """
     RecordLocator[String]: An optional identifier used to locate the resource record associated with this manifest.
