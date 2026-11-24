@@ -1,3 +1,11 @@
+# [1.1.0-alpha.4](https://github.com/smarter-sh/smarter-python/compare/v1.1.0-alpha.3...v1.1.0-alpha.4) (2026-11-24)
+
+
+### Bug Fixes
+
+* **contracts:** add vectorsearches to fixtures, ignore documents op ([e5e6896](https://github.com/smarter-sh/smarter-python/commit/e5e6896b9b675e11aea6f252d7751f24555cdd22))
+* **contracts:** sync with smarter v0.48.0 ([607e258](https://github.com/smarter-sh/smarter-python/commit/607e258ba9bf96785d53e56e4c3931375469e0a9))
+
 # [1.1.0-alpha.3](https://github.com/smarter-sh/smarter-python/compare/v1.1.0-alpha.2...v1.1.0-alpha.3) (2026-11-17)
 
 
