@@ -19,6 +19,9 @@
 #   verify-pypi        install it back from PyPI, and check the version
 #   publish-docs       the Sphinx site of the release, to docs.smarter-python.smarter.sh,
 #                      after PyPI has it (vars.PUBLISH_DOCS)
+#   merge-main         after a release on main, merge main into alpha and beta, so
+#                      that the next pull request from alpha starts from the release
+#                      commit (CHANGELOG.md, __version__.py) instead of conflicting with it
 #
 # Releasing and publishing are one workflow, so that a version can't be tagged
 # on GitHub and never reach PyPI. Uploads use trusted publishing (OIDC): there
@@ -105,6 +108,33 @@ jobs:
             echo "- Last release: ${{ steps.semantic.outputs.last_release_version || 'none' }}"
             echo "- Next release: ${{ steps.semantic.outputs.new_release_version || 'none' }}"
           } >> "$GITHUB_STEP_SUMMARY"
+
+  merge-main:
+    name: Merge main into alpha and beta
+    needs: release
+    if: >-
+      github.ref == 'refs/heads/main'
+      && needs.release.outputs.published == 'true'
+      && inputs.dry_run != true
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          token: ${{ secrets.PAT }}
+      - name: Merge main into alpha
+        uses: ./.github/actions/merge-branch
+        with:
+          github-token: ${{ secrets.PAT }}
+          source-branch: main
+          target-branch: alpha
+      - name: Merge main into beta
+        uses: ./.github/actions/merge-branch
+        with:
+          github-token: ${{ secrets.PAT }}
+          source-branch: main
+          target-branch: beta
 
   dist:
     name: Build distributions

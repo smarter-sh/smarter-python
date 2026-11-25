@@ -98,6 +98,7 @@ class TestOpenApiContract(SmarterTestBase):
     """Test the SDK's requests against the platform's OpenAPI document, for the api families that it covers."""
 
     NOT_CALLED = {
+        "documents",
         "prompt",
         "prompt_config",
         "llmclient_plugin_retrieve",
@@ -110,7 +111,8 @@ class TestOpenApiContract(SmarterTestBase):
     The operations that the SDK doesn't call.
 
     The cli's prompt commands, which it replaces with the chat api, and the reads of one related row of
-    an LLMClient, or of one model of a Provider, whose lists it reads instead.
+    an LLMClient, or of one model of a Provider, whose lists it reads instead. And the cli's documents
+    command, which lists, adds or removes the documents of a Vectorstore: the SDK doesn't cover it yet.
     """
 
     def setUp(self):
