@@ -1,10 +1,16 @@
-# [1.1.0-alpha.4](https://github.com/smarter-sh/smarter-python/compare/v1.1.0-alpha.3...v1.1.0-alpha.4) (2026-11-24)
+# [1.1.0](https://github.com/smarter-sh/smarter-python/compare/v1.0.2...v1.1.0) (2026-11-17)
 
 
 ### Bug Fixes
 
-* **contracts:** add vectorsearches to fixtures, ignore documents op ([e5e6896](https://github.com/smarter-sh/smarter-python/commit/e5e6896b9b675e11aea6f252d7751f24555cdd22))
-* **contracts:** sync with smarter v0.48.0 ([607e258](https://github.com/smarter-sh/smarter-python/commit/607e258ba9bf96785d53e56e4c3931375469e0a9))
+* **contracts:** sync with smarter v0.46.5 ([4fbae79](https://github.com/smarter-sh/smarter-python/commit/4fbae79230b2cf4f337eb5ec4bbb42b92c3fe889))
+* **sam:** require staticData in a static plugin manifest ([d14886f](https://github.com/smarter-sh/smarter-python/commit/d14886f6b05ac082f0f8f3745dfe3d7c83844ef5))
+
+
+### Features
+
+* **orchestrators:** start, list and poll the runs of an orchestrator ([7e51422](https://github.com/smarter-sh/smarter-python/commit/7e514221a520f526a02c8d3e681f0155341fa468))
+* **resources:** add extensions, usage, data exports, vectorsearch run ([11b188c](https://github.com/smarter-sh/smarter-python/commit/11b188c607a7e69dfaa2582b62e7cd3cc648493d))
 
 # [1.1.0-alpha.3](https://github.com/smarter-sh/smarter-python/compare/v1.1.0-alpha.2...v1.1.0-alpha.3) (2026-11-17)
 
